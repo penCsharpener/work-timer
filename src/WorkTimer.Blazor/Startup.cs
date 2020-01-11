@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WorkTimer.Blazor.Data;
+using WorkTimer.Blazor.Extensions;
 
 namespace WorkTimer.Blazor {
     public class Startup {
@@ -24,6 +25,11 @@ namespace WorkTimer.Blazor {
         public void ConfigureServices(IServiceCollection services) {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+#if DEBUG
+            services.WireUpMockClasses();
+#else
+            services.AddScoped<IWorkingDayRepository, WorkingDayRepository>();
+#endif
             services.AddSingleton<WeatherForecastService>();
         }
 

@@ -3,9 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>66f73240-e8c1-4b5e-8bd8-2eade45bd8ba</UserSecretsId>
+    <Nullable>Enable</Nullable>
   </PropertyGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\WorkTimer.Models\WorkTimer.Models.csproj" />
+    <ProjectReference Include="..\WorkTimer.Services\WorkTimer.Services.csproj" />
   </ItemGroup>
 </Project>
