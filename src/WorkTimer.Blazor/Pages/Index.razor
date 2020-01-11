@@ -26,7 +26,7 @@
 </table>
 
 @code {
-    List<WorkingDay> workingDays = new List<WorkingDay>();
+    List<WorkTimer.Models.WorkingDay> workingDays = new List<WorkTimer.Models.WorkingDay>();
 
     protected override async Task OnInitializedAsync() {
         workingDays = (await workingDayRepo.GetAll()).ToList();

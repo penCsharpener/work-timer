@@ -31,8 +31,8 @@
     [Parameter]
     public int Id { get; set; }
 
-    List<WorkPeriod> workPeriods = new List<WorkPeriod>();
-    WorkingDay workingDay = new WorkingDay();
+    List<WorkTimer.Models.WorkPeriod> workPeriods = new List<WorkTimer.Models.WorkPeriod>();
+    WorkTimer.Models.WorkingDay workingDay = new WorkTimer.Models.WorkingDay();
 
     protected override async Task OnInitializedAsync() {
         workPeriods = (await workPeriodRepo.FindByWorkingDayIds(new int[] { Id })).ToList();
