@@ -1,0 +1,42 @@
+﻿@page "/workingday/{Id:int}"
+
+@using WorkTimer.Models
+@inject WorkTimer.Contracts.IWorkPeriodRepository workPeriodRepo
+@inject WorkTimer.Contracts.IWorkingDayRepository workingDayRepo
+@inject NavigationManager NavigationManager
+
+<h1>Work Periods for @workingDay.Date.DayOfWeek @workingDay.Date.ToString("dd.MM.yyyy")</h1>
+
+<table class="table table-striped table-hover table-sm">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Start Time</th>
+            <th scope="col">End Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < workPeriods.Count; i++) {
+            <tr onclick="location.href='workingday/@workPeriods[i].Id'">
+                <th scope="row">@workPeriods[i].Id</th>
+                <td>@workPeriods[i].StartTime.ToString()</td>
+                <td>@workPeriods[i].EndTime.ToString()</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    List<WorkPeriod> workPeriods = new List<WorkPeriod>();
+    WorkingDay workingDay = new WorkingDay();
+
+    protected override async Task OnInitializedAsync() {
+        workPeriods = (await workPeriodRepo.FindByWorkingDayIds(new int[] { Id })).ToList();
+        workingDay = (await workingDayRepo.FindByIds(new int[] { Id })).FirstOrDefault();
+        await base.OnInitializedAsync();
+    }
+}

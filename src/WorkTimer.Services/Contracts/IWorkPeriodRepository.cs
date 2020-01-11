@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using WorkTimer.Models;
 
 namespace WorkTimer.Contracts {
-    public interface IWorkingDayRepository {
+    public interface IWorkPeriodRepository {
+        Task<IEnumerable<WorkPeriod>> GetAll();
+        Task<IEnumerable<WorkPeriod>> FindByWorkingDayIds(IEnumerable<int> workingDayIds);
 
-        Task<IEnumerable<WorkingDay>> GetAll();
-        Task<IEnumerable<WorkingDay>> FindByIds(IEnumerable<int> ids);
     }
 }
