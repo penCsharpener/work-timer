@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>66f73240-e8c1-4b5e-8bd8-2eade45bd8ba</UserSecretsId>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\WorkTimer.Models\WorkTimer.Models.csproj" />
+  </ItemGroup>
+</Project>
