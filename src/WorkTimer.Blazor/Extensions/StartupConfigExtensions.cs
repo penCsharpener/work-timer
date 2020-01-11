@@ -9,7 +9,8 @@ using WorkTimer.Repositories;
 namespace WorkTimer.Blazor.Extensions {
     public static class StartupConfigExtensions {
         public static IServiceCollection WireUpMockClasses(this IServiceCollection services) {
-            services.AddScoped<IWorkingDayRepository, MockWorkingDayRepository>();
+            services.AddSingleton<IWorkingDayRepository, MockWorkingDayRepository>();
+            services.AddSingleton<IWorkPeriodRepository, MockWorkPeriodRepository>();
             return services;
         }
     }
