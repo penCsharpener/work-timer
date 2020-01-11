@@ -10,5 +10,7 @@ namespace WorkTimer.Contracts {
 
         Task<IEnumerable<WorkingDay>> GetAll();
         Task<IEnumerable<WorkingDay>> FindByIds(IEnumerable<int> ids);
+        Task<IEnumerable<WorkingDay>> GetIncomplete();
+
     }
 }

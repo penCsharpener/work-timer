@@ -9,10 +9,7 @@ using WorkTimer.Models;
 namespace WorkTimer.Repositories {
     public class MockWorkPeriodRepository : IWorkPeriodRepository {
 
-        private List<WorkPeriod> data;
-
-        public MockWorkPeriodRepository() {
-            data = new List<WorkPeriod>() {
+        public static List<WorkPeriod> Data = new List<WorkPeriod>() {
                 new WorkPeriod() { Id = 1, WorkingDayId = 1, StartTime = new DateTime(2020,1,6,7, 7, 0), EndTime = new DateTime(2020,1,6,12, 2, 0) },
                 new WorkPeriod() { Id = 2, WorkingDayId = 1, StartTime = new DateTime(2020,1,6,12, 33, 0), EndTime = new DateTime(2020,1,6,16, 35, 0) },
                 new WorkPeriod() { Id = 3, WorkingDayId = 2, StartTime = new DateTime(2020,1,7,6, 45, 0), EndTime = new DateTime(2020,1,7,11, 56, 0) },
@@ -24,16 +21,24 @@ namespace WorkTimer.Repositories {
                 new WorkPeriod() { Id = 9, WorkingDayId = 5, StartTime = new DateTime(2020,1,10,8, 52, 0), EndTime = new DateTime(2020,1,10,11, 38, 0) },
                 new WorkPeriod() { Id = 10, WorkingDayId = 5, StartTime = new DateTime(2020,1,10,12, 31, 0), EndTime = new DateTime(2020,1,10,16, 36, 0) },
             };
+
+        public MockWorkPeriodRepository() {
+
         }
 
         public async Task<IEnumerable<WorkPeriod>> FindByWorkingDayIds(IEnumerable<int> workingDayIds) {
             await Task.Delay(0);
-            return data.Where(x => workingDayIds.Contains(x.WorkingDayId));
+            return Data.Where(x => workingDayIds.Contains(x.WorkingDayId));
         }
 
         public async Task<IEnumerable<WorkPeriod>> GetAll() {
             await Task.Delay(0);
-            return data;
+            return Data;
+        }
+
+        public async Task<IEnumerable<WorkPeriod>> GetIncomplete() {
+            await Task.Delay(0);
+            return Data.Where(x => !x.EndTime.HasValue);
         }
     }
 }

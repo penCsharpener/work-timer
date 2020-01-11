@@ -11,6 +11,9 @@ namespace WorkTimer.Blazor.Extensions {
         public static IServiceCollection WireUpMockClasses(this IServiceCollection services) {
             services.AddSingleton<IWorkingDayRepository, MockWorkingDayRepository>();
             services.AddSingleton<IWorkPeriodRepository, MockWorkPeriodRepository>();
+            services.AddTransient<IStartTracking, MockStartTracking>();
+            services.AddTransient<IWriterWorkingDay, MockWriterWorkingDays>();
+            services.AddTransient<IWriterWorkPeriod, MockWriterWorkPeriod>();
             return services;
         }
     }

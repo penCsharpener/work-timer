@@ -9,6 +9,6 @@ namespace WorkTimer.Contracts {
     public interface IWorkPeriodRepository {
         Task<IEnumerable<WorkPeriod>> GetAll();
         Task<IEnumerable<WorkPeriod>> FindByWorkingDayIds(IEnumerable<int> workingDayIds);
-
+        Task<IEnumerable<WorkPeriod>> GetIncomplete();
     }
 }
