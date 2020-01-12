@@ -22,6 +22,13 @@ namespace WorkTimer.Repositories {
             return item;
         }
 
+        public async Task<WorkPeriod> Insert(DateTime dateTime, string? comment = null) {
+            return await Insert(new WorkPeriod() {
+                StartTime = dateTime,
+                Comment = comment
+            });
+        }
+
         public async Task<WorkPeriod> Update(WorkPeriod item, string sql) {
             return item;
         }

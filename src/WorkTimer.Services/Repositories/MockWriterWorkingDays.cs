@@ -23,6 +23,12 @@ namespace WorkTimer.Repositories {
             return item;
         }
 
+        public async Task<WorkingDay> Insert(DateTime dateTime) {
+            return await Insert(new WorkingDay() {
+                Date = dateTime.Date,
+            });
+        }
+
         public async Task<WorkingDay> Update(WorkingDay item, string sql) {
             return item;
         }
