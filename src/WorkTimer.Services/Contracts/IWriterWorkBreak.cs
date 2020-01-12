@@ -7,5 +7,6 @@ using WorkTimer.Models;
 namespace WorkTimer.Contracts {
     public interface IWriterWorkBreak : IDbWriter<WorkBreak> {
         Task<WorkBreak> Insert(DateTime dateTime, string? comment = null);
+        Task<WorkBreak> UpdateEndTime(int id, DateTime endTime);
     }
 }

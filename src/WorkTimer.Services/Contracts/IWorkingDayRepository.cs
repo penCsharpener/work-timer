@@ -10,6 +10,12 @@ namespace WorkTimer.Contracts {
 
         Task<IEnumerable<WorkingDay>> GetAll();
         Task<IEnumerable<WorkingDay>> FindByIds(IEnumerable<int> ids);
+        /// <summary>
+        /// returns all existing data for the day, with WorkPeriods and WorkBreaks
+        /// </summary>
+        /// <param name="day"></param>
+        /// <returns></returns>
+        Task<WorkingDay> FindByDate(DateTime dateTime);
         Task<IEnumerable<WorkingDay>> GetIncomplete();
 
     }

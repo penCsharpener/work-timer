@@ -4,7 +4,17 @@
 @inject WorkTimer.Contracts.IWorkingDayRepository workingDayRepo
 @inject NavigationManager NavigationManager
 
-<h1>Timer</h1>
+<h1 class="mb-2">Timer</h1>
+
+<EditForm Model="@newDay" OnValidSubmit="@HandleValidSubmitAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="bookStartPage">Start page</label>
+        <InputDate class="form-control" id="bookStartPage" @bind-Value="newDay.Date" />
+    </div>
+    <button type="submit" class="btn btn-primary">Start</button>
+</EditForm>
 
 <table class="table table-striped table-hover table-sm">
     <thead>
@@ -31,5 +41,12 @@
     protected override async Task OnInitializedAsync() {
         workingDays = (await workingDayRepo.GetAll()).ToList();
         await base.OnInitializedAsync();
+    }
+
+    public WorkTimer.Models.WorkingDay newDay = new WorkTimer.Models.WorkingDay();
+    public WorkTimer.Models.WorkPeriod newPeriod = new WorkTimer.Models.WorkPeriod();
+
+    private async Task HandleValidSubmitAsync() {
+        NavigationManager.NavigateTo("/");
     }
 }

@@ -8,6 +8,5 @@ namespace WorkTimer.Contracts {
         Task<T> Insert(T item);
         Task Delete(T item);
         Task<T> Update(T item, string sql);
-
     }
 }

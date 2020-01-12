@@ -32,6 +32,15 @@ namespace WorkTimer.Repositories {
         public async Task<WorkPeriod> Update(WorkPeriod item, string sql) {
             return item;
         }
+
+        public async Task<WorkPeriod> UpdateEndTime(int id, DateTime endTime) {
+            var item = MockWorkPeriodRepository.Data.Find(x => x.Id == id);
+            if (item == null) {
+                throw new ArgumentOutOfRangeException($"{nameof(WorkPeriod)} with id {id} not found.");
+            }
+            item.EndTime = endTime;
+            return item;
+        }
     }
 }
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
