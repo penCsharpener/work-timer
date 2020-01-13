@@ -41,7 +41,7 @@ namespace WorkTimer.Services {
 
         public async Task<bool> TrackingExists(DateTime date) {
             await Task.Delay(0);
-            return MockWorkingDayRepository.Data.Any(x => x.Date.Date == date);
+            return (await _dayRepo.FindByDate(date)) != null;
         }
 
         public async Task<bool> TrackingExistsForToday() {

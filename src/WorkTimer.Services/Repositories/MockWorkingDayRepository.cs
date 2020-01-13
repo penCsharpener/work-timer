@@ -16,17 +16,15 @@ namespace WorkTimer.Repositories {
                 new WorkingDay() { Id = 4, Date = new DateTime(2020, 1, 9) },
                 new WorkingDay() { Id = 5, Date = new DateTime(2020, 1, 10) },
             };
-        private readonly IWorkPeriodRepository _periodRepo;
 
-        public MockWorkingDayRepository(IWorkPeriodRepository periodRepo) {
-            _periodRepo = periodRepo;
+        public MockWorkingDayRepository() {
         }
 
-        public async Task<WorkingDay> FindByDate(DateTime dateTime) {
+        public async Task<WorkingDay?> FindByDate(DateTime dateTime) {
             await Task.Delay(0);
             var day = Data.Find(x => x.Date.Date == dateTime.Date);
             if (day == null) {
-                throw new ArgumentOutOfRangeException($"No working day on {dateTime.Date.ToString("yyyy-MM-dd")} found.");
+                return default;
             }
             day.WorkPeriods = MockWorkPeriodRepository.Data.Where(x => x.WorkingDayId == day.Id).ToList();
             if (day.WorkPeriods.Any()) {
@@ -35,7 +33,6 @@ namespace WorkTimer.Repositories {
                 }
             }
             return day;
-
         }
 
         public async Task<IEnumerable<WorkingDay>> FindByIds(IEnumerable<int> ids) {

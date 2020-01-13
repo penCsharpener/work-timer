@@ -15,7 +15,7 @@ namespace WorkTimer.Contracts {
         /// </summary>
         /// <param name="day"></param>
         /// <returns></returns>
-        Task<WorkingDay> FindByDate(DateTime dateTime);
+        Task<WorkingDay?> FindByDate(DateTime dateTime);
         Task<IEnumerable<WorkingDay>> GetIncomplete();
 
     }
