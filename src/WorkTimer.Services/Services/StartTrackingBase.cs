@@ -8,7 +8,7 @@ using WorkTimer.Models;
 using WorkTimer.Repositories;
 
 namespace WorkTimer.Services {
-    public class StartTrackingBase : IStartTracking {
+    public class StartTrackingBase : IToggleTracking {
 
         protected readonly IWorkingDayRepository _dayRepo;
         protected readonly IWorkPeriodRepository _periodRepo;

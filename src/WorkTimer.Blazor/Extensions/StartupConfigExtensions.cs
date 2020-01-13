@@ -13,7 +13,7 @@ namespace WorkTimer.Blazor.Extensions {
             services.AddSingleton<IWorkingDayRepository, MockWorkingDayRepository>();
             services.AddSingleton<IWorkPeriodRepository, MockWorkPeriodRepository>();
             services.AddSingleton<IWorkBreakRepository, MockWorkBreakRepository>();
-            services.AddTransient<IStartTracking, MockStartTracking>();
+            services.AddTransient<IToggleTracking, MockStartTracking>();
             services.AddTransient<IWriterWorkingDay, MockWriterWorkingDays>();
             services.AddTransient<IWriterWorkPeriod, MockWriterWorkPeriod>();
             services.AddTransient<IWriterWorkBreak, MockWriterWorkBreak>();

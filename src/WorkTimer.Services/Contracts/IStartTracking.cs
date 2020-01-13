@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using WorkTimer.Models;
 
 namespace WorkTimer.Contracts {
-    public interface IStartTracking {
+    public interface IToggleTracking {
 
         /// <summary>
         /// Starts tracking for the day if not existent or ends all running tracking.

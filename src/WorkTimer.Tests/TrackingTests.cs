@@ -48,8 +48,11 @@ namespace WorkTimer.Tests {
         }
 
         [TestCase()]
-        public async Task TestTemplateAsync() {
-            await Task.Delay(0);
+        public async Task ToggleTrackingAsyncTest() {
+            var tracker = _serviceProvider.GetService<IToggleTracking>();
+            await tracker.ToggleTracking(DateTime.Now);
+            await Task.Delay(5);
+            await tracker.ToggleTracking(DateTime.Now);
             Assert.IsTrue(true);
         }
     }
