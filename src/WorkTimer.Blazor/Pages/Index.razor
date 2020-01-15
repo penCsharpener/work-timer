@@ -6,15 +6,39 @@
 
 <h1 class="mb-2">Timer</h1>
 
-<EditForm Model="@newDay" OnValidSubmit="@HandleValidSubmitAsync">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="form-group">
-        <label for="bookStartPage">Start page</label>
-        <InputDate class="form-control" id="bookStartPage" @bind-Value="newDay.Date" />
-    </div>
-    <button type="submit" class="btn btn-primary">Start</button>
-</EditForm>
+@*<EditForm Model="@newDay" OnValidSubmit="@HandleValidSubmitAsync">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="bookStartPage">Start page</label>
+            <InputDate class="form-control" id="bookStartPage" @bind-Value="newDay.Date" />
+        </div>
+        <button type="submit" class="btn btn-primary">Start</button>
+    </EditForm>
+*@
+
+<div class="row mb-3">
+    <EditForm class="form-inline" Model="@newPeriod" OnValidSubmit="@HandleValidSubmitAsync">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label class="mr-3" for="periodComment">Comment</label>
+            <InputText class="mr-3" id="periodComment" @bind-Value="@newPeriod.Comment" style="width:40rem"/>
+        </div>
+        <button type="submit" class="btn btn-primary">Start Work</button>
+    </EditForm>
+</div>
+<div class="row mb-3">
+    <EditForm class="form-inline" Model="@newBreak" OnValidSubmit="@HandleValidSubmitBreakAsync">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label class="mr-3" for="breakComment">Comment</label>
+            <InputText class="mr-3" id="breakComment" @bind-Value="@newBreak.Comment" style="width:40rem"/>
+        </div>
+        <button type="submit" class="btn btn-primary">Have a break</button>
+    </EditForm>
+</div>
 
 <table class="table table-striped table-hover table-sm">
     <thead>
@@ -45,8 +69,13 @@
 
     public WorkTimer.Models.WorkingDay newDay = new WorkTimer.Models.WorkingDay();
     public WorkTimer.Models.WorkPeriod newPeriod = new WorkTimer.Models.WorkPeriod();
+    public WorkTimer.Models.WorkBreak newBreak = new WorkTimer.Models.WorkBreak();
 
     private async Task HandleValidSubmitAsync() {
+        NavigationManager.NavigateTo("/");
+    }
+
+    private async Task HandleValidSubmitBreakAsync() {
         NavigationManager.NavigateTo("/");
     }
 }
