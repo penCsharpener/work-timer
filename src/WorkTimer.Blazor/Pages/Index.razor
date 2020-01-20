@@ -2,6 +2,7 @@
 
 @using WorkTimer.Models
 @inject WorkTimer.Contracts.IWorkingDayRepository workingDayRepo
+@inject WorkTimer.Contracts.IWorkBreakRepository workBreakRepo
 @inject NavigationManager NavigationManager
 
 <h1 class="mb-2">Timer</h1>
@@ -25,7 +26,7 @@
             <label class="mr-3" for="periodComment">Comment</label>
             <InputText class="mr-3" id="periodComment" @bind-Value="@newPeriod.Comment" style="width:40rem"/>
         </div>
-        <button type="submit" class="btn btn-primary">Start Work</button>
+        <button type="submit" class="btn btn-primary">@dayButtonText</button>
     </EditForm>
 </div>
 <div class="row mb-3">
@@ -36,7 +37,7 @@
             <label class="mr-3" for="breakComment">Comment</label>
             <InputText class="mr-3" id="breakComment" @bind-Value="@newBreak.Comment" style="width:40rem"/>
         </div>
-        <button type="submit" class="btn btn-primary">Have a break</button>
+        <button type="submit" class="btn btn-primary">@breakButtonText</button>
     </EditForm>
 </div>
 
@@ -62,7 +63,15 @@
 @code {
     List<WorkTimer.Models.WorkingDay> workingDays = new List<WorkTimer.Models.WorkingDay>();
 
+    private string dayButtonText = "Start Work";
+    private string breakButtonText = "Have a break";
+
     protected override async Task OnInitializedAsync() {
+        var incomplete = await workingDayRepo.GetIncomplete();
+        dayButtonText = incomplete.Any() == true ? "Let's go home" : "Start Work";
+        var breaksIncomplete = await workBreakRepo.GetIncomplete();
+        breakButtonText = breaksIncomplete.Any() == true ? "crack on" : "Have a break";
+
         workingDays = (await workingDayRepo.GetAll()).ToList();
         await base.OnInitializedAsync();
     }
