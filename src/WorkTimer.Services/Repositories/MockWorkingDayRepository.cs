@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,7 +23,7 @@ namespace WorkTimer.Repositories {
 
         public async Task<WorkingDay?> FindByDate(DateTime dateTime) {
             await Task.Delay(0);
-            var day = Data.Find(x => x.Date.Date == dateTime.Date);
+            var day = Fill(Data).FirstOrDefault(x => x.Date.Date == dateTime.Date);
             if (day == null) {
                 return default;
             }
@@ -37,21 +38,28 @@ namespace WorkTimer.Repositories {
 
         public async Task<IEnumerable<WorkingDay>> FindByIds(IEnumerable<int> ids) {
             await Task.Delay(0);
-            return Data.Where(x => ids.Contains(x.Id));
+            return Fill(Data).Where(x => ids.Contains(x.Id));
         }
 
         public async Task<IEnumerable<WorkingDay>> GetAll() {
             await Task.Delay(0);
-            return Data;
+            return Fill(Data);
         }
 
         public async Task<IEnumerable<WorkingDay>> GetIncomplete() {
             await Task.Delay(0);
             var list = new List<WorkPeriod>();
-            foreach (var day in Data) {
+            foreach (var day in Fill(Data)) {
                 day.WorkPeriods = MockWorkPeriodRepository.Data.Where(x => x.WorkingDayId == day.Id).ToList();
             }
             return Data.Where(x => x.WorkPeriods.Any(y => !y.EndTime.HasValue));
+        }
+
+        private static IEnumerable<WorkingDay> Fill(IEnumerable<WorkingDay> list) {
+            foreach (var item in list) {
+                item.WorkPeriods = MockWorkPeriodRepository.Data.Where(x => x.WorkingDayId == item.Id).ToList();
+                yield return item;
+            }
         }
     }
 }

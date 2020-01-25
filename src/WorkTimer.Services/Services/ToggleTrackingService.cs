@@ -7,9 +7,9 @@ using WorkTimer.Contracts;
 using WorkTimer.Models;
 
 namespace WorkTimer.Services {
-    public class MockStartTracking : StartTrackingBase {
+    public class ToggleTrackingService : StartTrackingBase {
 
-        public MockStartTracking(IWorkingDayRepository dayRepo,
+        public ToggleTrackingService(IWorkingDayRepository dayRepo,
                                  IWorkPeriodRepository periodRepo,
                                  IWorkBreakRepository breakRepo,
                                  IWriterWorkingDay writerWorkingDay,
@@ -38,19 +38,23 @@ namespace WorkTimer.Services {
                         await _writerWorkPeriod.UpdateEndTime(latest.Id, dateTime);
                     }
                 }
-                
+
+            } else if ((await _dayRepo.FindByDate(dateTime)) is { } day) {
+                var newPeriod = new WorkPeriod() { StartTime = dateTime };
+                await _writerWorkPeriod.Insert(day.Id, dateTime, comment);
             } else {
                 // if no incomplete days create a new day
                 var newDay = new WorkingDay() { Date = dateTime.Date };
                 var newPeriod = new WorkPeriod() { StartTime = dateTime };
-                await _writerWorkingDay.Insert(dateTime.Date);
-                await _writerWorkPeriod.Insert(dateTime, comment);
+                var createdDay = await _writerWorkingDay.Insert(dateTime.Date);
+                await _writerWorkPeriod.Insert(createdDay.Id, dateTime, comment);
             }
         }
 
-        public async Task ToggleBreak(DateTime dateTime) {
+        public Task ToggleBreak(DateTime dateTime) {
             // TODO: end any breaks when work period is ended
             //       in that case break and period end at the same time
+            return Task.CompletedTask;
         }
     }
 }

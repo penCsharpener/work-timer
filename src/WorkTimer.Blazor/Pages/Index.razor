@@ -3,6 +3,7 @@
 @using WorkTimer.Models
 @inject WorkTimer.Contracts.IWorkingDayRepository workingDayRepo
 @inject WorkTimer.Contracts.IWorkBreakRepository workBreakRepo
+@inject WorkTimer.Contracts.IToggleTracking toggleTracking
 @inject NavigationManager NavigationManager
 
 <h1 class="mb-2">Timer</h1>
@@ -81,10 +82,14 @@
     public WorkTimer.Models.WorkBreak newBreak = new WorkTimer.Models.WorkBreak();
 
     private async Task HandleValidSubmitAsync() {
+        await toggleTracking.ToggleTracking(DateTime.Now, newPeriod.Comment);
+        newPeriod = new WorkTimer.Models.WorkPeriod();
         NavigationManager.NavigateTo("/");
     }
 
-    private async Task HandleValidSubmitBreakAsync() {
+    private Task HandleValidSubmitBreakAsync() {
+
         NavigationManager.NavigateTo("/");
+        return Task.CompletedTask;
     }
 }
