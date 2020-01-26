@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using WorkTimer.Config;
 
 namespace WorkTimer {
@@ -10,6 +8,10 @@ namespace WorkTimer {
             return $"Data Source={Path.Combine(Environment.ExpandEnvironmentVariables(config.PathToDatabase), config.DatabaseFileName)};Version=3;" +
                 $"{(string.IsNullOrEmpty(config.DatabasePassword) ? "" : $"Password={config.DatabasePassword};")}" +
                 $"Compress=True;UTF8Encoding=True;";
+        }
+
+        public static string ToTimeString(this TimeSpan timeSpan) {
+            return $"{timeSpan.Hours.ToString().PadLeft(2, '0')}:{timeSpan.Minutes.ToString().PadLeft(2, '0')}:{timeSpan.Seconds.ToString().PadLeft(2, '0')}";
         }
     }
 }

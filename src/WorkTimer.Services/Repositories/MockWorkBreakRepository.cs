@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using WorkTimer.Contracts;
 using WorkTimer.Models;
@@ -10,25 +9,23 @@ using WorkTimer.Models;
 namespace WorkTimer.Repositories {
     public class MockWorkBreakRepository : IWorkBreakRepository {
 
-        public static List<WorkBreak> Data = new List<WorkBreak>() {
-            new WorkBreak() { Id = 1, WorkPeriodId = 10, StartTime = new DateTime(2020, 1, 10, 14, 11, 14), EndTime = new DateTime(2020, 1, 10, 14, 13, 55), Comment = "stretching my legs" }
-        };
+        private IEnumerable<WorkPeriod> Data => MockWorkPeriodRepository.Data.Where(x => x.IsBreak);
 
         public MockWorkBreakRepository() {
 
         }
 
-        public async Task<IEnumerable<WorkBreak>> FindByWorkPeriodIds(IEnumerable<int> workPeriodIds) {
+        public async Task<IEnumerable<WorkPeriod>> FindByDate(DateTime date) {
             await Task.Delay(0);
-            return Data.Where(x => workPeriodIds.Contains(x.WorkPeriodId));
+            return Data.Where(x => x.Date == date.Date);
         }
 
-        public async Task<IEnumerable<WorkBreak>> GetAll() {
+        public async Task<IEnumerable<WorkPeriod>> GetAll() {
             await Task.Delay(0);
             return Data;
         }
 
-        public async Task<IEnumerable<WorkBreak>> GetIncomplete() {
+        public async Task<IEnumerable<WorkPeriod>> GetIncomplete() {
             await Task.Delay(0);
             return Data.Where(x => !x.EndTime.HasValue);
         }

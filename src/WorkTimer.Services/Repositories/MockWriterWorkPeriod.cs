@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using WorkTimer.Contracts;
 using WorkTimer.Models;
@@ -31,7 +29,6 @@ namespace WorkTimer.Repositories {
 
         public async Task<WorkPeriod> Insert(int workDayId, DateTime dateTime, string? comment = null) {
             return await Insert(new WorkPeriod() {
-                WorkingDayId = workDayId,
                 StartTime = dateTime,
                 Comment = comment
             });

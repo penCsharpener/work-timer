@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using WorkTimer.Contracts;
 using WorkTimer.Models;
@@ -10,35 +8,16 @@ using WorkTimer.Models;
 namespace WorkTimer.Repositories {
     public class MockWorkingDayRepository : IWorkingDayRepository {
 
-        public static List<WorkingDay> Data = new List<WorkingDay>() {
-                new WorkingDay() { Id = 1, Date = new DateTime(2020, 1, 6) },
-                new WorkingDay() { Id = 2, Date = new DateTime(2020, 1, 7) },
-                new WorkingDay() { Id = 3, Date = new DateTime(2020, 1, 8) },
-                new WorkingDay() { Id = 4, Date = new DateTime(2020, 1, 9) },
-                new WorkingDay() { Id = 5, Date = new DateTime(2020, 1, 10) },
-            };
+        private List<WorkPeriod> Data => MockWorkPeriodRepository.Data;
 
         public MockWorkingDayRepository() {
+
         }
 
         public async Task<WorkingDay?> FindByDate(DateTime dateTime) {
             await Task.Delay(0);
             var day = Fill(Data).FirstOrDefault(x => x.Date.Date == dateTime.Date);
-            if (day == null) {
-                return default;
-            }
-            day.WorkPeriods = MockWorkPeriodRepository.Data.Where(x => x.WorkingDayId == day.Id).ToList();
-            if (day.WorkPeriods.Any()) {
-                foreach (var period in day.WorkPeriods) {
-                    period.WorkBreaks = MockWorkBreakRepository.Data.Where(x => x.WorkPeriodId == period.Id).ToList();
-                }
-            }
-            return day;
-        }
-
-        public async Task<IEnumerable<WorkingDay>> FindByIds(IEnumerable<int> ids) {
-            await Task.Delay(0);
-            return Fill(Data).Where(x => ids.Contains(x.Id));
+            return day ?? (default);
         }
 
         public async Task<IEnumerable<WorkingDay>> GetAll() {
@@ -46,19 +25,12 @@ namespace WorkTimer.Repositories {
             return Fill(Data);
         }
 
-        public async Task<IEnumerable<WorkingDay>> GetIncomplete() {
-            await Task.Delay(0);
-            var list = new List<WorkPeriod>();
-            foreach (var day in Fill(Data)) {
-                day.WorkPeriods = MockWorkPeriodRepository.Data.Where(x => x.WorkingDayId == day.Id).ToList();
-            }
-            return Data.Where(x => x.WorkPeriods.Any(y => !y.EndTime.HasValue));
-        }
-
-        private static IEnumerable<WorkingDay> Fill(IEnumerable<WorkingDay> list) {
-            foreach (var item in list) {
-                item.WorkPeriods = MockWorkPeriodRepository.Data.Where(x => x.WorkingDayId == item.Id).ToList();
-                yield return item;
+        private static IEnumerable<WorkingDay> Fill(IEnumerable<WorkPeriod> list) {
+            foreach (var item in list.GroupBy(x => x.Date)) {
+                yield return new WorkingDay() {
+                    Date = item.Key,
+                    WorkPeriods = item.Select(x => x).ToList(),
+                };
             }
         }
     }

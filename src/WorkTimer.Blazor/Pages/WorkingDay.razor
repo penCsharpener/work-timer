@@ -1,11 +1,11 @@
-﻿@page "/workingday/{Id:int}"
+﻿@page "/workingday/{Year:int}/{Month:int}/{Day:int}"
 
 @using WorkTimer.Models
 @inject WorkTimer.Contracts.IWorkPeriodRepository workPeriodRepo
 @inject WorkTimer.Contracts.IWorkingDayRepository workingDayRepo
 @inject NavigationManager NavigationManager
 
-<h1>Working day details for @workingDay.Date.DayOfWeek @workingDay.Date.ToString("dd.MM.yyyy")</h1>
+<h1>Working day details for @workingDay?.Date.DayOfWeek @workingDay?.Date.ToString("dd.MM.yyyy")</h1>
 
 <table class="table table-striped table-hover table-sm">
     <thead>
@@ -13,14 +13,16 @@
             <th scope="col">Id</th>
             <th scope="col">Start Time</th>
             <th scope="col">End Time</th>
+            <th scope="col">Is Break</th>
         </tr>
     </thead>
     <tbody>
         @for (int i = 0; i < workPeriods.Count; i++) {
-            <tr onclick="location.href='workingday/@Id/workperiod/@workPeriods[i].Id'">
+            <tr>
                 <th scope="row">@workPeriods[i].Id</th>
                 <td>@workPeriods[i].StartTime.ToString()</td>
                 <td>@workPeriods[i].EndTime.ToString()</td>
+                <td>@(workPeriods[i].IsBreak ? "yes" : "no")</td>
             </tr>
         }
     </tbody>
@@ -29,14 +31,18 @@
 @code {
 
     [Parameter]
-    public int Id { get; set; }
+    public int Year { get; set; }
+    [Parameter]
+    public int Month { get; set; }
+    [Parameter]
+    public int Day { get; set; }
 
     List<WorkTimer.Models.WorkPeriod> workPeriods = new List<WorkTimer.Models.WorkPeriod>();
     WorkTimer.Models.WorkingDay workingDay = new WorkTimer.Models.WorkingDay();
 
     protected override async Task OnInitializedAsync() {
-        workPeriods = (await workPeriodRepo.FindByWorkingDayIds(new int[] { Id })).ToList();
-        workingDay = (await workingDayRepo.FindByIds(new int[] { Id })).FirstOrDefault();
+        workPeriods = (await workPeriodRepo.FindByDate(new DateTime(Year, Month, Day))).ToList();
+        workingDay = await workingDayRepo.FindByDate(new DateTime(Year, Month, Day));
         await base.OnInitializedAsync();
     }
 }

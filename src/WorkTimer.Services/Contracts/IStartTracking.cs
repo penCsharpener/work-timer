@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using WorkTimer.Models;
 
 namespace WorkTimer.Contracts {
     public interface IToggleTracking {
-        Task ToggleBreak(DateTime dateTime, string? comment = null);
 
         /// <summary>
         /// Starts tracking for the day if not existent or ends all running tracking.
