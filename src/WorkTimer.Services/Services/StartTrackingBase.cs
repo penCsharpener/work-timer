@@ -18,7 +18,7 @@ namespace WorkTimer.Services {
             _writerWorkPeriod = writerWorkPeriod;
         }
 
-        public virtual Task ToggleTracking(DateTime dateTime, string? comment = null) {
+        public virtual Task ToggleTracking(DateTime dateTime, bool isBreak, string? comment = null) {
             return Task.CompletedTask;
         }
 

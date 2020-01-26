@@ -46,7 +46,6 @@
     List<WorkTimer.Models.WorkingDay> workingDays = new List<WorkTimer.Models.WorkingDay>();
 
     private string dayButtonText = "Start Work";
-    private string breakButtonText = "Have a break";
 
     protected override async Task OnInitializedAsync() {
         var incomplete = await workPeriodRepo.GetIncomplete();
@@ -59,8 +58,11 @@
     public WorkTimer.Models.WorkPeriod newPeriod = new WorkTimer.Models.WorkPeriod();
 
     private async Task HandleValidSubmitAsync() {
-        await toggleTracking.ToggleTracking(DateTime.Now, newPeriod.Comment);
+        await toggleTracking.ToggleTracking(DateTime.Now, newPeriod.IsBreak, newPeriod.Comment);
         newPeriod = new WorkTimer.Models.WorkPeriod();
+        var incomplete = await workPeriodRepo.GetIncomplete();
+        dayButtonText = incomplete?.Any() == true ? "Stop" : "Start";
+        workingDays = (await workingDayRepo.GetAll()).ToList();
         NavigationManager.NavigateTo("/");
     }
 }

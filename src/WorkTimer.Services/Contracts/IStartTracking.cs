@@ -11,7 +11,7 @@ namespace WorkTimer.Contracts {
         /// <param name="dateTime"></param>
         /// <param name="comment"></param>
         /// <returns></returns>
-        Task ToggleTracking(DateTime dateTime, string? comment = null);
+        Task ToggleTracking(DateTime dateTime, bool isBreak, string? comment = null);
 
         /// <summary>
         /// Checks with provided date whether there is a WorkingDay item for that date
