@@ -25,7 +25,7 @@
         <ValidationSummary />
         <div class="form-group">
             <label class="mr-3" for="periodComment">Comment</label>
-            <InputText class="mr-3" id="periodComment" @bind-Value="@newPeriod.Comment" style="width:40rem"/>
+            <InputText class="mr-3" id="periodComment" @bind-Value="@newPeriod.Comment" style="width:40rem" />
         </div>
         <button type="submit" class="btn btn-primary">@dayButtonText</button>
     </EditForm>
@@ -36,7 +36,7 @@
         <ValidationSummary />
         <div class="form-group">
             <label class="mr-3" for="breakComment">Comment</label>
-            <InputText class="mr-3" id="breakComment" @bind-Value="@newBreak.Comment" style="width:40rem"/>
+            <InputText class="mr-3" id="breakComment" @bind-Value="@newBreak.Comment" style="width:40rem" />
         </div>
         <button type="submit" class="btn btn-primary">@breakButtonText</button>
     </EditForm>
@@ -87,9 +87,8 @@
         NavigationManager.NavigateTo("/");
     }
 
-    private Task HandleValidSubmitBreakAsync() {
-
+    private async Task HandleValidSubmitBreakAsync() {
+        await toggleTracking.ToggleBreak(DateTime.Now, newBreak.Comment);
         NavigationManager.NavigateTo("/");
-        return Task.CompletedTask;
     }
 }

@@ -11,7 +11,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTimer.Tests", "src\Work
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTimer.Models", "src\WorkTimer.Models\WorkTimer.Models.csproj", "{9ADBF4CE-AB56-4DED-87AE-9A78C9013F73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkTimer.Services", "src\WorkTimer.Services\WorkTimer.Services.csproj", "{6D5B7C7D-F0DC-4544-98B7-4F8931E428F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTimer.Services", "src\WorkTimer.Services\WorkTimer.Services.csproj", "{6D5B7C7D-F0DC-4544-98B7-4F8931E428F0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1182D9EA-9691-4CC7-92FD-A180A2057092}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

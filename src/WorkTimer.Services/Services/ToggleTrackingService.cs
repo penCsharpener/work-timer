@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using WorkTimer.Contracts;
 using WorkTimer.Models;
@@ -51,10 +49,30 @@ namespace WorkTimer.Services {
             }
         }
 
-        public Task ToggleBreak(DateTime dateTime) {
+        public override async Task ToggleBreak(DateTime dateTime, string? comment = null) {
             // TODO: end any breaks when work period is ended
             //       in that case break and period end at the same time
-            return Task.CompletedTask;
+
+            var incompletePeriods = await _periodRepo.GetIncomplete();
+            if (incompletePeriods.Any()) {
+                var incompleteBreaks = await _breakRepo.GetIncomplete();
+
+                if (incompleteBreaks.Any() && incompleteBreaks.Count() == 1) {
+                    var workBreak = incompleteBreaks.FirstOrDefault();
+                    if (!workBreak.EndTime.HasValue) {
+                        await _writerWorkBreak.UpdateEndTime(workBreak.Id, dateTime);
+                    }
+                } else {
+                    if (incompletePeriods.OrderByDescending(x => x.StartTime).FirstOrDefault() is { } period) {
+                        var newBreak = new WorkBreak() {
+                            StartTime = dateTime,
+                            WorkPeriodId = period.Id,
+                            Comment = comment
+                        };
+                        await _writerWorkBreak.Insert(newBreak);
+                    }
+                }
+            }
         }
     }
 }

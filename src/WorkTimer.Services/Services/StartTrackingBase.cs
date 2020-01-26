@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using WorkTimer.Contracts;
-using WorkTimer.Models;
 using WorkTimer.Repositories;
 
 namespace WorkTimer.Services {
@@ -47,6 +44,10 @@ namespace WorkTimer.Services {
         public async Task<bool> TrackingExistsForToday() {
             await Task.Delay(0);
             return MockWorkingDayRepository.Data.Any(x => x.Date.Date == DateTime.Now.Date);
+        }
+
+        public virtual Task ToggleBreak(DateTime dateTime, string? comment = null) {
+            return Task.CompletedTask;
         }
     }
 }
