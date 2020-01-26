@@ -38,7 +38,7 @@
     public int Day { get; set; }
 
     List<WorkTimer.Models.WorkPeriod> workPeriods = new List<WorkTimer.Models.WorkPeriod>();
-    WorkTimer.Models.WorkingDay workingDay = new WorkTimer.Models.WorkingDay();
+    WorkTimer.Models.WorkingDay? workingDay = new WorkTimer.Models.WorkingDay();
 
     protected override async Task OnInitializedAsync() {
         workPeriods = (await workPeriodRepo.FindByDate(new DateTime(Year, Month, Day))).ToList();
