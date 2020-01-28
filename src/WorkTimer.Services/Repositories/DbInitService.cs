@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Options;
-using System;
 using System.Data.SQLite;
 using System.IO;
 using System.Threading.Tasks;
 using WorkTimer.Config;
 using WorkTimer.Contracts;
+using WorkTimer.ManualMigrations;
 
 namespace WorkTimer.Repositories {
     public class DbInitService : IDbInitService {
@@ -19,21 +19,16 @@ namespace WorkTimer.Repositories {
         }
 
         public async Task InitializeDatabase() {
-            if (!Directory.Exists(Environment.ExpandEnvironmentVariables(_options.Value.PathToDatabase))) {
-                Directory.CreateDirectory(Environment.ExpandEnvironmentVariables(_options.Value.PathToDatabase));
+            var path = Path.GetDirectoryName(_options.Value.DatabaseFullPath);
+            if (!Directory.Exists(path)) {
+                Directory.CreateDirectory(path);
             }
-            if (!File.Exists(Environment.ExpandEnvironmentVariables(_options.Value.DatabaseFileName))) {
-                SQLiteConnection.CreateFile(Path.Combine(Environment.ExpandEnvironmentVariables(_options.Value.PathToDatabase), _options.Value.DatabaseFileName));
+            if (!File.Exists(_options.Value.DatabaseFullPath)) {
+                SQLiteConnection.CreateFile(_options.Value.DatabaseFullPath);
                 using (var con = new SQLiteConnection(ConnectionString)) {
                     using (var cmd = new SQLiteCommand(con)) {
                         await con.OpenAsync();
-                        cmd.CommandText = @"CREATE TABLE `WorkPeriod` (
-                                                `Id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-                                                `StartTime`	REAL NOT NULL,
-                                                `EndTime`	REAL,
-                                                `IsBreak`	INTEGER NOT NULL,
-                                                `Comment`	TEXT
-                                            );";
+                        cmd.CommandText = CreateTableWorkPeriod.GetCreateTableWorkPeriod();
                         await cmd.ExecuteNonQueryAsync();
 
                         await con.CloseAsync();

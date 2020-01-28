@@ -30,14 +30,20 @@ namespace WorkTimer.Tests {
         }
 
 
-        [TestCase()]
-        public async Task TestTemplateAsync() {
+        [TestCase]
+        public async Task Init_Database() {
             var options = _serviceProvider.GetService<IOptions<SqliteConfiguration>>();
             var dbService = new DbInitService(options);
             await dbService.InitializeDatabase();
-            Assert.IsTrue(true);
+            Assert.IsTrue(File.Exists(options.Value.DatabaseFullPath));
         }
 
+        [Test]
+        public void DatabaseExists() {
+            var options = _serviceProvider.GetService<IOptions<SqliteConfiguration>>();
+
+            Assert.IsTrue(File.Exists(options.Value.DatabaseFullPath));
+        }
     }
     /*
         public class DbTests2 {

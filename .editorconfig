@@ -209,3 +209,6 @@ dotnet_naming_style._fieldname.required_prefix = _
 dotnet_naming_style._fieldname.required_suffix = 
 dotnet_naming_style._fieldname.word_separator = 
 dotnet_naming_style._fieldname.capitalization = camel_case
+
+# CA2100: Review SQL queries for security vulnerabilities
+dotnet_diagnostic.CA2100.severity = silent
