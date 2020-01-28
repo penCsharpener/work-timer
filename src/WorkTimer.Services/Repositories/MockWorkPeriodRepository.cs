@@ -26,9 +26,12 @@ namespace WorkTimer.Repositories {
 
         }
 
-        public async Task<IEnumerable<WorkPeriod>> FindByDate(DateTime date) {
-            await Task.Delay(0);
-            return Data.Where(x => x.Date == date.Date);
+        public Task<IEnumerable<WorkPeriod>> FindByDate(DateTime date) {
+            return Task.FromResult(Data.Where(x => x.Date == date.Date));
+        }
+
+        public Task<WorkPeriod> FindById(int id) {
+            return Task.FromResult(Data.FirstOrDefault(x => x.Id == id));
         }
 
         public async Task<IEnumerable<WorkPeriod>> GetAll() {

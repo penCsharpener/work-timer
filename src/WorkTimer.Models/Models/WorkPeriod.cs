@@ -8,6 +8,7 @@ namespace WorkTimer.Models {
         public DateTime? EndTime { get; set; }
         public bool IsBreak { get; set; }
         public string? Comment { get; set; }
+        public int ExpectedHours { get; set; } = 8;
 
         [Computed]
         public DateTime Date => StartTime.Date;

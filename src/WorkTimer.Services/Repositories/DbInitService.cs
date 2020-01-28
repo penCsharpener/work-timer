@@ -9,13 +9,12 @@ using WorkTimer.ManualMigrations;
 namespace WorkTimer.Repositories {
     public class DbInitService : IDbInitService {
         private readonly IOptions<SqliteConfiguration> _options;
+        private readonly IDatabaseConnection<SQLiteConnection> _conService;
 
-        public string ConnectionString { get; }
-
-        public DbInitService(IOptions<SqliteConfiguration> options) {
+        public DbInitService(IDatabaseConnection<SQLiteConnection> conService,
+                             IOptions<SqliteConfiguration> options) {
+            _conService = conService;
             _options = options;
-            ConnectionString = _options.Value.ToConnectionString();
-
         }
 
         public async Task InitializeDatabase() {
@@ -25,15 +24,13 @@ namespace WorkTimer.Repositories {
             }
             if (!File.Exists(_options.Value.DatabaseFullPath)) {
                 SQLiteConnection.CreateFile(_options.Value.DatabaseFullPath);
-                using (var con = new SQLiteConnection(ConnectionString)) {
-                    using (var cmd = new SQLiteCommand(con)) {
-                        await con.OpenAsync();
-                        cmd.CommandText = CreateTableWorkPeriod.GetCreateTableWorkPeriod();
-                        await cmd.ExecuteNonQueryAsync();
+                var con = _conService.Get();
+                using var cmd = new SQLiteCommand(con);
+                await con.OpenAsync();
+                cmd.CommandText = CreateTableWorkPeriod.GetCreateTableWorkPeriod();
+                await cmd.ExecuteNonQueryAsync();
 
-                        await con.CloseAsync();
-                    }
-                }
+                await con.CloseAsync();
             }
         }
     }
