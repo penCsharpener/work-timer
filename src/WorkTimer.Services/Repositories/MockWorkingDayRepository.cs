@@ -33,5 +33,9 @@ namespace WorkTimer.Repositories {
                 };
             }
         }
+
+        public Task<TimeSpan> GetTotalOverhours() {
+            throw new NotImplementedException();
+        }
     }
 }

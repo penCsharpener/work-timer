@@ -3,6 +3,7 @@ using Dapper.Contrib.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using System.Linq;
 using System.Threading.Tasks;
 using WorkTimer.Contracts;
 using WorkTimer.Models;
@@ -22,16 +23,13 @@ namespace WorkTimer.Repositories {
         }
 
         public async Task<IEnumerable<WorkPeriod>> FindByDate(DateTime date) {
-            var p = new {
-                date
-            };
-            var list = await _con.QueryAsync<WorkPeriodRaw>(SelectAll + WhereDate + OrderByDescStartTime, p);
-            return list.FromRaw();
+            var list = await GetAll();
+            return list.Where(x => x.StartTime.Date == date.Date).ToList();
         }
 
         public async Task<IEnumerable<WorkPeriod>> GetAll() {
             var list = await _con.GetAllAsync<WorkPeriodRaw>();
-            return list.FromRaw();
+            return list.FromRaw().OrderByDescending(x => x.StartTime);
         }
 
         public async Task<IEnumerable<WorkPeriod>> GetIncomplete() {

@@ -23,12 +23,17 @@
     </EditForm>
 </div>
 
+<h3>Total Overhours</h3>
+
+<p>@totalOverhours</p>
+
 <table class="table table-striped table-hover table-sm">
     <thead>
         <tr>
             <th scope="col">Day of Week</th>
             <th scope="col">Date</th>
             <th scope="col">Time worked</th>
+            <th scope="col">Overhours</th>
         </tr>
     </thead>
     <tbody>
@@ -37,21 +42,25 @@
                 <td>@workingDays[i].Date.DayOfWeek.ToString()</td>
                 <td>@workingDays[i].Date.ToString("dd.MM.yyyy")</td>
                 <td>@workingDays[i].WorkTime.ToTimeString()</td>
+                <td>@workingDays[i].Overhours.ToTimeString()</td>
             </tr>
         }
     </tbody>
 </table>
 
+
 @code {
     List<WorkTimer.Models.WorkingDay> workingDays = new List<WorkTimer.Models.WorkingDay>();
 
     private string dayButtonText = "Start Work";
+    private string totalOverhours;
 
     protected override async Task OnInitializedAsync() {
         var incomplete = await workPeriodRepo.GetIncomplete();
         dayButtonText = incomplete?.Any() == true ? "Stop" : "Start";
 
         workingDays = (await workingDayRepo.GetAll()).ToList();
+        totalOverhours = (await workingDayRepo.GetTotalOverhours()).ToTimeString();
         await base.OnInitializedAsync();
     }
 

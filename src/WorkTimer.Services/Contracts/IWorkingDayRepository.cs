@@ -13,6 +13,7 @@ namespace WorkTimer.Contracts {
         /// <param name="day"></param>
         /// <returns></returns>
         Task<WorkingDay> FindByDate(DateTime dateTime);
+        Task<TimeSpan> GetTotalOverhours();
 
     }
 }

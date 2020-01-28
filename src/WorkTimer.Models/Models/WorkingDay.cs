@@ -14,6 +14,8 @@ namespace WorkTimer.Models {
         [Computed]
         public TimeSpan WorkTime => TimeSpan.FromSeconds(WorkPeriods.Where(x => !x.IsBreak).Sum(x => x.WorkTime.TotalSeconds));
 
+        [Computed]
+        public TimeSpan Overhours => WorkTime - TimeSpan.FromHours(8);
 
     }
 }

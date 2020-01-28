@@ -12,7 +12,11 @@ namespace WorkTimer {
         }
 
         public static string ToTimeString(this TimeSpan timeSpan) {
-            return $"{timeSpan.Hours.ToString().PadLeft(2, '0')}:{timeSpan.Minutes.ToString().PadLeft(2, '0')}:{timeSpan.Seconds.ToString().PadLeft(2, '0')}";
+            var s = $"{timeSpan.Hours.ToString().Replace("-", "").PadLeft(2, '0')}:{timeSpan.Minutes.ToString().Replace("-", "").PadLeft(2, '0')}:{timeSpan.Seconds.ToString().Replace("-", "").PadLeft(2, '0')}";
+            if (timeSpan < TimeSpan.Zero) {
+                return "-" + s;
+            }
+            return s;
         }
 
         public static WorkPeriodRaw ToRaw(this WorkPeriod wp) {

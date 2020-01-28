@@ -28,6 +28,9 @@ namespace WorkTimer.Tests {
 
             services.AddTransient<IWorkPeriodWriter, WorkPeriodWriter>();
             services.AddTransient<IWorkPeriodRepository, WorkPeriodRepository>();
+            services.AddTransient<IToggleTracking, ToggleTrackingService>();
+            services.AddTransient<IWriterWorkPeriod, WriterWorkPeriod>();
+            services.AddTransient<IWorkingDayRepository, WorkingDayRepository>();
             services.AddSingleton<IDatabaseConnection<SQLiteConnection>, SqliteDatabaseConnectionService>();
 
             var conf = new ConfigurationBuilder();
@@ -121,6 +124,19 @@ namespace WorkTimer.Tests {
             var repo = _serviceProvider.GetService<IWorkPeriodRepository>();
             var items = await repo.GetAll();
             Assert.IsTrue(items.Any());
+        }
+
+        [Test]
+        public async Task GetTotalOverhours() {
+            var dayRepo = _serviceProvider.GetService<IWorkingDayRepository>();
+            var list = await dayRepo.GetAll();
+
+            double seconds = 0;
+            foreach (var item in list) {
+                seconds += item.Overhours.TotalSeconds;
+            }
+            var quickTotal = await dayRepo.GetTotalOverhours();
+            Assert.AreEqual(quickTotal.TotalSeconds, seconds);
         }
     }
     /*

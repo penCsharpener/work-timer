@@ -16,13 +16,18 @@ namespace WorkTimer.Repositories {
         public async Task<WorkingDay> FindByDate(DateTime dateTime) {
             return new WorkingDay() {
                 Date = dateTime,
-                WorkPeriods = await _repo.FindByDate(dateTime)
+                WorkPeriods = (await _repo.FindByDate(dateTime)).ToList()
             };
         }
 
         public async Task<IEnumerable<WorkingDay>> GetAll() {
             var periods = await _repo.GetAll();
             return periods.GroupBy(x => x.StartTime.Date).Select(x => new WorkingDay() { Date = x.Key, WorkPeriods = x.Select(y => y).ToList() });
+        }
+
+        public async Task<TimeSpan> GetTotalOverhours() {
+            var all = (await GetAll()).ToList();
+            return TimeSpan.FromSeconds(all.Sum(x => x.Overhours.TotalSeconds));
         }
     }
 }
