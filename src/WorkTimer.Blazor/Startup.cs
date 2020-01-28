@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using WorkTimer.Blazor.Data;
-using WorkTimer.Blazor.Extensions;
+using System.Data.SQLite;
 using WorkTimer.Config;
+using WorkTimer.Contracts;
+using WorkTimer.Repositories;
+using WorkTimer.Services;
 
 namespace WorkTimer.Blazor {
     public class Startup {
@@ -21,12 +23,18 @@ namespace WorkTimer.Blazor {
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.Configure<SqliteConfiguration>(Configuration.GetSection(nameof(SqliteConfiguration)));
-#if DEBUG
-            services.WireUpMockClasses();
-#else
+            services.AddScoped<IWorkPeriodWriter, WorkPeriodWriter>();
+            services.AddScoped<IWorkPeriodRepository, WorkPeriodRepository>();
+            services.AddScoped<IToggleTracking, ToggleTrackingService>();
+            services.AddScoped<IWriterWorkPeriod, WriterWorkPeriod>();
             services.AddScoped<IWorkingDayRepository, WorkingDayRepository>();
-#endif
-            services.AddSingleton<WeatherForecastService>();
+            services.AddScoped<IWorkBreakRepository, MockWorkBreakRepository>();
+            services.AddSingleton<IDatabaseConnection<SQLiteConnection>, SqliteDatabaseConnectionService>();
+            //#if DEBUG
+            //            services.WireUpMockClasses();
+            //#else
+            //            services.AddScoped<IWorkingDayRepository, WorkingDayRepository>();
+            //#endif
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
