@@ -1,9 +1,12 @@
 ﻿using Dapper.Contrib.Extensions;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace WorkTimer.Models {
     public class WorkPeriod {
         public int Id { get; set; }
+
+        [Required]
         public DateTime StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public bool IsBreak { get; set; }

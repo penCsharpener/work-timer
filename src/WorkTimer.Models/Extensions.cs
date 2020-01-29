@@ -55,5 +55,9 @@ namespace WorkTimer {
         public static string ToSqlite(this DateTime dateTime) {
             return dateTime.ToString("yyyy-MM-dd HH:mm:ss");
         }
+
+        public static string ToSqlite(this DateTime? dateTime) {
+            return dateTime.HasValue ? dateTime.Value.ToString("yyyy-MM-dd HH:mm:ss") : "";
+        }
     }
 }

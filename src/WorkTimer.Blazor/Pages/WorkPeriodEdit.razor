@@ -1,0 +1,71 @@
+﻿@page "/workperiod/{Id:int}/edit"
+
+@using WorkTimer.Models
+@inject WorkTimer.Contracts.IWorkPeriodRepository workPeriodRepo
+@inject WorkTimer.Contracts.IWorkPeriodWriter workPeriodWriter
+@inject WorkTimer.Contracts.IWorkingDayRepository workingDayRepo
+@inject NavigationManager NavigationManager
+
+<h1>Edit work period @(WorkPeriod.StartTime.ToString())@(WorkPeriod.EndTime.HasValue ? " - " + WorkPeriod.EndTime.HasValue.ToString() : "")</h1>
+
+<EditForm Model="@WorkPeriod" OnValidSubmit="HandleValidSubmitAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label>
+            StartTime
+            <InputText id="StartTime" class="form-control" @bind-Value="StartTimeString" />
+        </label>
+    </div>
+
+    <div class="form-group">
+        <label>
+            EndTime
+            <InputText id="EndTime" class="form-control" @bind-Value="EndTimeString" />
+        </label>
+    </div>
+
+    <div class="form-group">
+        <label>
+            Is Break
+            <InputCheckbox id="IsBreak" class="form-control" @bind-Value="WorkPeriod.IsBreak" />
+        </label>
+    </div>
+
+    <div class="form-group w-100">
+        <label>
+            Comment
+            <InputTextArea id="Comment" class="form-control w-100" @bind-Value="WorkPeriod.Comment" />
+        </label>
+    </div>
+
+    <button type="submit">Submit</button>
+
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    public WorkPeriod WorkPeriod { get; set; } = new WorkPeriod();
+    public string StartTimeString { get; set; } = "";
+    public string EndTimeString { get; set; } = "";
+
+    protected override async Task OnInitializedAsync() {
+        WorkPeriod = await workPeriodRepo.FindById(Id);
+        StartTimeString = WorkPeriod.StartTime.ToSqlite();
+        EndTimeString = WorkPeriod.EndTime.ToSqlite();
+        await base.OnInitializedAsync();
+    }
+
+    protected async Task HandleValidSubmitAsync() {
+        await workPeriodWriter.Update(Id, 
+                                      DateTime.Parse(StartTimeString), 
+                                      string.IsNullOrEmpty(EndTimeString) ? default(DateTime?) : DateTime.Parse(EndTimeString), 
+                                      WorkPeriod.IsBreak, 
+                                      WorkPeriod.Comment);
+        NavigationManager.NavigateTo($"/workingday/{WorkPeriod.StartTime.Year}/{WorkPeriod.StartTime.Month}/{WorkPeriod.StartTime.Day}");
+    }
+}

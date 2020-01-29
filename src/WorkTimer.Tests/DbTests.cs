@@ -121,7 +121,7 @@ namespace WorkTimer.Tests {
 
         [Test]
         public async Task Seeding() {
-            var list = new List<WorkPeriod>();
+            var list = new System.Collections.Generic.List<WorkPeriod>();
             //var list = SeedingData.GetList();
 
             var writer = _serviceProvider.GetService<IWorkPeriodWriter>();

@@ -53,7 +53,7 @@
     List<WorkTimer.Models.WorkingDay> workingDays = new List<WorkTimer.Models.WorkingDay>();
 
     private string dayButtonText = "Start Work";
-    private string totalOverhours;
+    private string totalOverhours = "";
 
     protected override async Task OnInitializedAsync() {
         var incomplete = await workPeriodRepo.GetIncomplete();

@@ -37,8 +37,8 @@ namespace WorkTimer.Repositories {
         public async Task<WorkPeriod> Update(int id, DateTime startTime, DateTime? endTime, bool isBreak, string? comment) {
             var p = new {
                 id,
-                startTime = startTime.Ticks,
-                endTime = endTime == null ? default(double?) : endTime.Value.Ticks,
+                startTime = startTime.ToSqlite(),
+                endTime = endTime == null ? default(string) : endTime.Value.ToSqlite(),
                 isBreak = isBreak ? 1 : 0,
                 comment
             };
