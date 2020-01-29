@@ -9,6 +9,7 @@ namespace WorkTimer.Blazor {
 
         public static IHostBuilder CreateHostBuilder(string[] args) {
             return Host.CreateDefaultBuilder(args)
+                       .UseWindowsService()
                        .ConfigureAppConfiguration(conf => {
                            //conf.SetBasePath(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location))
                            //.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
