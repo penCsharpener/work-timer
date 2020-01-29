@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
@@ -115,15 +114,15 @@ namespace WorkTimer.Tests {
             var item = items.FirstOrDefault();
             var itemId = item.Id;
             var startTimeFirst = item.StartTime.AddDays(1);
-            await writer.Update(item.Id, startTimeFirst, item.EndTime, item.IsBreak, item.Comment, item.ExpectedHours);
+            await writer.Update(item.Id, startTimeFirst, item.EndTime, item.IsBreak, item.Comment);
             var itemUpdated = await repo.FindById(itemId);
             Assert.IsTrue(startTimeFirst == itemUpdated.StartTime);
         }
 
         [Test]
         public async Task Seeding() {
-            var list = new List<WorkPeriod>() {
-            };
+            var list = new List<WorkPeriod>();
+            //var list = SeedingData.GetList();
 
             var writer = _serviceProvider.GetService<IWorkPeriodWriter>();
 

@@ -6,7 +6,15 @@
                        "`StartTime` TEXT NOT NULL, " +
                        "`EndTime` TEXT, " +
                        "`IsBreak` INTEGER NOT NULL, " +
-                       "`Comment` TEXT )";
+                       "`Comment` TEXT );";
+        }
+
+        public static string CreateIndeces() {
+            return "CREATE UNIQUE INDEX `workperiods_id_asc` ON `WorkPeriods` ( `Id`\tASC );" +
+                   "CREATE INDEX `workperiods_starttime_asc` ON `WorkPeriods` ( `StartTime`\tASC );" +
+                   "CREATE INDEX `workperiods_starttime_desc` ON `WorkPeriods` ( `StartTime`\tDESC );" +
+                   "CREATE INDEX `workperiods_endtime_asc` ON `WorkPeriods` ( `EndTime`\tASC ); " +
+                   "CREATE INDEX `workperiods_endtime_desc` ON `WorkPeriods` ( `EndTime`\tDESC ); ";
         }
     }
 }

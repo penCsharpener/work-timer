@@ -32,6 +32,7 @@ namespace WorkTimer.Repositories {
             using var cmd = new SQLiteCommand(con);
             await con.OpenAsync();
             cmd.CommandText = CreateTableWorkPeriod.GetCreateTableWorkPeriod();
+            cmd.CommandText += CreateTableWorkPeriod.CreateIndeces();
             await cmd.ExecuteNonQueryAsync();
 
             await con.CloseAsync();
