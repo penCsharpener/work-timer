@@ -26,7 +26,6 @@ namespace WorkTimer {
                 StartTime = wp.StartTime.Ticks,
                 EndTime = wp.EndTime == null ? default(double?) : wp.EndTime.Value.Ticks,
                 IsBreak = wp.IsBreak ? 1 : 0,
-                ExpectedHours = wp.ExpectedHours
             };
         }
 
@@ -37,7 +36,7 @@ namespace WorkTimer {
                 StartTime = new DateTime(Convert.ToInt64(wpr.StartTime)),
                 EndTime = wpr.EndTime == null ? default(DateTime?) : new DateTime(Convert.ToInt64(wpr.EndTime.Value)),
                 IsBreak = Convert.ToBoolean(wpr.IsBreak),
-                ExpectedHours = wpr.ExpectedHours
+                ExpectedHours = 8
             };
         }
 

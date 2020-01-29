@@ -6,8 +6,7 @@
                        "`StartTime` REAL NOT NULL, " +
                        "`EndTime` REAL, " +
                        "`IsBreak` INTEGER NOT NULL, " +
-                       "`Comment` TEXT," +
-                       "`ExpectedHours` INTEGER NOT NULL )";
+                       "`Comment` TEXT )";
         }
     }
 }

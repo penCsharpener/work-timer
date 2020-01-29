@@ -8,6 +8,5 @@ namespace WorkTimer.Models {
         public double? EndTime { get; set; }
         public int IsBreak { get; set; }
         public string? Comment { get; set; }
-        public int ExpectedHours { get; set; } = 8;
     }
 }

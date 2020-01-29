@@ -17,21 +17,24 @@ namespace WorkTimer.Repositories {
             _options = options;
         }
 
-        public async Task InitializeDatabase() {
+        public void CreateDatabase() {
             var path = Path.GetDirectoryName(_options.Value.DatabaseFullPath);
             if (!Directory.Exists(path)) {
                 Directory.CreateDirectory(path);
             }
             if (!File.Exists(_options.Value.DatabaseFullPath)) {
                 SQLiteConnection.CreateFile(_options.Value.DatabaseFullPath);
-                var con = _conService.Get();
-                using var cmd = new SQLiteCommand(con);
-                await con.OpenAsync();
-                cmd.CommandText = CreateTableWorkPeriod.GetCreateTableWorkPeriod();
-                await cmd.ExecuteNonQueryAsync();
-
-                await con.CloseAsync();
             }
+        }
+
+        public async Task CreateTable() {
+            var con = _conService.Get();
+            using var cmd = new SQLiteCommand(con);
+            await con.OpenAsync();
+            cmd.CommandText = CreateTableWorkPeriod.GetCreateTableWorkPeriod();
+            await cmd.ExecuteNonQueryAsync();
+
+            await con.CloseAsync();
         }
     }
 }

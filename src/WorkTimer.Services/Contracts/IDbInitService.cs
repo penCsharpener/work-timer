@@ -2,6 +2,7 @@
 
 namespace WorkTimer.Contracts {
     public interface IDbInitService {
-        Task InitializeDatabase();
+        void CreateDatabase();
+        Task CreateTable();
     }
 }

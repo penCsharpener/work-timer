@@ -46,11 +46,11 @@ namespace WorkTimer.Tests {
 
 
         [TestCase]
-        public async Task Init_Database() {
+        public void Init_Database() {
             var conService = _serviceProvider.GetService<IDatabaseConnection<SQLiteConnection>>();
             var options = _serviceProvider.GetService<IOptions<SqliteConfiguration>>();
             var dbService = new DbInitService(conService, options);
-            await dbService.InitializeDatabase();
+            dbService.CreateDatabase();
             Assert.IsTrue(File.Exists(options.Value.DatabaseFullPath));
         }
 
@@ -59,6 +59,15 @@ namespace WorkTimer.Tests {
             var options = _serviceProvider.GetService<IOptions<SqliteConfiguration>>();
 
             Assert.IsTrue(File.Exists(options.Value.DatabaseFullPath));
+        }
+
+        [Test]
+        public async Task CreateTable() {
+            var conService = _serviceProvider.GetService<IDatabaseConnection<SQLiteConnection>>();
+            var options = _serviceProvider.GetService<IOptions<SqliteConfiguration>>();
+            var dbService = new DbInitService(conService, options);
+            await dbService.CreateTable();
+            Assert.Pass();
         }
 
         [Test]
