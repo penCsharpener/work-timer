@@ -23,8 +23,8 @@ namespace WorkTimer {
             return new WorkPeriodRaw() {
                 Id = wp.Id,
                 Comment = wp.Comment,
-                StartTime = wp.StartTime.Ticks,
-                EndTime = wp.EndTime == null ? default(double?) : wp.EndTime.Value.Ticks,
+                StartTime = wp.StartTime.ToSqlite(),
+                EndTime = wp.EndTime == null ? default(string?) : wp.EndTime.Value.ToSqlite(),
                 IsBreak = wp.IsBreak ? 1 : 0,
             };
         }
@@ -33,8 +33,8 @@ namespace WorkTimer {
             return new WorkPeriod() {
                 Id = wpr.Id,
                 Comment = wpr.Comment,
-                StartTime = new DateTime(Convert.ToInt64(wpr.StartTime)),
-                EndTime = wpr.EndTime == null ? default(DateTime?) : new DateTime(Convert.ToInt64(wpr.EndTime.Value)),
+                StartTime = DateTime.Parse(wpr.StartTime),
+                EndTime = wpr.EndTime == null ? default(DateTime?) : DateTime.Parse(wpr.EndTime),
                 IsBreak = Convert.ToBoolean(wpr.IsBreak),
                 ExpectedHours = 8
             };
@@ -50,6 +50,10 @@ namespace WorkTimer {
             foreach (var item in wprs) {
                 yield return item.FromRaw();
             }
+        }
+
+        public static string ToSqlite(this DateTime dateTime) {
+            return dateTime.ToString("yyyy-MM-dd HH:mm:ss");
         }
     }
 }

@@ -3,8 +3,8 @@
         public static string GetCreateTableWorkPeriod() {
             return "CREATE TABLE IF NOT EXISTS `WorkPeriods` ( " +
                        "`Id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, " +
-                       "`StartTime` REAL NOT NULL, " +
-                       "`EndTime` REAL, " +
+                       "`StartTime` TEXT NOT NULL, " +
+                       "`EndTime` TEXT, " +
                        "`IsBreak` INTEGER NOT NULL, " +
                        "`Comment` TEXT )";
         }
