@@ -43,7 +43,7 @@ namespace WorkTimer.Repositories {
         public async Task<WorkPeriod> UpdateEndTime(int id, DateTime endTime) {
             var p = new {
                 id,
-                endTime = endTime == null ? default(double?) : endTime.Ticks,
+                endTime = endTime == null ? default(string?) : endTime.ToSqlite(),
             };
             var result = await _con.ExecuteAsync(UpdateEndTimeQuery, p);
             return await _repo.FindById(id);
