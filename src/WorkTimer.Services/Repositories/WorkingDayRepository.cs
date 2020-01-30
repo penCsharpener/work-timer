@@ -27,7 +27,7 @@ namespace WorkTimer.Repositories {
 
         public async Task<TimeSpan> GetTotalOverhours() {
             var all = (await GetAll()).ToList();
-            return TimeSpan.FromSeconds(all.Sum(x => x.Overhours.TotalSeconds));
+            return TimeSpan.FromSeconds(all.Where(x => x.WorkPeriods.All(w => w.EndTime.HasValue)).Sum(x => x.Overhours.TotalSeconds));
         }
     }
 }
