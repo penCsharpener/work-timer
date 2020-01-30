@@ -1,10 +1,14 @@
 ﻿@page "/"
 
-@using WorkTimer.Models
-@inject WorkTimer.Contracts.IWorkingDayRepository workingDayRepo
-@inject WorkTimer.Contracts.IWorkPeriodRepository workPeriodRepo
-@inject WorkTimer.Contracts.IWorkBreakRepository workBreakRepo
-@inject WorkTimer.Contracts.IToggleTracking toggleTracking
+@using Microsoft.Extensions.Options
+@using WorkTimer.Config
+@using WorkTimer.Contracts
+@inject IWorkingDayRepository workingDayRepo
+@inject IWorkPeriodRepository workPeriodRepo
+@inject IWorkBreakRepository workBreakRepo
+@inject IDbInitService dbService
+@inject IToggleTracking toggleTracking
+@inject IOptions<SqliteConfiguration> options
 @inject NavigationManager NavigationManager
 
 <h1 class="mb-2">Timer</h1>
@@ -56,6 +60,11 @@
     private string totalOverhours = "";
 
     protected override async Task OnInitializedAsync() {
+        if (!System.IO.File.Exists(options.Value.DatabaseFullPath))
+        {
+            dbService.CreateDatabase();
+            await dbService.CreateTable();
+        }
         var incomplete = await workPeriodRepo.GetIncomplete();
         dayButtonText = incomplete?.Any() == true ? "Stop" : "Start";
 

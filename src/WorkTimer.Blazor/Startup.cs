@@ -29,6 +29,7 @@ namespace WorkTimer.Blazor {
             services.AddScoped<IWriterWorkPeriod, WriterWorkPeriod>();
             services.AddScoped<IWorkingDayRepository, WorkingDayRepository>();
             services.AddScoped<IWorkBreakRepository, MockWorkBreakRepository>();
+            services.AddScoped<IDbInitService, DbInitService>();
             services.AddSingleton<IDatabaseConnection<SQLiteConnection>, SqliteDatabaseConnectionService>();
             //#if DEBUG
             //            services.WireUpMockClasses();
@@ -56,6 +57,7 @@ namespace WorkTimer.Blazor {
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
+            
         }
     }
 }
