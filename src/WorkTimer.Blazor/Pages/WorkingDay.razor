@@ -13,6 +13,7 @@
             <th scope="col">Id</th>
             <th scope="col">Start Time</th>
             <th scope="col">End Time</th>
+            <th scope="col">Length</th>
             <th scope="col">Is Break</th>
             <th scope="col">Comment</th>
             <th scope="col">Edit</th>
@@ -24,6 +25,7 @@
                 <th scope="row">@workPeriods[i].Id</th>
                 <td>@workPeriods[i].StartTime.ToString()</td>
                 <td>@workPeriods[i].EndTime.ToString()</td>
+                <td>@workPeriods[i].Length</td>
                 <td>@(workPeriods[i].IsBreak ? "yes" : "no")</td>
                 <td>@workPeriods[i].Comment</td>
                 <td><a href="workperiod/@(workPeriods[i].Id)/edit"><span class="oi oi-pencil" title="oi-pencil" aria-hidden="true"></span></a></td>

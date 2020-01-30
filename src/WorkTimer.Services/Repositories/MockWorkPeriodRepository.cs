@@ -43,5 +43,9 @@ namespace WorkTimer.Repositories {
             await Task.Delay(0);
             return Data.Where(x => !x.EndTime.HasValue);
         }
+
+        public Task<IEnumerable<WorkPeriod>> MostRecent(int limit) {
+            return Task.FromResult(Data.OrderByDescending(x => x.StartTime).Take(limit));
+        }
     }
 }

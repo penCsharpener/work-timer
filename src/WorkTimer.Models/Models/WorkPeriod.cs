@@ -25,5 +25,12 @@ namespace WorkTimer.Models {
                 return DateTime.Now - StartTime;
             }
         }
+
+        [Computed]
+        public string Length {
+            get {
+                return WorkTime.ToTimeString();
+            }
+        }
     }
 }

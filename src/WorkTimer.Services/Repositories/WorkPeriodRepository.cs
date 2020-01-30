@@ -16,7 +16,8 @@ namespace WorkTimer.Repositories {
         private const string WhereDate = "WHERE Date(StartTime) = @date ";
         private const string WhereIncomplete = "WHERE EndTime IS NULL ";
         private const string WhereById = "Where Id = @id ";
-        private const string OrderByDescStartTime = "ORDER BY StartTime DESC;";
+        private const string OrderByDescStartTime = "ORDER BY StartTime DESC ";
+        private const string LimitClause = "LIMIT @limit;";
 
         public WorkPeriodRepository(IDatabaseConnection<SQLiteConnection> conService) {
             _con = conService.Get();
@@ -33,13 +34,18 @@ namespace WorkTimer.Repositories {
         }
 
         public async Task<IEnumerable<WorkPeriod>> GetIncomplete() {
-            var list = await _con.QueryAsync<WorkPeriodRaw>(SelectAll + WhereIncomplete + OrderByDescStartTime);
+            var list = await _con.QueryAsync<WorkPeriodRaw>(SelectAll + WhereIncomplete + OrderByDescStartTime + ";");
             return list.FromRaw();
         }
 
         public async Task<WorkPeriod> FindById(int id) {
             var item = await _con.QueryFirstOrDefaultAsync<WorkPeriodRaw>(SelectAll + WhereById + ";", new { id });
             return item.FromRaw();
+        }
+
+        public async Task<IEnumerable<WorkPeriod>> MostRecent(int limit) {
+            var items = await _con.QueryAsync<WorkPeriodRaw>(SelectAll + OrderByDescStartTime + LimitClause, new { limit });
+            return items.FromRaw();
         }
     }
 }

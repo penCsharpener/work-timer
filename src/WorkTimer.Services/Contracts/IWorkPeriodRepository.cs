@@ -9,5 +9,6 @@ namespace WorkTimer.Contracts {
         Task<IEnumerable<WorkPeriod>> FindByDate(DateTime date);
         Task<IEnumerable<WorkPeriod>> GetIncomplete();
         Task<WorkPeriod> FindById(int id);
+        Task<IEnumerable<WorkPeriod>> MostRecent(int limit);
     }
 }
