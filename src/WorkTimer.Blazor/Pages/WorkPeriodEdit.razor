@@ -6,38 +6,35 @@
 @inject WorkTimer.Contracts.IWorkingDayRepository workingDayRepo
 @inject NavigationManager NavigationManager
 
-<h1>Edit work period @(WorkPeriod.StartTime.ToString())@(WorkPeriod.EndTime.HasValue ? " - " + WorkPeriod.EndTime.HasValue.ToString() : "")</h1>
+<h1>Edit work period @(WorkPeriod.StartTime.ToString())@GetEndTimeForTitle()</h1>
 
 <EditForm Model="@WorkPeriod" OnValidSubmit="HandleValidSubmitAsync">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div class="form-group">
-        <label>
-            StartTime
-            <InputText id="StartTime" class="form-control" @bind-Value="StartTimeString" />
-        </label>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label For="StartTime">StartTime</label>
+            <InputText id="StartTime" class="form-control" placeholder="@DateTime.Now.ToSqlite()" @bind-Value="StartTimeString" />
+        </div>
+
+        <div class="form-group col-md-6">
+            <label For="EndTime">EndTime</label>
+            <InputText id="EndTime" class="form-control" placeholder="@DateTime.Now.ToSqlite()" @bind-Value="EndTimeString" />
+
+        </div>
     </div>
 
     <div class="form-group">
-        <label>
-            EndTime
-            <InputText id="EndTime" class="form-control" @bind-Value="EndTimeString" />
-        </label>
+        <div class="form-check">
+            <InputCheckbox id="IsBreak" class="form-check-input" @bind-Value="WorkPeriod.IsBreak" />
+            <label class="form-check-label" for="IsBreak">Is Break</label>
+        </div>
     </div>
 
     <div class="form-group">
-        <label>
-            Is Break
-            <InputCheckbox id="IsBreak" class="form-control" @bind-Value="WorkPeriod.IsBreak" />
-        </label>
-    </div>
-
-    <div class="form-group w-100">
-        <label>
-            Comment
-            <InputTextArea id="Comment" class="form-control w-100" @bind-Value="WorkPeriod.Comment" />
-        </label>
+        <label class="w-100" for="Comment">Comment</label>
+        <InputTextArea id="Comment" class="form-control w-100" @bind-Value="WorkPeriod.Comment" />
     </div>
 
     <button type="submit">Submit</button>
@@ -60,11 +57,15 @@
         await base.OnInitializedAsync();
     }
 
+    protected string GetEndTimeForTitle() {
+        return WorkPeriod.EndTime.HasValue ? " - " + WorkPeriod.EndTime.Value.ToString() : "";
+    }
+
     protected async Task HandleValidSubmitAsync() {
-        await workPeriodWriter.Update(Id, 
-                                      DateTime.Parse(StartTimeString), 
-                                      string.IsNullOrEmpty(EndTimeString) ? default(DateTime?) : DateTime.Parse(EndTimeString), 
-                                      WorkPeriod.IsBreak, 
+        await workPeriodWriter.Update(Id,
+                                      DateTime.Parse(StartTimeString),
+                                      string.IsNullOrEmpty(EndTimeString) ? default(DateTime?) : DateTime.Parse(EndTimeString),
+                                      WorkPeriod.IsBreak,
                                       WorkPeriod.Comment);
         NavigationManager.NavigateTo($"/workingday/{WorkPeriod.StartTime.Year}/{WorkPeriod.StartTime.Month}/{WorkPeriod.StartTime.Day}");
     }
