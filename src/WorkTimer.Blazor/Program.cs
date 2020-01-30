@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using System.IO;
 
 namespace WorkTimer.Blazor {
     public sealed class Program {
@@ -18,7 +19,12 @@ namespace WorkTimer.Blazor {
                            //.AddCommandLine(args);
                        })
                        .ConfigureWebHostDefaults(webBuilder => {
-                           webBuilder.UseStartup<Startup>();
+                           webBuilder.UseStartup<Startup>()
+                                     .UseKestrel()
+#if !DEBUG
+                                     .UseUrls("http://localhost:4664/")
+#endif
+                               ;
                        });
         }
     }
