@@ -106,8 +106,7 @@
         await base.OnInitializedAsync();
     }
 
-    private async Task LoadWorkPeriods()
-    {
+    private async Task LoadWorkPeriods() {
         workPeriods = (await workPeriodRepo.FindByDate(DateTime.Now.Date)).ToList();
         if (workPeriods.Count == 0) {
             MostRecentTitle = "Most Recent";
@@ -118,12 +117,12 @@
     public WorkTimer.Models.WorkPeriod newPeriod = new WorkTimer.Models.WorkPeriod();
 
     private async Task HandleValidSubmitAsync() {
-        await LoadWorkPeriods();
         await toggleTracking.ToggleTracking(DateTime.Now, newPeriod.IsBreak, newPeriod.Comment);
         newPeriod = new WorkTimer.Models.WorkPeriod();
         var incomplete = await workPeriodRepo.GetIncomplete();
         dayButtonText = incomplete?.Any() == true ? "Stop" : "Start";
         workingDays = (await workingDayRepo.GetAll()).ToList();
+        await LoadWorkPeriods();
         NavigationManager.NavigateTo("/");
     }
 }
