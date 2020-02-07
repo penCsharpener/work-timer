@@ -1,11 +1,16 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 using System.Data.SQLite;
 using WorkTimer.Config;
 using WorkTimer.Contracts;
+using WorkTimer.EF;
+using WorkTimer.Models;
 using WorkTimer.Repositories;
 using WorkTimer.Services;
 
@@ -21,6 +26,13 @@ namespace WorkTimer.Blazor {
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services) {
             services.AddRazorPages();
+            services.AddDbContextPool<AppDbContext>(options => {
+                options.UseSqlite(Environment.ExpandEnvironmentVariables(Configuration.GetConnectionString("SqliteEFCoreIdentity")), opt => {
+                    opt.MigrationsAssembly("WorkTimer.EF");
+                });
+            });
+            //services.AddEntityFrameworkSqlite();
+            services.AddIdentity<AppUser, IdentityRole<int>>().AddEntityFrameworkStores<AppDbContext>();
             services.AddServerSideBlazor();
             services.Configure<SqliteConfiguration>(Configuration.GetSection(nameof(SqliteConfiguration)));
             services.AddScoped<IWorkPeriodWriter, WorkPeriodWriter>();
@@ -50,6 +62,8 @@ namespace WorkTimer.Blazor {
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseAuthentication();
 
             app.UseRouting();
 

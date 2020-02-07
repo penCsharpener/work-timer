@@ -7,6 +7,10 @@
     <Nullable>Enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.1" />
@@ -14,6 +18,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\WorkTimer.EF\WorkTimer.EF.csproj" />
     <ProjectReference Include="..\WorkTimer.Models\WorkTimer.Models.csproj" />
     <ProjectReference Include="..\WorkTimer.Services\WorkTimer.Services.csproj" />
   </ItemGroup>
