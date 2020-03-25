@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WorkTimer.Api.Extensions;
 using WorkTimer.Api.Models.Config;
+using WorkTimer.EF;
 
 namespace WorkTimer.Api {
     public class Startup {
@@ -21,6 +23,7 @@ namespace WorkTimer.Api {
 
         public void ConfigureServices(IServiceCollection services) {
             services.Configure<JwtAuthentication>(Configuration.GetSection(nameof(JwtAuthentication)));
+            services.AddDbContext<AppDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddIdentity(Configuration.GetSection(nameof(PasswordOptions)).Get<PasswordOptions>());
             services.AddAuthentication("OAuth")
                 .AddJwtBearer("OAuth", config => {
