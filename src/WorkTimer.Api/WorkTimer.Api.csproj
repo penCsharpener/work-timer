@@ -15,5 +15,9 @@
     <Folder Include="Contracts\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\WorkTimer.EF\WorkTimer.EF.csproj" />
+  </ItemGroup>
+
 
 </Project>

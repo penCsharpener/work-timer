@@ -9,9 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using WorkTimer.EF.Models;
 
-namespace WorkTimer.EF
-{
+namespace WorkTimer.EF {
     public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int> {
 
         public AppDbContext([NotNull] DbContextOptions options) : base(options) {
