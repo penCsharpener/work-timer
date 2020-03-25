@@ -36,7 +36,9 @@ namespace WorkTimer.Api.Controllers {
                     _options.Value.ValidAudience,
                     claims,
                     notBefore: DateTime.Now,
-                    expires: DateTime.Now.AddHours(1),
+                    expires: DateTime.Now.AddMinutes(_options.Value.TokenValidityMinutes)
+                                         .AddHours(_options.Value.TokenValidityHours)
+                                         .AddDays(_options.Value.TokenValidityDays),
                     signingCredentials);
 
             var tokenJson = new JwtSecurityTokenHandler().WriteToken(token);
