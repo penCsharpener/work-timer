@@ -1,14 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using WorkTimer.Api.Models.Config;
 
 namespace WorkTimer.Api.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase {
+        private readonly IOptions<JwtAuthentication> _options;
+
+        public AuthController(IOptions<JwtAuthentication> options) {
+            _options = options;
+        }
+
         // GET: api/Auth
         [HttpPost("login")]
         public IActionResult Login() {
@@ -17,15 +25,15 @@ namespace WorkTimer.Api.Controllers {
                 new Claim("granny", "cookie")
             };
 
-            var secretBytes = Encoding.UTF8.GetBytes("adfadfaldjganvut4oauuou9993449997rnaflfhfaljfdlgjs");
+            var secretBytes = Encoding.UTF8.GetBytes(_options.Value.ServerSecret);
             var key = new SymmetricSecurityKey(secretBytes);
             var algorithm = SecurityAlgorithms.HmacSha256;
 
             var signingCredentials = new SigningCredentials(key, algorithm);
 
             var token = new JwtSecurityToken(
-                    "https://localhost:5661/",
-                    "https://localhost:5661/",
+                    _options.Value.ValidIssuer,
+                    _options.Value.ValidAudience,
                     claims,
                     notBefore: DateTime.Now,
                     expires: DateTime.Now.AddHours(1),

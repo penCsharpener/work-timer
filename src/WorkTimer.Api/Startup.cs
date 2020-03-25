@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Threading.Tasks;
+using WorkTimer.Api.Models.Config;
 
 namespace WorkTimer.Api {
     public class Startup {
@@ -17,9 +18,11 @@ namespace WorkTimer.Api {
         public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services) {
+            services.Configure<JwtAuthentication>(Configuration.GetSection(nameof(JwtAuthentication)));
             services.AddAuthentication("OAuth")
                 .AddJwtBearer("OAuth", config => {
-                    var secretBytes = Encoding.UTF8.GetBytes("adfadfaldjganvut4oauuou9993449997rnaflfhfaljfdlgjs");
+                    var jwtOptions = Configuration.GetSection(nameof(JwtAuthentication)).Get<JwtAuthentication>();
+                    var secretBytes = Encoding.UTF8.GetBytes(jwtOptions.ServerSecret);
                     var key = new SymmetricSecurityKey(secretBytes);
 
                     config.Events = new JwtBearerEvents() {
@@ -33,8 +36,8 @@ namespace WorkTimer.Api {
                     };
 
                     config.TokenValidationParameters = new TokenValidationParameters() {
-                        ValidAudience = "https://localhost:5661/",
-                        ValidIssuer = "https://localhost:5661/",
+                        ValidAudience = jwtOptions.ValidIssuer,
+                        ValidIssuer = jwtOptions.ValidAudience,
                         IssuerSigningKey = key,
                     };
                 });
