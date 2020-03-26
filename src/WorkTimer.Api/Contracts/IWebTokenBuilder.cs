@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using WorkTimer.Api.Models;
 
 namespace WorkTimer.Api.Contracts {
     public interface IWebTokenBuilder {
-        string GenerateToken();
+        string GenerateToken(User user);
     }
 }
