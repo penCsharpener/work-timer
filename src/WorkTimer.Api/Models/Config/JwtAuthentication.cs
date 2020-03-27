@@ -25,15 +25,26 @@ namespace WorkTimer.Api.Models.Config {
             }
         }
 
+        public SymmetricSecurityKey SymmetricSecurityKey {
+            get {
+                if (string.IsNullOrWhiteSpace(ServerSecret)) {
+                    throw new ArgumentNullException(nameof(ServerSecret));
+                }
+
+                var secretBytes = Encoding.UTF8.GetBytes(ServerSecret);
+                return new SymmetricSecurityKey(secretBytes);
+            }
+        }
+
         public TimeSpan ValidFor => new TimeSpan(TokenValidityDays, TokenValidityHours, TokenValidityMinutes, 0);
 
         public string JtGuid => Guid.NewGuid().ToString();
 
         private SigningCredentials GetSigningCredentials() {
             if (!string.IsNullOrWhiteSpace(ServerSecret)) {
-                var secretBytes = Encoding.UTF8.GetBytes(ServerSecret);
 
-                return new SigningCredentials(new SymmetricSecurityKey(secretBytes), SecurityAlgorithms.HmacSha512);
+
+                return new SigningCredentials(SymmetricSecurityKey, SecurityAlgorithms.HmacSha512);
             }
 
             return default;

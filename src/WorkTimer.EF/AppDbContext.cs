@@ -1,18 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using WorkTimer.EF.Models;
 
 namespace WorkTimer.EF {
-    public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int> {
+    public class AppDbContext : IdentityDbContext<AppUser, AppRole, int> {
 
         public AppDbContext([NotNull] DbContextOptions options) : base(options) {
 

@@ -1,49 +1,69 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using WorkTimer.Api.Models.Config;
+using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using WorkTimer.Api.Contracts;
+using WorkTimer.Api.Models;
 
 namespace WorkTimer.Api.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase {
-        private readonly IOptions<JwtAuthentication> _options;
+        private readonly IWebTokenBuilder _webTokenBuilder;
+        private readonly IAuthProvider _authProvider;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IOptions<JwtAuthentication> options) {
-            _options = options;
+        public AuthController(IWebTokenBuilder webTokenBuilder,
+                              IAuthProvider authProvider,
+                              ILogger<AuthController> logger) {
+            _webTokenBuilder = webTokenBuilder;
+            _authProvider = authProvider;
+            _logger = logger;
         }
 
         // GET: api/Auth
         [HttpPost("login")]
-        public IActionResult Login() {
-            var claims = new[] {
-                new Claim(JwtRegisteredClaimNames.Sub, "some_id"),
-                new Claim("granny", "cookie")
-            };
+        public async Task<IActionResult> Login([FromBody] LoginModel loginModel) {
+            if (!ModelState.IsValid) {
+                _logger.LogError($"Invalid model for user: ${loginModel?.Email} and password with length ${loginModel?.Password?.Length ?? 0}");
+                return BadRequest(ModelState);
+            }
 
-            var secretBytes = Encoding.UTF8.GetBytes(_options.Value.ServerSecret);
-            var key = new SymmetricSecurityKey(secretBytes);
-            var algorithm = SecurityAlgorithms.HmacSha256;
+            var user = await _authProvider.Login(loginModel);
 
-            var signingCredentials = new SigningCredentials(key, algorithm);
+            if (user == null) {
+                _logger.LogError($"User not found for user: ${loginModel?.Email} and password with length ${loginModel?.Password?.Length ?? 0}");
+                return BadRequest();
+            }
 
-            var token = new JwtSecurityToken(
-                    _options.Value.ValidIssuer,
-                    _options.Value.ValidAudience,
-                    claims,
-                    notBefore: DateTime.Now,
-                    expires: DateTime.Now.AddMinutes(_options.Value.TokenValidityMinutes)
-                                         .AddHours(_options.Value.TokenValidityHours)
-                                         .AddDays(_options.Value.TokenValidityDays),
-                    signingCredentials);
+            var token = _webTokenBuilder.GenerateToken(user);
+            return Ok(new { user.FirstName, user.LastName, Token = token });
+        }
 
-            var tokenJson = new JwtSecurityTokenHandler().WriteToken(token);
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterModel registerModel) {
+            if (!ModelState.IsValid) {
+                _logger.LogError($"Invalid model for user: ${registerModel?.Email} and password with length ${registerModel?.Password?.Length ?? 0}");
+                return BadRequest(ModelState);
+            }
 
-            return Ok(new { access_token = tokenJson });
+            if (registerModel.Password != registerModel.PasswordConfirm) {
+                _logger.LogError($"Password inputs don't match for {registerModel?.Email}");
+                return BadRequest("Password inputs don't match.");
+            }
+
+            if (await _authProvider.UserExists(registerModel)) {
+                return BadRequest("User already registered.");
+            }
+
+            var user = await _authProvider.Register(registerModel);
+
+            if (user == null) {
+                _logger.LogError($"User could not be registered: ${registerModel?.Email}");
+                return BadRequest("User could not be registered");
+            }
+
+            var token = _webTokenBuilder.GenerateToken(user);
+            return Ok(new { user.FirstName, user.LastName, Token = token });
         }
 
         // GET: api/Auth/5

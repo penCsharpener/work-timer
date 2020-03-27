@@ -5,7 +5,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using WorkTimer.Api.Extensions;
-using WorkTimer.Api.Models.Config;
 
 namespace WorkTimer.Api {
     public sealed class Program {
@@ -37,8 +36,10 @@ namespace WorkTimer.Api {
             return Host.CreateDefaultBuilder(args)
                        .ConfigureWebHostDefaults(webBuilder => {
                            webBuilder.UseStartup<Startup>()
+                           // the two lines below prevent ef migrations to be added via PM console
                            .UseKestrel()
-                           .UseUrls(LaunchSettings.GetSection(nameof(ApplicationSettings)).Get<ApplicationSettings>().LaunchUrls);
+                           .UseUrls(LaunchSettings.GetSection(nameof(Models.Config.ApplicationSettings)).Get<Models.Config.ApplicationSettings>().LaunchUrls)
+                           ;
                        });
         }
     }
