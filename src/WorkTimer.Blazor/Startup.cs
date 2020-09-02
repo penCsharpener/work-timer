@@ -7,8 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WorkTimer.Blazor.Areas.Identity;
-using WorkTimer.Blazor.Data;
 using WorkTimer.Domain.Models;
+using WorkTimer.Persistence.Data;
 
 namespace WorkTimer.Blazor {
     public class Startup {

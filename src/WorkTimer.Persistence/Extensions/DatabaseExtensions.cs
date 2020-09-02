@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
-using WorkTimer.Blazor.Data;
+using WorkTimer.Persistence.Data;
 
 namespace WorkTimer.Persistence.Extensions {
     public static class DatabaseExtensions {

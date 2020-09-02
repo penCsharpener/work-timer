@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using WorkTimer.Domain.Models;
 
-namespace WorkTimer.Blazor.Data {
+namespace WorkTimer.Persistence.Data {
     public class AppDbContext : IdentityDbContext<AppUser, AppRole, int> {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) {
 
