@@ -3,14 +3,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WorkTimer.Blazor.Areas.Identity;
-using WorkTimer.Domain.Models;
 using WorkTimer.MediatR.Pipelines;
-using WorkTimer.Persistence.Data;
+using WorkTimer.Persistence.Extensions;
 
 namespace WorkTimer.Blazor {
     public class Startup {
@@ -23,11 +21,7 @@ namespace WorkTimer.Blazor {
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services) {
-            services.AddDbContext<AppDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<AppUser>(options => {
-                options.SignIn.RequireConfirmedAccount = true;
-                options.Password = Configuration.GetSection(nameof(PasswordOptions)).Get<PasswordOptions>();
-            }).AddRoles<AppRole>().AddEntityFrameworkStores<AppDbContext>();
+            services.AddEntityFramework(Configuration);
             services.AddHttpContextAccessor();
             services.AddRazorPages();
             services.AddServerSideBlazor();
