@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WorkTimer.Blazor.Areas.Identity;
 using WorkTimer.Domain.Models;
+using WorkTimer.MediatR.Pipelines;
 using WorkTimer.Persistence.Data;
 
 namespace WorkTimer.Blazor {
@@ -26,8 +28,11 @@ namespace WorkTimer.Blazor {
                 options.SignIn.RequireConfirmedAccount = true;
                 options.Password = Configuration.GetSection(nameof(PasswordOptions)).Get<PasswordOptions>();
             }).AddRoles<AppRole>().AddEntityFrameworkStores<AppDbContext>();
+            services.AddHttpContextAccessor();
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddMediatR(typeof(MediatR.Models.UserContext).Assembly);
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UserIdPipeline<,>));
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
         }
 
