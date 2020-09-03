@@ -8,10 +8,16 @@ namespace WorkTimer.Persistence.Data {
 
         }
 
-
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+            base.OnConfiguring(optionsBuilder);
+#if DEBUG
+            optionsBuilder.EnableSensitiveDataLogging();
+            optionsBuilder.EnableDetailedErrors();
+#endif
+        }
 
         public DbSet<WorkingPeriod> WorkingPeriods { get; set; }
-        public DbSet<WorkDay> WorkingDays { get; set; }
+        public DbSet<WorkDay> WorkDays { get; set; }
         public DbSet<Contract> Contracts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {

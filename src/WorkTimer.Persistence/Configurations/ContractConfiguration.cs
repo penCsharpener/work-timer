@@ -8,6 +8,9 @@ namespace WorkTimer.Persistence.Configurations {
             builder.Property(x => x.Name).IsRequired();
             builder.Property(x => x.Employer).IsRequired();
             builder.Property(x => x.HoursPerWeek).IsRequired();
+
+            builder.HasMany(x => x.WorkDays).WithOne(x => x.Contract).HasForeignKey(x => x.ContractId);
+            builder.HasOne(x => x.User).WithMany(x => x.Contracts).HasForeignKey(x => x.UserId);
         }
     }
 }

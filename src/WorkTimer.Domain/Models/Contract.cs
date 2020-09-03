@@ -1,4 +1,6 @@
-﻿namespace WorkTimer.Domain.Models {
+﻿using System.Collections.Generic;
+
+namespace WorkTimer.Domain.Models {
     public class Contract {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -6,6 +8,7 @@
         public int HoursPerWeek { get; set; }
         public int UserId { get; set; }
 
+        public ICollection<WorkDay> WorkDays { get; set; }
         public AppUser User { get; set; }
     }
 }

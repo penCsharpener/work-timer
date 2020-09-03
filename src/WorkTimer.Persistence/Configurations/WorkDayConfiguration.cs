@@ -7,6 +7,8 @@ namespace WorkTimer.Persistence.Configurations {
         public void Configure(EntityTypeBuilder<WorkDay> builder) {
             builder.Property(x => x.Date).IsRequired();
             builder.Property(x => x.ContractId).IsRequired();
+
+            builder.HasOne(x => x.Contract).WithMany(x => x.WorkDays).HasForeignKey(x => x.ContractId);
         }
     }
 }

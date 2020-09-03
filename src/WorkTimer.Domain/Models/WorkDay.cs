@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace WorkTimer.Domain.Models {
     public class WorkDay {
@@ -7,6 +8,8 @@ namespace WorkTimer.Domain.Models {
         public DateTime Date { get; set; }
         public WorkDayType WorkDayType { get; set; }
         public int ContractId { get; set; }
+
+        public TimeSpan WorkTime => WorkingPeriods != null ? TimeSpan.FromSeconds(WorkingPeriods.Sum(x => x.WorkTime.TotalSeconds)) : new TimeSpan();
 
         public Contract Contract { get; set; }
         public ICollection<WorkingPeriod> WorkingPeriods { get; set; }
