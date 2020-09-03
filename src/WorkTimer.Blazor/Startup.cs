@@ -1,4 +1,3 @@
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -7,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WorkTimer.Blazor.Areas.Identity;
-using WorkTimer.MediatR.Pipelines;
+using WorkTimer.Blazor.Extensions;
 using WorkTimer.Persistence.Extensions;
 
 namespace WorkTimer.Blazor {
@@ -25,8 +24,7 @@ namespace WorkTimer.Blazor {
             services.AddHttpContextAccessor();
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddMediatR(typeof(MediatR.Models.UserContext).Assembly);
-            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UserIdPipeline<,>));
+            services.AddWorkTimerServices();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
         }
 
