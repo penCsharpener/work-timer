@@ -1,0 +1,38 @@
+﻿@page "/contracts"
+@inject global::MediatR.IMediator Mediator
+@inject NavigationManager Navi
+@attribute [Authorize]
+
+@if (Response?.Contracts != null) {
+
+    foreach (var contract in Response.Contracts) {
+        <div class="card border-light mb-3" style="max-width: 18rem;">
+            <div class="card-header d-flex"><span>@contract.Name</span><a class="oi oi-pencil ml-auto" href="contracts/@contract.Id"></a></div>
+            <div class="card-body">
+                <h5 class="card-title">@contract.Employer</h5>
+                <p class="card-text">Hours per week: @contract.HoursPerWeek</p>
+                <p class="card-text">Is current contract: @(contract.IsCurrent ? "☑" : "☐")</p>
+            </div>
+        </div>
+    }
+
+    <a class="btn btn-primary" href="contracts/add">Add contract</a>
+
+} else {
+    @RedirectToCreateContract()
+}
+
+@code {
+    public ContractListResponse Response { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Response = await Mediator.Send(new ContractListRequest());
+    }
+
+    private string RedirectToCreateContract()
+    {
+        Navi.NavigateTo("/contracts/add");
+        return string.Empty;
+    }
+}

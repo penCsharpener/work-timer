@@ -4,7 +4,6 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using WorkTimer.MediatR.Models;
 using WorkTimer.MediatR.Requests;
 using WorkTimer.MediatR.Responses;
 using WorkTimer.Persistence.Data;
@@ -23,12 +22,13 @@ namespace WorkTimer.MediatR.Handlers {
                 return Task.FromResult(new IndexResponse());
             }
 
-            var results = _context.WorkDays.Include(x => x.Contract)
+            var results = _context.WorkDays.Include(x => x.Contract).Include(x => x.WorkingPeriods)
                 .Where(x => x.Contract.UserId == request.User.Id)
                 .ToList()
                 .Select(x => new DisplayWorkDayModel(x) {
                     OverhoursInSeconds = x.WorkingPeriods.Where(y => y.EndTime.HasValue).Sum(y => (y.EndTime.Value - y.StartTime).TotalSeconds),
-                    HasOngoingWorkingDay = x.WorkingPeriods.Any(y => !y.EndTime.HasValue)
+                    HasOngoingWorkingDay = x.WorkingPeriods.Any(y => !y.EndTime.HasValue),
+                    ContractedHours = x.Contract.HoursPerWeek / 5
                 })
                 .ToList();
 

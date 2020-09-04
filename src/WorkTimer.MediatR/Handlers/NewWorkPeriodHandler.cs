@@ -18,7 +18,6 @@ namespace WorkTimer.MediatR.Handlers {
 
         public Task<bool> Handle(NewWorkPeriodRequest request, CancellationToken cancellationToken) {
             try {
-
                 var workDayToday = _context.WorkDays.Include(x => x.Contract)
                     .Where(x => x.Contract.UserId == request.User.Id)
                     .OrderByDescending(x => x.Date)
@@ -26,24 +25,49 @@ namespace WorkTimer.MediatR.Handlers {
                     .FirstOrDefault();
 
                 if (workDayToday == null) {
+                    var contract = _context.Contracts.Where(x => x.UserId == request.User.Id && x.IsCurrent).FirstOrDefault();
 
+                    if (contract == null) {
+                        // some error message and re-route to create a contract
+                        contract = new Contract {
+                            Employer = "some Employer",
+                            Name = "fulltime at some Employer",
+                            UserId = request.User.Id,
+                            IsCurrent = true,
+                            HoursPerWeek = 40,
+                        };
+                        _context.Contracts.Add(contract);
+                        _context.SaveChanges();
+                    }
+
+                    workDayToday = new WorkDay {
+                        ContractId = contract.Id,
+                        Date = DateTime.Now.Date,
+                        WorkDayType = WorkDayType.Workday,
+                    };
+                    _context.WorkDays.Add(workDayToday);
+                    _context.SaveChanges();
                 }
 
+                WorkDay newWorkDay = null;
                 if (workDayToday.Date.Date < DateTime.Now.Date) {
-                    var newWorkDay = new WorkDay {
+                    newWorkDay = new WorkDay {
                         ContractId = workDayToday.ContractId,
                         Date = DateTime.Now.Date,
                         WorkDayType = WorkDayType.Workday,
                     };
 
                     _context.WorkDays.Add(newWorkDay);
+                    _context.SaveChanges();
                 }
 
                 _context.WorkingPeriods.Add(new WorkingPeriod {
                     Comment = request.Comment,
                     StartTime = DateTime.Now,
-                    WorkDayId = workDayToday.Id
+                    WorkDayId = newWorkDay?.Id ?? workDayToday.Id
                 });
+
+                _context.SaveChanges();
 
                 return Task.FromResult(true);
             } catch (System.Exception) {

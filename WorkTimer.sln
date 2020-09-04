@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTimer.Domain", "src\Wor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTimer.Persistence", "src\WorkTimer.Persistence\WorkTimer.Persistence.csproj", "{2673B023-FCF9-4666-8174-032992CDCF8B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkTimer.MediatR", "src\WorkTimer.MediatR\WorkTimer.MediatR.csproj", "{9D9597A2-275A-4AA8-9D18-1ADA351F7A96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTimer.MediatR", "src\WorkTimer.MediatR\WorkTimer.MediatR.csproj", "{9D9597A2-275A-4AA8-9D18-1ADA351F7A96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

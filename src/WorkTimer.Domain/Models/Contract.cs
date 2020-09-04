@@ -6,6 +6,7 @@ namespace WorkTimer.Domain.Models {
         public string Name { get; set; }
         public string Employer { get; set; }
         public int HoursPerWeek { get; set; }
+        public bool IsCurrent { get; set; }
         public int UserId { get; set; }
 
         public ICollection<WorkDay> WorkDays { get; set; }

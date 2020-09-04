@@ -83,11 +83,18 @@
 
     protected override async Task OnInitializedAsync() {
         IndexResponse = await Mediator.Send(new IndexRequest());
+        EvaluateButtonText();
         await base.OnInitializedAsync();
     }
 
     private async Task HandleValidSubmitAsync() {
-        dayButtonText = IndexResponse.HasOngoingWorkPeriod ? "Stop" : "Start";
+        var result = await Mediator.Send(new NewWorkPeriodRequest());
+        NewPeriodModel = new NewWorkPeriodRequest();
+        EvaluateButtonText();
         Navigation.NavigateTo("/");
+    }
+
+    private void EvaluateButtonText() {
+        dayButtonText = IndexResponse.HasOngoingWorkPeriod ? "Stop" : "Start";
     }
 }
