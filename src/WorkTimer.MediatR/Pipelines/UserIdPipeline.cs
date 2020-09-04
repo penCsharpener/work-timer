@@ -21,8 +21,10 @@ namespace WorkTimer.MediatR.Pipelines {
             var claim = httpContext.User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
 
             if (request is UserContext userContext) {
-                userContext.UserEmail = claim.Value.ToUpper();
-                userContext.User = _context.Users.Where(x => x.NormalizedEmail == userContext.UserEmail).SingleOrDefault();
+                if (userContext.User == null) {
+                    userContext.UserEmail = claim.Value.ToUpper();
+                    userContext.User = _context.Users.Where(x => x.NormalizedEmail == userContext.UserEmail).SingleOrDefault();
+                }
             }
 
             return await next();
