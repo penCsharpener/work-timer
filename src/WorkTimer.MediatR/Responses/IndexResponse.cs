@@ -18,6 +18,8 @@ namespace WorkTimer.MediatR.Responses {
             Date = workDay.Date;
             WorkDayType = workDay.WorkDayType;
             ContractId = workDay.ContractId;
+            Contract = workDay.Contract;
+            WorkingPeriods = workDay.WorkingPeriods;
 
             WorkHours = TimeSpan.FromSeconds(workDay.WorkingPeriods.Sum(x => x.WorkTime.TotalSeconds));
         }
