@@ -24,6 +24,7 @@ namespace WorkTimer.MediatR.Handlers {
 
             var results = _context.WorkDays.Include(x => x.Contract).Include(x => x.WorkingPeriods)
                 .Where(x => x.Contract.UserId == request.User.Id)
+                .OrderByDescending(x => x.Date)
                 .ToList()
                 .Select(x => new DisplayWorkDayModel(x, x.Contract.HoursPerWeek / (double)5) {
                     OverhoursInSeconds = x.WorkingPeriods.Where(y => y.EndTime.HasValue).Sum(y => (y.EndTime.Value - y.StartTime).TotalSeconds),
@@ -38,9 +39,10 @@ namespace WorkTimer.MediatR.Handlers {
                 .ToList();
 
             return Task.FromResult(new IndexResponse {
-                WorkDays = results.Select(x => x).ToList(),
+                WorkDays = results,
                 TotalOverHours = TimeSpan.FromSeconds(results.Sum(x => x.Overhours.TotalSeconds)),
-                MostRecentWorkPeriods = mostRecent
+                MostRecentWorkPeriods = mostRecent,
+                HasOngoingWorkPeriod = results.Any(x => x.HasOngoingWorkingDay)
             });
         }
     }

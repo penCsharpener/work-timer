@@ -7,6 +7,7 @@
         HalfVacation = 4,
         SickDay = 5,
         ParentalLeave = 6,
-        ChildSickDay = 7
+        ChildSickDay = 7,
+        Weekend = 8
     }
 }

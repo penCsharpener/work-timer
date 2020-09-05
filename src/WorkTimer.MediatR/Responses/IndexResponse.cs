@@ -34,6 +34,7 @@ namespace WorkTimer.MediatR.Responses {
                 case WorkDayType.ChildSickDay:
                 case WorkDayType.ParentalLeave:
                 case WorkDayType.BankHoliday:
+                case WorkDayType.Weekend:
                     workdayTypeMultiplier = 0;
                     break;
             }

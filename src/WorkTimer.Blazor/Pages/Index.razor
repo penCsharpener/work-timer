@@ -88,8 +88,9 @@
     }
 
     private async Task HandleValidSubmitAsync() {
-        var result = await Mediator.Send(new NewWorkPeriodRequest());
+        var result = await Mediator.Send(NewPeriodModel);
         NewPeriodModel = new NewWorkPeriodRequest();
+        IndexResponse = await Mediator.Send(new IndexRequest());
         EvaluateButtonText();
         Navi.NavigateTo("/");
     }

@@ -61,6 +61,15 @@ namespace WorkTimer.MediatR.Handlers {
                     _context.SaveChanges();
                 }
 
+                var unfinished = workDayToday.WorkingPeriods.FirstOrDefault(x => !x.EndTime.HasValue);
+                if (unfinished != null) {
+                    unfinished.EndTime = DateTime.Now;
+
+                    _context.WorkingPeriods.Update(unfinished);
+                    _context.SaveChanges();
+                    return Task.FromResult(true);
+                }
+
                 _context.WorkingPeriods.Add(new WorkingPeriod {
                     Comment = request.Comment,
                     StartTime = DateTime.Now,
