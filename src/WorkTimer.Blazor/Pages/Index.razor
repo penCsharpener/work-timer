@@ -1,6 +1,6 @@
 ﻿@page "/"
 @inject global::MediatR.IMediator Mediator
-@inject NavigationManager Navigation;
+@inject NavigationManager Navi;
 @attribute [Authorize]
 
 <h1 class="mb-2">Timer</h1>
@@ -93,13 +93,13 @@
         var result = await Mediator.Send(new NewWorkPeriodRequest());
         NewPeriodModel = new NewWorkPeriodRequest();
         EvaluateButtonText();
-        Navigation.NavigateTo("/");
+        Navi.NavigateTo("/");
     }
 
     private string CheckForContracts() {
         var contract = Mediator.Send(new ContractListRequest()).GetAwaiter().GetResult();
         if (contract?.Contracts?.Any() == false) {
-            Navigation.NavigateTo("/contracts/add");
+            Navi.NavigateTo("/contracts/add");
         }
         return "";
     }
