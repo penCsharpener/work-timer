@@ -18,7 +18,7 @@
     <MatBlazor.MatSelectValue @bind-Value="Model.WorkDay.ContractId"
                               Items="@Model.Contracts"
                               ValueSelector="@(i => i.Id)"
-                              class="mx-3 w-100"
+                              class="mx-3"
                               id="cboContract">
         <ItemTemplate Context="contractItem">
             <span>@contractItem.Name</span>

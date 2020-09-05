@@ -59,12 +59,12 @@
             </tr>
         </thead>
         <tbody>
-            @for (int i = 0; i < IndexResponse.WorkDays.Count; i++) {
-                <tr onclick="location.href='workday/@IndexResponse.WorkDays[i].Id'">
-                    <td>@IndexResponse.WorkDays[i].Date.DayOfWeek.ToString()</td>
-                    <td>@IndexResponse.WorkDays[i].Date.ToString("dd.MM.yyyy")</td>
-                    <td>@IndexResponse.WorkDays[i].WorkTime.ToTimeString()</td>
-                    <td>@IndexResponse.WorkDays[i].Overhours.ToTimeString()</td>
+            @foreach (var workDay in IndexResponse.WorkDays) {
+                <tr onclick="location.href='workday/@workDay.Id'">
+                    <td>@workDay.Date.DayOfWeek.ToString()</td>
+                    <td>@workDay.Date.ToString("dd.MM.yyyy")</td>
+                    <td>@workDay.WorkTime.ToTimeString()</td>
+                    <td>@workDay.Overhours.ToTimeString()</td>
                 </tr>
             }
         </tbody>
