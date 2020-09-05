@@ -22,13 +22,20 @@ namespace WorkTimer.MediatR.Handlers {
                 .Where(x => x.Contract.UserId == request.User.Id && x.Id == request.WorkDayId)
                 .FirstOrDefault();
 
+            var contracts = _context.Contracts.Where(x => x.UserId == request.User.Id)
+                .Select(x => new ContractDropdownListModel {
+                    Id = x.Id,
+                    Name = x.Name
+                }).ToList();
+
             if (result != null) {
 
                 return Task.FromResult(
                     new GetWorkDayDetailsResponse {
                         WorkingPeriods = result.WorkingPeriods,
                         WorkDay = result,
-                        IsOpenWorkday = result.WorkingPeriods.Any(x => !x.EndTime.HasValue)
+                        IsOpenWorkday = result.WorkingPeriods.Any(x => !x.EndTime.HasValue),
+                        Contracts = contracts
                     });
             }
 

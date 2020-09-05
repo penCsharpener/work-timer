@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTimer.Dev.Seeding", "sr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D8AAFD8A-E9BA-41A4-AC66-0149FA24BB08}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkTimer.Seeding.Tests", "tests\WorkTimer.Seeding.Tests\WorkTimer.Seeding.Tests.csproj", "{845F8A62-F0FB-4445-8886-79A66B7C8F6F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTimer.Seeding.Tests", "tests\WorkTimer.Seeding.Tests\WorkTimer.Seeding.Tests.csproj", "{845F8A62-F0FB-4445-8886-79A66B7C8F6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

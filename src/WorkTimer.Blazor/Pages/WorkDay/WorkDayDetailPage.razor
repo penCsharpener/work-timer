@@ -1,4 +1,5 @@
 ﻿@page "/workday/{WorkDayId:int}"
+@using Microsoft.AspNetCore.Components.Web
 @inject global::MediatR.IMediator Mediator
 @inject NavigationManager Navi;
 @attribute [Authorize]
@@ -9,9 +10,20 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <label class="mr-3 mt-2 align-self-center" for="txtComment">Work day type: </label>
-    <MatBlazor.MatSelectItem id="txtComment" Items="WorkDayTypes" @bind-Value="Model.WorkDay.WorkDayType">
+    <label class="mx-3 mt-2 align-self-center" for="txtComment">Work day type: </label>
+    <MatBlazor.MatSelectItem class="mx-3" id="txtComment" Items="WorkDayTypes" @bind-Value="Model.WorkDay.WorkDayType">
     </MatBlazor.MatSelectItem>
+
+    <label class="mx-3 mt-2 align-self-center" for="cboContract">Contract: </label>
+    <MatBlazor.MatSelectValue @bind-Value="Model.WorkDay.ContractId"
+                              Items="@Model.Contracts"
+                              ValueSelector="@(i => i.Id)"
+                              class="mx-3 w-100"
+                              id="cboContract">
+        <ItemTemplate Context="contractItem">
+            <span>@contractItem.Name</span>
+        </ItemTemplate>
+    </MatBlazor.MatSelectValue>
 
     <button class="btn btn-outline-primary ml-4 align-self-center" type="submit">Save</button>
 </EditForm>
