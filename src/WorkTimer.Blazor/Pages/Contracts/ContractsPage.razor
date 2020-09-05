@@ -3,7 +3,7 @@
 @inject NavigationManager Navi
 @attribute [Authorize]
 
-@if (Response?.Contracts != null) {
+@if (Response?.Contracts?.Any() == true){
 
     foreach (var contract in Response.Contracts) {
         <div class="card border-light mb-3" style="max-width: 18rem;">
@@ -25,13 +25,11 @@
 @code {
     public ContractListResponse Response { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
+    protected override async Task OnInitializedAsync() {
         Response = await Mediator.Send(new ContractListRequest());
     }
 
-    private string RedirectToCreateContract()
-    {
+    private string RedirectToCreateContract() {
         Navi.NavigateTo("/contracts/add");
         return string.Empty;
     }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using WorkTimer.Dev.Seeding;
 using WorkTimer.Persistence.Extensions;
 
 namespace WorkTimer.Blazor {
@@ -24,7 +25,7 @@ namespace WorkTimer.Blazor {
                     var sp = scope.ServiceProvider;
                     try {
                         await sp.MigrateDatabaseAsync();
-                        //await sp.SeedDatabaseAsync();
+                        await sp.SeedDatabaseAsync();
                     } catch (Exception ex) {
                         var logger = sp.GetRequiredService<ILogger<Program>>();
                         logger.LogError(ex, "An error occurred while migrating the database.");
@@ -36,7 +37,6 @@ namespace WorkTimer.Blazor {
             } catch (Exception ex) {
 
             }
-            CreateHostBuilder(args).Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) {

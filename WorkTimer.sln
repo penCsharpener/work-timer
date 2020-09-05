@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTimer.Persistence", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTimer.MediatR", "src\WorkTimer.MediatR\WorkTimer.MediatR.csproj", "{9D9597A2-275A-4AA8-9D18-1ADA351F7A96}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkTimer.Dev.Seeding", "src\WorkTimer.Dev.Seeding\WorkTimer.Dev.Seeding.csproj", "{DBAACA40-B030-4065-8F50-5017313B7FDC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{9D9597A2-275A-4AA8-9D18-1ADA351F7A96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D9597A2-275A-4AA8-9D18-1ADA351F7A96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D9597A2-275A-4AA8-9D18-1ADA351F7A96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBAACA40-B030-4065-8F50-5017313B7FDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBAACA40-B030-4065-8F50-5017313B7FDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBAACA40-B030-4065-8F50-5017313B7FDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBAACA40-B030-4065-8F50-5017313B7FDC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -50,6 +56,7 @@ Global
 		{994FD5A3-0704-41ED-8494-A27A2A543604} = {14B07CCB-83D2-4EA6-824B-4CCCBD6D933A}
 		{2673B023-FCF9-4666-8174-032992CDCF8B} = {14B07CCB-83D2-4EA6-824B-4CCCBD6D933A}
 		{9D9597A2-275A-4AA8-9D18-1ADA351F7A96} = {14B07CCB-83D2-4EA6-824B-4CCCBD6D933A}
+		{DBAACA40-B030-4065-8F50-5017313B7FDC} = {14B07CCB-83D2-4EA6-824B-4CCCBD6D933A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {11478E0A-1753-4FE2-AC81-F0C4E43EB48C}

@@ -9,6 +9,7 @@ namespace WorkTimer.MediatR.Responses {
         public IList<WorkingPeriod> MostRecentWorkPeriods { get; set; }
         public TimeSpan TotalOverHours { get; set; }
         public bool HasOngoingWorkPeriod { get; set; }
+        public string RedirectRoute { get; set; }
     }
 
     public class DisplayWorkDayModel : WorkDay {
