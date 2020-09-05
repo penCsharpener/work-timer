@@ -5,6 +5,17 @@
 
 <h1>Work day details for @Model.WorkDay?.Date.DayOfWeek @Model.WorkDay?.Date.ToString("dd.MM.yyyy")</h1>
 
+<EditForm class="d-flex mb-3" Model="@Model.WorkDay" OnValidSubmit="HandleValidSubmitAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <label class="mr-3 mt-2 align-self-center" for="txtComment">Work day type: </label>
+    <MatBlazor.MatSelectItem id="txtComment" Items="WorkDayTypes" @bind-Value="Model.WorkDay.WorkDayType">
+    </MatBlazor.MatSelectItem>
+
+    <button class="btn btn-outline-primary ml-4 align-self-center" type="submit">Save</button>
+</EditForm>
+
 <table class="table table-striped table-hover table-sm">
     <thead>
         <tr>
@@ -37,7 +48,13 @@
 
     public GetWorkDayDetailsResponse Model { get; set; }
 
+    public WorkTimer.Domain.Models.WorkDayType[] WorkDayTypes { get; set; } = Enum.GetValues(typeof(WorkTimer.Domain.Models.WorkDayType)).Cast<WorkTimer.Domain.Models.WorkDayType>().ToArray();
+
     protected override async Task OnInitializedAsync() {
         Model = await Mediator.Send(new GetWorkDayDetailsRequest(WorkDayId));
+    }
+
+    protected async Task HandleValidSubmitAsync() {
+        var result = await Mediator.Send(Model);
     }
 }
