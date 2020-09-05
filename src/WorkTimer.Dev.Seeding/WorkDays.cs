@@ -14,16 +14,25 @@ namespace WorkTimer.Dev.Seeding {
         }
 
         public static IEnumerable<WorkingPeriod> GetWorkingPeriods(DateTime date) {
-            var startEnd = GetStartEndTime(date);
-            yield return new WorkingPeriod { StartTime = startEnd.start, EndTime = startEnd.end };
+            int periodCount = _rnd.Next(1, 3);
+            for (int i = 1; i < (periodCount + 1); i++) {
+                var (start, end) = GetStartEndTime(date, i, periodCount);
+                yield return new WorkingPeriod { StartTime = start, EndTime = end };
+            }
         }
 
         private static Random _rnd = new Random();
 
-        private static (DateTime start, DateTime end) GetStartEndTime(DateTime date) {
-            var startTime = _rnd.Next(6 * 60 * 60, 8 * 60 * 60);
-            var endTime = _rnd.Next(15 * 60 * 60, 17 * 60 * 60);
-            return (date.Date.AddSeconds(startTime), date.Date.AddSeconds(endTime));
+        private static (DateTime start, DateTime end) GetStartEndTime(DateTime date, int current, int total) {
+            if (total == 1) {
+                return (date.Date.AddSeconds(_rnd.Next(6 * 60 * 60, 8 * 60 * 60)), date.Date.AddSeconds(_rnd.Next(15 * 60 * 60, 17 * 60 * 60)));
+            } else {
+                if (current == 1) {
+                    return (date.Date.AddSeconds(_rnd.Next(6 * 60 * 60, 8 * 60 * 60)), date.Date.AddSeconds(_rnd.Next(12 * 60 * 60, (int)(12.5 * 60 * 60))));
+                } else {
+                    return (date.Date.AddSeconds(_rnd.Next((int)(12.5 * 60 * 60), 13 * 60 * 60)), date.Date.AddSeconds(_rnd.Next(15 * 60 * 60, 17 * 60 * 60)));
+                }
+            }
         }
     }
 }
