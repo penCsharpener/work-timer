@@ -11,7 +11,11 @@ namespace WorkTimer.Dev.Seeding {
             var context = provider.GetRequiredService<AppDbContext>();
             var userManager = provider.GetRequiredService<UserManager<AppUser>>();
 
-            await context.SeedUsers(userManager);
+            if (!await context.SeedUsers(userManager)) {
+                context.Contracts.AddRange(Contracts.GetEntities());
+                context.SaveChanges();
+                context.WorkDays.AddRange(WorkDays.GetEntities(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 1));
+            }
 
             await context.SaveChangesAsync();
         }

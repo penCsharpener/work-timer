@@ -22,8 +22,9 @@ namespace WorkTimer.Dev.Seeding {
             return _appUsers;
         }
 
-        public static async Task SeedUsers(this AppDbContext context, UserManager<AppUser> userManager) {
-            if (!context.Users.Any()) {
+        public static async Task<bool> SeedUsers(this AppDbContext context, UserManager<AppUser> userManager) {
+            var hasUsers = context.Users.Any();
+            if (!hasUsers) {
 
                 context.Users.AddRange(Users.GetUsers());
                 context.SaveChanges();
@@ -33,6 +34,8 @@ namespace WorkTimer.Dev.Seeding {
                 await userManager.AddToRoleAsync(Users.GetUsers()[1], "User");
                 await userManager.AddToRoleAsync(Users.GetUsers()[2], "User");
             }
+
+            return hasUsers;
         }
     }
 }
