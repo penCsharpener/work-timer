@@ -12,12 +12,12 @@
     <div class="form-row">
         <div class="form-group col-md-6">
             <label For="dtpStartTime">StartTime</label>
-            <MatBlazor.MatDatePicker id="dtpStartTime" class="form-control" EnableTime="true" placeholder="@DateTime.Now.ToString("G")" @bind-Value="Model.WorkingPeriod.StartTime" />
+            <MatBlazor.MatDatePicker id="dtpStartTime" class="form-control" EnableTime="true" Enable24hours="true" placeholder="@DateTime.Now.ToString("G")" @bind-Value="Model.StartTime" />
         </div>
 
         <div class="form-group col-md-6">
             <label For="dtpEndTime">EndTime</label>
-            <MatBlazor.MatDatePicker id="dtpEndTime" class="form-control" EnableTime="true" placeholder="@DateTime.Now.ToString("G")" @bind-Value="Model.WorkingPeriod.EndTime" />
+            <MatBlazor.MatDatePicker id="dtpEndTime" class="form-control" EnableTime="true" Enable24hours="true" placeholder="@DateTime.Now.ToString("G")" @bind-Value="Model.EndTime" />
         </div>
     </div>
 
