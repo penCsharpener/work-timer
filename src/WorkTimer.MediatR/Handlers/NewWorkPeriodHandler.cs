@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading;
@@ -7,13 +8,16 @@ using System.Threading.Tasks;
 using WorkTimer.Domain.Models;
 using WorkTimer.MediatR.Requests;
 using WorkTimer.Persistence.Data;
+using static Nager.Date.DateSystem;
 
 namespace WorkTimer.MediatR.Handlers {
     public class NewWorkPeriodHandler : IRequestHandler<NewWorkPeriodRequest, bool> {
         private readonly AppDbContext _context;
+        private readonly ILogger<NewWorkPeriodHandler> _logger;
 
-        public NewWorkPeriodHandler(AppDbContext context) {
+        public NewWorkPeriodHandler(AppDbContext context, ILogger<NewWorkPeriodHandler> logger) {
             _context = context;
+            _logger = logger;
         }
 
         public Task<bool> Handle(NewWorkPeriodRequest request, CancellationToken cancellationToken) {
@@ -43,7 +47,7 @@ namespace WorkTimer.MediatR.Handlers {
                     workDayToday = new WorkDay {
                         ContractId = contract.Id,
                         Date = DateTime.Now.Date,
-                        WorkDayType = WorkDayType.Workday,
+                        WorkDayType = GetWorkdayTypeToday(),
                     };
                     _context.WorkDays.Add(workDayToday);
                     _context.SaveChanges();
@@ -54,7 +58,7 @@ namespace WorkTimer.MediatR.Handlers {
                     newWorkDay = new WorkDay {
                         ContractId = workDayToday.ContractId,
                         Date = DateTime.Now.Date,
-                        WorkDayType = WorkDayType.Workday,
+                        WorkDayType = GetWorkdayTypeToday(),
                     };
 
                     _context.WorkDays.Add(newWorkDay);
@@ -79,9 +83,20 @@ namespace WorkTimer.MediatR.Handlers {
                 _context.SaveChanges();
 
                 return Task.FromResult(true);
-            } catch (System.Exception) {
+            } catch (System.Exception ex) {
+                _logger.LogError(ex, "new work period could not be created");
                 return Task.FromResult(false);
             }
+        }
+
+        public static WorkDayType GetWorkdayTypeToday() {
+            if (IsPublicHoliday(DateTime.Now.Date, Nager.Date.CountryCode.DE, "DE-SN")) {
+                return WorkDayType.BankHoliday;
+            }
+            if (IsWeekend(DateTime.Now, Nager.Date.CountryCode.DE)) {
+                return WorkDayType.Weekend;
+            }
+            return WorkDayType.Workday;
         }
     }
 }
