@@ -9,14 +9,5 @@ namespace WorkTimer.Domain.Models {
         public int WorkDayId { get; set; }
 
         public WorkDay WorkDay { get; set; }
-
-        public TimeSpan WorkTime {
-            get {
-                if (EndTime.HasValue) {
-                    return EndTime.Value - StartTime;
-                }
-                return DateTime.Now - StartTime;
-            }
-        }
     }
 }

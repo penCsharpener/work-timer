@@ -36,7 +36,7 @@
                 <th scope="row">@period.Id</th>
                 <td>@period.StartTime.ToString()</td>
                 <td>@period.EndTime.ToString()</td>
-                <td>@period.WorkTime.ToTimeString()</td>
+                <td>@period.GetWorkTime().ToTimeString()</td>
                 <td>@period.Comment</td>
                 <td onclick="location.href='workday/@period.WorkDayId/workperiod/@period.Id'"><span class="oi oi-pencil" title="oi-pencil" aria-hidden="true"></span></td>
             </tr>
@@ -63,7 +63,7 @@
                 <tr onclick="location.href='workday/@workDay.Id'">
                     <td>@workDay.Date.DayOfWeek.ToString()</td>
                     <td>@workDay.Date.ToString("dd.MM.yyyy")</td>
-                    <td>@workDay.WorkTime.ToTimeString()</td>
+                    <td>@workDay.GetWorkTime().ToTimeString()</td>
                     <td>@workDay.Overhours.ToTimeString()</td>
                 </tr>
             }
