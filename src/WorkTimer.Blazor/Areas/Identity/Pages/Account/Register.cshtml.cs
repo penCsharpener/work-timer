@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -13,6 +14,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using WorkTimer.Domain.Models;
+using WorkTimer.MediatR.Requests;
 
 namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
     [AllowAnonymous]
@@ -21,16 +23,19 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
         private readonly UserManager<AppUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IMediator _mediator;
 
         public RegisterModel(
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender) {
+            IEmailSender emailSender,
+            IMediator mediator) {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _mediator = mediator;
         }
 
         [BindProperty]
@@ -66,7 +71,8 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
         public async Task<IActionResult> OnPostAsync(string? returnUrl = null) {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            if (ModelState.IsValid) {
+            var allowRegistration = await _mediator.Send(new RestrictRegistrationRequest(Input.Email));
+            if (ModelState.IsValid && allowRegistration) {
                 var user = new AppUser { UserName = Input.Email, Email = Input.Email };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded) {
@@ -93,6 +99,10 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
                 foreach (var error in result.Errors) {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
+            }
+
+            if (!allowRegistration) {
+                ModelState.AddModelError("Email", "Email or domain not permitted.");
             }
 
             // If we got this far, something failed, redisplay form
