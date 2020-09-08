@@ -26,7 +26,7 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
             if (returnUrl != null) {
                 return LocalRedirect(returnUrl);
             } else {
-                return RedirectToPage();
+                return RedirectToPage("Login");
             }
         }
     }
