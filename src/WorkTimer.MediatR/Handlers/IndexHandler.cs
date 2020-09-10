@@ -40,7 +40,7 @@ namespace WorkTimer.MediatR.Handlers {
 
             return Task.FromResult(new IndexResponse {
                 WorkDays = results,
-                TotalOverHours = TimeSpan.FromSeconds(results.Sum(x => x.Overhours.TotalSeconds)),
+                TotalOverHours = TimeSpan.FromSeconds(results.Where(x => !x.HasOngoingWorkingDay).Sum(x => x.Overhours.TotalSeconds)),
                 MostRecentWorkPeriods = mostRecent,
                 HasOngoingWorkPeriod = results.Any(x => x.HasOngoingWorkingDay)
             });
