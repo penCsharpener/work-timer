@@ -4,7 +4,7 @@ using WorkTimer.Domain.Models;
 
 namespace WorkTimer.MediatR.Responses {
     public class IndexResponse {
-        public IList<DisplayWorkDayModel> WorkDays { get; internal set; }
+        public PagedResult<DisplayWorkDayModel> WorkDays { get; internal set; }
         public IList<WorkingPeriod> MostRecentWorkPeriods { get; internal set; }
         public TimeSpan TotalOverHours { get; internal set; }
         public bool HasOngoingWorkPeriod { get; internal set; }

@@ -19,7 +19,11 @@ namespace WorkTimer.Domain.Extensions {
         }
 
         public static double GetWorkHourMultiplier(this WorkDay workDay) {
-            return workDay.WorkDayType switch
+            return workDay.WorkDayType.GetWorkHourMultiplier();
+        }
+
+        public static double GetWorkHourMultiplier(this WorkDayType workDayType) {
+            return workDayType switch
             {
                 WorkDayType.HalfVacation => 0.5,
                 WorkDayType.Workday => 1,

@@ -18,7 +18,7 @@
     "WorkTimer.Blazor": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:6421;http://localhost:6420",
+      "applicationUrl": "https://localhost:4661;http://localhost:4660",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

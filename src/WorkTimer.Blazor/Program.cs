@@ -43,7 +43,7 @@ namespace WorkTimer.Blazor {
             return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder => {
                     webBuilder.UseStartup<Startup>()
-                              .UseUrls("http://localhost:4660,https://localhost:4661");
+                              .UseUrls("http://localhost:4660;https://localhost:4661");
                 });
         }
     }

@@ -23,7 +23,7 @@ namespace WorkTimer.MediatR.Handlers {
         public Task<bool> Handle(NewWorkPeriodRequest request, CancellationToken cancellationToken) {
             try {
                 var workDayToday = _context.WorkDays.Include(x => x.Contract)
-                    .Where(x => x.Contract.UserId == request.User.Id)
+                    .Where(x => x.Contract.UserId == request.User.Id && x.Contract.IsCurrent)
                     .OrderByDescending(x => x.Date)
                     .Take(1)
                     .FirstOrDefault();
@@ -32,16 +32,7 @@ namespace WorkTimer.MediatR.Handlers {
                     var contract = _context.Contracts.Where(x => x.UserId == request.User.Id && x.IsCurrent).FirstOrDefault();
 
                     if (contract == null) {
-                        // some error message and re-route to create a contract
-                        contract = new Contract {
-                            Employer = "some Employer",
-                            Name = "fulltime at some Employer",
-                            UserId = request.User.Id,
-                            IsCurrent = true,
-                            HoursPerWeek = 40,
-                        };
-                        _context.Contracts.Add(contract);
-                        _context.SaveChanges();
+                        return Task.FromResult(false);
                     }
 
                     workDayToday = new WorkDay {
@@ -65,7 +56,7 @@ namespace WorkTimer.MediatR.Handlers {
                     _context.SaveChanges();
                 }
 
-                var unfinished = workDayToday.WorkingPeriods.FirstOrDefault(x => !x.EndTime.HasValue);
+                var unfinished = workDayToday.WorkingPeriods?.FirstOrDefault(x => !x.EndTime.HasValue);
                 if (unfinished != null) {
                     unfinished.EndTime = DateTime.Now;
 

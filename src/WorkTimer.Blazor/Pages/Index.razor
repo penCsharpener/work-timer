@@ -48,7 +48,11 @@
 
 <p>@IndexResponse.TotalOverHours.ToTimeString()</p>
 
-@if (IndexResponse?.WorkDays?.Any() == true) {
+@if (IndexResponse?.WorkDays?.Items.Any() == true) {
+    <div>
+        <MatPaginator Length="@IndexResponse.WorkDays.Count" PageSize="@pageSize" Page="@OnPage"></MatPaginator>
+    </div>
+
     <table class="table table-striped table-hover table-sm">
         <thead>
             <tr>
@@ -59,7 +63,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var workDay in IndexResponse.WorkDays) {
+            @foreach (var workDay in IndexResponse.WorkDays.Items) {
                 <tr onclick="location.href='workday/@workDay.Id'">
                     <td>@workDay.Date.DayOfWeek.ToString()</td>
                     <td>@workDay.Date.ToString("dd.MM.yyyy")</td>
@@ -81,8 +85,11 @@
 
     public string dayButtonText;
 
+    int pageSize = 25;
+    int pageIndex = 0;
+
     protected override async Task OnInitializedAsync() {
-        IndexResponse = await Mediator.Send(new IndexRequest());
+        IndexResponse = await Mediator.Send(new IndexRequest(pageIndex, pageSize));
         EvaluateButtonText();
         await base.OnInitializedAsync();
     }
@@ -106,4 +113,24 @@
     private void EvaluateButtonText() {
         dayButtonText = IndexResponse.HasOngoingWorkPeriod ? "Stop" : "Start";
     }
+
+    async Task OnPage(MatPaginatorPageEvent e) {
+        pageSize = e.PageSize;
+        pageIndex = e.PageIndex;
+        IndexResponse = await Mediator.Send(new IndexRequest(pageIndex, pageSize));
+    }
+
+
+    //private int Count { get; set; } = 10;
+
+    //void StartCountdown() {
+    //    var timer = new System.Threading.Timer(new System.Threading.TimerCallback(_ => {
+    //        if (Count <= 0) return;
+    //        Count--;
+
+    //        // Note that the following line is necessary because otherwise
+    //        // Blazor would not recognize the state change and not refresh the UI
+    //        this.StateHasChanged();
+    //    }), null, 1000, 1000);
+    //}
 }
