@@ -34,15 +34,16 @@ namespace WorkTimer.Blazor {
 
                 host.Run();
 
-            } catch (Exception ex) {
-
+            } catch {
+                // no serilog yet
             }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) {
             return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder => {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>()
+                              .UseUrls("http://localhost:4660,https://localhost:4661");
                 });
         }
     }
