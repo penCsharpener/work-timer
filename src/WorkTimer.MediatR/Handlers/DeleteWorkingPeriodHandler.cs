@@ -29,7 +29,7 @@ namespace WorkTimer.MediatR.Handlers {
                 return Task.FromResult(true);
 
             } catch (Exception ex) {
-                _logger.LogError(ex, $"Working period with id {request.WorkingPeriod} of User '{request.User?.Id}' could not be deleted");
+                _logger.LogError(ex, $"Working period with id {request.WorkingPeriod.Id} of User '{request.User?.Id}' could not be deleted");
                 return Task.FromResult(false);
             }
         }

@@ -8,7 +8,7 @@ namespace WorkTimer.Persistence.Configurations {
             builder.Property(x => x.Date).IsRequired();
             builder.Property(x => x.ContractId).IsRequired();
 
-            builder.HasOne(x => x.Contract).WithMany(x => x.WorkDays).HasForeignKey(x => x.ContractId);
+            builder.HasOne(x => x.Contract).WithMany(x => x.WorkDays).HasForeignKey(x => x.ContractId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

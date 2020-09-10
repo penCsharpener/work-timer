@@ -28,6 +28,21 @@
     <button class="btn btn-outline-primary ml-4 align-self-center" type="submit">Save</button>
 </EditForm>
 
+<div class="my-3">
+    <MatButton OnClick="@OpenDialog" Raised="true">Delete</MatButton>
+
+    <MatDialog @bind-IsOpen="@dialogIsOpen">
+        <MatDialogTitle>Delete work day</MatDialogTitle>
+        <MatDialogContent>
+            <p>Do you really want to delete this with all its working periods?</p>
+        </MatDialogContent>
+        <MatDialogActions>
+            <MatButton OnClick="@(e => { dialogIsOpen = false; })">Cancel</MatButton>
+            <MatButton OnClick="@OkClickAsync">OK</MatButton>
+        </MatDialogActions>
+    </MatDialog>
+</div>
+
 <table class="table table-striped table-hover table-sm">
     <thead>
         <tr>
@@ -68,5 +83,19 @@
 
     protected async Task HandleValidSubmitAsync() {
         var result = await Mediator.Send(Model);
+    }
+
+    bool dialogIsOpen = false;
+
+    void OpenDialog() {
+        dialogIsOpen = true;
+    }
+
+    async Task OkClickAsync() {
+        var result = await Mediator.Send(new DeleteWorkDayRequest(Model.WorkDay) { User = Model.UserContext.User });
+        if (result) {
+            dialogIsOpen = false;
+            Navi.NavigateTo($"/");
+        }
     }
 }

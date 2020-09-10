@@ -76,7 +76,9 @@
 
     async Task OkClickAsync() {
         var result = await Mediator.Send(new DeleteWorkingPeriodRequest(Model.WorkingPeriod) { User = Model.UserContext.User });
-        dialogIsOpen = false;
-        Navi.NavigateTo($"workday/{Model.WorkingPeriod.WorkDayId}");
+        if (result) {
+            dialogIsOpen = false;
+            Navi.NavigateTo($"workday/{Model.WorkingPeriod.WorkDayId}");
+        }
     }
 }

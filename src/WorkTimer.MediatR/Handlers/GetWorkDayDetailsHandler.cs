@@ -35,7 +35,12 @@ namespace WorkTimer.MediatR.Handlers {
                         WorkingPeriods = result.WorkingPeriods,
                         WorkDay = result,
                         IsOpenWorkday = result.WorkingPeriods.Any(x => !x.EndTime.HasValue),
-                        Contracts = contracts
+                        Contracts = contracts,
+                        UserContext = new Models.UserContext {
+                            User = request.User,
+                            UserEmail = request.UserEmail,
+                            UserIsAdmin = request.UserIsAdmin
+                        }
                     });
             }
 
