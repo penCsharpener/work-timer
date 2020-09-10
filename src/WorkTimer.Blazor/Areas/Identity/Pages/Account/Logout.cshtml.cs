@@ -18,6 +18,7 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
         }
 
         public void OnGet() {
+            // Method intentionally left empty.
         }
 
         public async Task<IActionResult> OnPost(string? returnUrl = null) {

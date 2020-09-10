@@ -30,6 +30,21 @@
 
 </EditForm>
 
+<div class="my-3">
+    <MatButton OnClick="@OpenDialog" Raised="true">Delete</MatButton>
+
+    <MatDialog @bind-IsOpen="@dialogIsOpen">
+        <MatDialogTitle>Delete working period</MatDialogTitle>
+        <MatDialogContent>
+            <p>Do you really want to delete this?</p>
+        </MatDialogContent>
+        <MatDialogActions>
+            <MatButton OnClick="@(e => { dialogIsOpen = false; })">Cancel</MatButton>
+            <MatButton OnClick="@OkClickAsync">OK</MatButton>
+        </MatDialogActions>
+    </MatDialog>
+</div>
+
 @code {
     [Parameter]
     public int WorkDayId { get; set; }
@@ -51,5 +66,17 @@
 
     protected string GetEndTimeForTitle() {
         return Model.WorkingPeriod.EndTime.HasValue ? " - " + Model.WorkingPeriod.EndTime.Value.ToString() : "";
+    }
+
+    bool dialogIsOpen = false;
+
+    void OpenDialog() {
+        dialogIsOpen = true;
+    }
+
+    async Task OkClickAsync() {
+        var result = await Mediator.Send(new DeleteWorkingPeriodRequest(Model.WorkingPeriod) { User = Model.UserContext.User });
+        dialogIsOpen = false;
+        Navi.NavigateTo($"workday/{Model.WorkingPeriod.WorkDayId}");
     }
 }

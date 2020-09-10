@@ -24,10 +24,15 @@ namespace WorkTimer.MediatR.Handlers {
             if (workingPeriod != null) {
                 return Task.FromResult(new GetWorkingPeriodResponse {
                     WorkingPeriod = workingPeriod,
+                    UserContext = new Models.UserContext {
+                        User = request.User,
+                        UserEmail = request.UserEmail,
+                        UserIsAdmin = request.UserIsAdmin
+                    }
                 });
             }
 
-            return null;
+            return Task.FromResult(default(GetWorkingPeriodResponse));
         }
     }
 }
