@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WorkTimer.Blazor.Areas.Identity;
 using WorkTimer.Blazor.Extensions;
+using WorkTimer.Domain.Models;
 using WorkTimer.Persistence.Extensions;
 
 namespace WorkTimer.Blazor {
@@ -25,7 +25,7 @@ namespace WorkTimer.Blazor {
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddWorkTimerServices();
-            services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+            services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<AppUser>>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
