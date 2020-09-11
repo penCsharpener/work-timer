@@ -5,45 +5,50 @@
 
 <h1>Edit work period @(Model.WorkingPeriod.StartTime.ToString())@GetEndTimeForTitle()</h1>
 
-<EditForm Model="@Model.WorkingPeriod" OnValidSubmit="HandleValidSubmitAsync">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<div>
+    <div>
+        <EditForm Model="@Model.WorkingPeriod" OnValidSubmit="HandleValidSubmitAsync">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-    <div class="form-row">
-        <div class="form-group col-md-6">
-            <label For="dtpStartTime">StartTime</label>
-            <MatBlazor.MatDatePicker id="dtpStartTime" class="form-control" EnableTime="true" Enable24hours="true" placeholder="@DateTime.Now.ToString("G")" @bind-Value="Model.StartTime" />
-        </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label For="dtpStartTime">StartTime</label>
+                    <MatBlazor.MatDatePicker id="dtpStartTime" class="form-control" EnableTime="true" Enable24hours="true" placeholder="@DateTime.Now.ToString("G")" @bind-Value="Model.StartTime" />
+                </div>
 
-        <div class="form-group col-md-6">
-            <label For="dtpEndTime">EndTime</label>
-            <MatBlazor.MatDatePicker id="dtpEndTime" class="form-control" EnableTime="true" Enable24hours="true" placeholder="@DateTime.Now.ToString("G")" @bind-Value="Model.EndTime" />
-        </div>
+                <div class="form-group col-md-6">
+                    <label For="dtpEndTime">EndTime</label>
+                    <MatBlazor.MatDatePicker id="dtpEndTime" class="form-control" EnableTime="true" Enable24hours="true" placeholder="@DateTime.Now.ToString("G")" @bind-Value="Model.EndTime" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="w-100" for="txtComment">Comment</label>
+                <InputTextArea id="txtComment" class="form-control w-100" @bind-Value="Model.WorkingPeriod.Comment" />
+            </div>
+
+            <MatButton Class="btn btn-outline-primary" Type="submit" Raised="true">Save</MatButton>
+        </EditForm>
     </div>
+    <div class="mt-5">
+        <MatButton Class="mt-5" OnClick="@OpenDialog" Raised="false">Delete</MatButton>
 
-    <div class="form-group">
-        <label class="w-100" for="txtComment">Comment</label>
-        <InputTextArea id="txtComment" class="form-control w-100" @bind-Value="Model.WorkingPeriod.Comment" />
+        <MatDialog @bind-IsOpen="@dialogIsOpen">
+            <MatDialogTitle>Delete working period</MatDialogTitle>
+            <MatDialogContent>
+                <p>Do you really want to delete this?</p>
+            </MatDialogContent>
+            <MatDialogActions>
+                <MatButton OnClick="@(e => { dialogIsOpen = false; })">Cancel</MatButton>
+                <MatButton OnClick="@OkClickAsync">OK</MatButton>
+            </MatDialogActions>
+        </MatDialog>
     </div>
-
-    <button class="btn btn-outline-primary" type="submit">Save</button>
-
-</EditForm>
-
-<div class="my-3">
-    <MatButton OnClick="@OpenDialog" Raised="true">Delete</MatButton>
-
-    <MatDialog @bind-IsOpen="@dialogIsOpen">
-        <MatDialogTitle>Delete working period</MatDialogTitle>
-        <MatDialogContent>
-            <p>Do you really want to delete this?</p>
-        </MatDialogContent>
-        <MatDialogActions>
-            <MatButton OnClick="@(e => { dialogIsOpen = false; })">Cancel</MatButton>
-            <MatButton OnClick="@OkClickAsync">OK</MatButton>
-        </MatDialogActions>
-    </MatDialog>
 </div>
+
+
+
 
 @code {
     [Parameter]

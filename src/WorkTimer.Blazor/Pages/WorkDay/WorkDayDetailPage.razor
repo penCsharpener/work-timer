@@ -6,41 +6,44 @@
 
 <h1>Work day details for @Model.WorkDay?.Date.DayOfWeek @Model.WorkDay?.Date.ToString("dd.MM.yyyy")</h1>
 
-<EditForm class="d-flex mb-3" Model="@Model.WorkDay" OnValidSubmit="HandleValidSubmitAsync">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<div class="d-flex flex-row justify-content-between">
+    <div>
+        <EditForm class="d-flex mb-3" Model="@Model.WorkDay" OnValidSubmit="HandleValidSubmitAsync">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-    <label class="mx-3 mt-2 align-self-center" for="txtComment">Work day type: </label>
-    <MatBlazor.MatSelectItem class="mx-3" id="txtComment" Items="WorkDayTypes" @bind-Value="Model.WorkDay.WorkDayType">
-    </MatBlazor.MatSelectItem>
+            <label class="mx-3 mt-2 align-self-center" for="txtComment">Work day type: </label>
+            <MatBlazor.MatSelectItem class="mx-3" id="txtComment" Items="WorkDayTypes" @bind-Value="Model.WorkDay.WorkDayType">
+            </MatBlazor.MatSelectItem>
 
-    <label class="mx-3 mt-2 align-self-center" for="cboContract">Contract: </label>
-    <MatBlazor.MatSelectValue @bind-Value="Model.WorkDay.ContractId"
-                              Items="@Model.Contracts"
-                              ValueSelector="@(i => i.Id)"
-                              class="mx-3"
-                              id="cboContract">
-        <ItemTemplate Context="contractItem">
-            <span>@contractItem.Name</span>
-        </ItemTemplate>
-    </MatBlazor.MatSelectValue>
+            <label class="mx-3 mt-2 align-self-center" for="cboContract">Contract: </label>
+            <MatBlazor.MatSelectValue @bind-Value="Model.WorkDay.ContractId"
+                                      Items="@Model.Contracts"
+                                      ValueSelector="@(i => i.Id)"
+                                      class="mx-3"
+                                      id="cboContract">
+                <ItemTemplate Context="contractItem">
+                    <span>@contractItem.Name</span>
+                </ItemTemplate>
+            </MatBlazor.MatSelectValue>
 
-    <button class="btn btn-outline-primary ml-4 align-self-center" type="submit">Save</button>
-</EditForm>
+            <MatButton Class="btn btn-outline-primary ml-4 align-self-center" Raised="true" Type="submit">Save</MatButton>
+        </EditForm>
+    </div>
+    <div class="mt-2">
+        <MatButton OnClick="@OpenDialog" Raised="false" Type="button">Delete</MatButton>
 
-<div class="my-3">
-    <MatButton OnClick="@OpenDialog" Raised="true">Delete</MatButton>
-
-    <MatDialog @bind-IsOpen="@dialogIsOpen">
-        <MatDialogTitle>Delete work day</MatDialogTitle>
-        <MatDialogContent>
-            <p>Do you really want to delete this with all its working periods?</p>
-        </MatDialogContent>
-        <MatDialogActions>
-            <MatButton OnClick="@(e => { dialogIsOpen = false; })">Cancel</MatButton>
-            <MatButton OnClick="@OkClickAsync">OK</MatButton>
-        </MatDialogActions>
-    </MatDialog>
+        <MatDialog @bind-IsOpen="@dialogIsOpen">
+            <MatDialogTitle>Delete work day</MatDialogTitle>
+            <MatDialogContent>
+                <p>Do you really want to delete this with all its working periods?</p>
+            </MatDialogContent>
+            <MatDialogActions>
+                <MatButton OnClick="@(e => { dialogIsOpen = false; })">Cancel</MatButton>
+                <MatButton OnClick="@OkClickAsync">OK</MatButton>
+            </MatDialogActions>
+        </MatDialog>
+    </div>
 </div>
 
 <table class="table table-striped table-hover table-sm">
