@@ -20,6 +20,10 @@ namespace WorkTimer.MediatR.Pipelines {
         public async Task<TOut> Handle(TIn request, CancellationToken cancellationToken, RequestHandlerDelegate<TOut> next) {
             var claim = httpContext.User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
 
+            if (string.IsNullOrEmpty(claim?.Value)) {
+                return await next();
+            }
+
             if (request is UserContext userContext && userContext.User == null) {
                 userContext.UserEmail = claim.Value.ToUpper();
                 userContext.User = _context.Users.Where(x => x.NormalizedEmail == userContext.UserEmail).SingleOrDefault();
