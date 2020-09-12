@@ -17,18 +17,14 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
             _logger = logger;
         }
 
-        public void OnGet() {
-            // Method intentionally left empty.
+        public async Task<IActionResult> OnGet() {
+            return await OnPost();
         }
 
-        public async Task<IActionResult> OnPost(string? returnUrl = null) {
+        public async Task<IActionResult> OnPost() {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
-            if (returnUrl != null) {
-                return LocalRedirect(returnUrl);
-            } else {
-                return RedirectToPage("Login");
-            }
+            return RedirectToPage("Login");
         }
     }
 }
