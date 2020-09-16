@@ -44,7 +44,10 @@ namespace WorkTimer.Blazor {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
 
-            app.UseHttpsRedirection();
+            if (Configuration?.GetValue<string>("ApplicationSettings:LaunchUrls")?.Contains("https") == true) {
+                app.UseHttpsRedirection();
+            }
+
             app.UseStaticFiles();
 
             app.UseRouting();
