@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -11,16 +12,24 @@ namespace WorkTimer.MediatR.Pipelines {
     public class UserIdPipeline<TIn, TOut> : IPipelineBehavior<TIn, TOut> {
         private readonly HttpContext httpContext;
         private readonly AppDbContext _context;
+        private readonly ILogger<UserIdPipeline<TIn, TOut>> _logger;
 
-        public UserIdPipeline(IHttpContextAccessor accessor, AppDbContext context) {
+        public UserIdPipeline(IHttpContextAccessor accessor, AppDbContext context, ILogger<UserIdPipeline<TIn, TOut>> logger) {
             httpContext = accessor.HttpContext;
             _context = context;
+            _logger = logger;
         }
 
         public async Task<TOut> Handle(TIn request, CancellationToken cancellationToken, RequestHandlerDelegate<TOut> next) {
+            if (httpContext?.User?.Claims == null) {
+                _logger.LogError("no user or claims in httpContext");
+                return await next();
+            }
+
             var claim = httpContext.User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
 
             if (string.IsNullOrEmpty(claim?.Value)) {
+                _logger.LogError("no matching claim found");
                 return await next();
             }
 
