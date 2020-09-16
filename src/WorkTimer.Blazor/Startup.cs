@@ -26,6 +26,7 @@ namespace WorkTimer.Blazor {
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddWorkTimerServices();
+            services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<AppUser>>();
         }
 
@@ -33,7 +34,6 @@ namespace WorkTimer.Blazor {
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
             if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
             } else {
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
