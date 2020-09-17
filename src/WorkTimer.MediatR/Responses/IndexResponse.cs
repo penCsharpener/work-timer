@@ -19,6 +19,7 @@ namespace WorkTimer.MediatR.Responses {
             ContractId = workDay.ContractId;
             Contract = workDay.Contract;
             WorkingPeriods = workDay.WorkingPeriods;
+            TotalHours = workDay.TotalHours;
         }
 
         public TimeSpan Overhours { get; internal set; }

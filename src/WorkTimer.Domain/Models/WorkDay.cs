@@ -7,6 +7,7 @@ namespace WorkTimer.Domain.Models {
         public DateTime Date { get; set; }
         public WorkDayType WorkDayType { get; set; }
         public int ContractId { get; set; }
+        public double TotalHours { get; set; }
 
         public Contract Contract { get; set; }
         public ICollection<WorkingPeriod> WorkingPeriods { get; set; }

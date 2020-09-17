@@ -70,7 +70,7 @@
                 <tr onclick="location.href='workday/@workDay.Id'">
                     <td>@workDay.Date.DayOfWeek.ToString()</td>
                     <td>@workDay.Date.ToString("dd.MM.yyyy")</td>
-                    <td>@workDay.GetWorkTime().ToTimeString()</td>
+                    <td>@workDay.TotalHours</td>
                     <td>@workDay.Overhours.ToTimeString()</td>
                 </tr>
             }
@@ -122,18 +122,4 @@
         pageIndex = e.PageIndex;
         IndexResponse = await Mediator.Send(new IndexRequest(pageIndex, pageSize));
     }
-
-
-    //private int Count { get; set; } = 10;
-
-    //void StartCountdown() {
-    //    var timer = new System.Threading.Timer(new System.Threading.TimerCallback(_ => {
-    //        if (Count <= 0) return;
-    //        Count--;
-
-    //        // Note that the following line is necessary because otherwise
-    //        // Blazor would not recognize the state change and not refresh the UI
-    //        this.StateHasChanged();
-    //    }), null, 1000, 1000);
-    //}
 }
