@@ -1,0 +1,44 @@
+﻿@page "/admin"
+@attribute [Authorize]
+@inject global::MediatR.IMediator Mediator
+
+<h3>Administration</h3>
+
+<EditForm class="form-inline" Model="@RequestModel" OnValidSubmit="@HandleValidSubmitAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+            <MatCheckbox @bind-Value="RequestModel.CalculateZeroHourWorkDays">Calculate Zero Hour Days</MatCheckbox>
+        </li>
+        <li class="nav-item px-3">
+            <MatCheckbox @bind-Value="RequestModel.RecalculateAllMyWorkDays">Recalculate all my work days</MatCheckbox>
+        </li>
+        <li class="nav-item px-3">
+            <MatCheckbox @bind-Value="RequestModel.RecalculateAllUsersHours">Recalculate all user's work days</MatCheckbox>
+        </li>
+    </ul>
+    <div class="d-block">
+        <MatButton Type="submit" Class="btn btn-primary" Raised="true">Run Batch Tasks</MatButton>
+    </div>
+</EditForm>
+
+
+<div class="container">
+    <p class="text-left @(ResponseModel.HasError ? "text-danger" : "text-info")">@ResponseModel.Message</p>
+</div>
+
+@code {
+
+    public AdminRequest RequestModel { get; set; } = new AdminRequest();
+
+    public AdminResponse ResponseModel { get; set; } = new AdminResponse();
+
+    protected override async Task OnInitializedAsync() {
+
+    }
+
+    private async Task HandleValidSubmitAsync() {
+        ResponseModel = await Mediator.Send(RequestModel);
+    }
+}
