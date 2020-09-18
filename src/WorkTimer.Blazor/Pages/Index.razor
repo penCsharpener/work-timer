@@ -70,7 +70,7 @@
                 <tr onclick="location.href='workday/@workDay.Id'">
                     <td>@workDay.Date.DayOfWeek.ToString()</td>
                     <td>@workDay.Date.ToString("dd.MM.yyyy")</td>
-                    <td>@workDay.TotalHours</td>
+                    <td>@workDay.GetWorkTime()</td>
                     <td>@workDay.Overhours.ToTimeString()</td>
                 </tr>
             }

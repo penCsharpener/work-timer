@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using WorkTimer.Domain.Models;
 
 namespace WorkTimer.Domain.Extensions {
@@ -11,11 +10,7 @@ namespace WorkTimer.Domain.Extensions {
         }
 
         public static TimeSpan GetWorkTime(this WorkDay workDay) {
-            if (workDay.WorkingPeriods?.Count == 0) {
-                return new TimeSpan();
-            }
-
-            return TimeSpan.FromSeconds(workDay.WorkingPeriods.Sum(x => x.GetWorkTime().TotalSeconds));
+            return TimeSpan.FromHours(workDay.TotalHours);
         }
 
         public static double GetWorkHourMultiplier(this WorkDay workDay) {

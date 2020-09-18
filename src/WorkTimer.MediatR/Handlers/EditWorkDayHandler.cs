@@ -4,35 +4,23 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using WorkTimer.MediatR.Handlers.Shared;
 using WorkTimer.MediatR.Responses;
 using WorkTimer.Persistence.Data;
 
 namespace WorkTimer.MediatR.Handlers {
-    public class EditWorkDayHandler : IRequestHandler<GetWorkDayDetailsResponse, bool> {
-        private readonly AppDbContext _context;
+    public class EditWorkDayHandler : TotalHoursBase, IRequestHandler<GetWorkDayDetailsResponse, bool> {
         private readonly ILogger<EditWorkDayHandler> _logger;
 
-        public EditWorkDayHandler(AppDbContext context, ILogger<EditWorkDayHandler> logger) {
-            _context = context;
+        public EditWorkDayHandler(AppDbContext context, ILogger<EditWorkDayHandler> logger) : base(context) {
             _logger = logger;
         }
 
         public Task<bool> Handle(GetWorkDayDetailsResponse request, CancellationToken cancellationToken) {
             try {
-                var workingPeriods = _context.WorkingPeriods.Where(a => a.WorkDayId == request.WorkDay.Id).Select(x => new { x.StartTime.Date }).ToList();
-                if (workingPeriods?.Count > 0) {
-                    var count = workingPeriods.GroupBy(x => x.Date).Count();
-
-                    if (count == 1) {
-                        var date = workingPeriods.FirstOrDefault().Date;
-                        if (date != request.WorkDay.Date) {
-                            request.WorkDay.Date = date;
-                        }
-                    }
-                }
-
+                CorrectWorkDayDateBasedOnPeriods(request);
+                UpdateTotalHoursOfWorkDay(request.WorkDay);
                 _context.WorkDays.Update(request.WorkDay);
-
                 _context.SaveChanges();
 
                 return Task.FromResult(true);
@@ -41,6 +29,21 @@ namespace WorkTimer.MediatR.Handlers {
                 _logger.LogError(ex, $"Could not update work day with id {request.WorkDay.Id}");
 
                 return Task.FromResult(false);
+            }
+        }
+
+        private void CorrectWorkDayDateBasedOnPeriods(GetWorkDayDetailsResponse request) {
+            var workingPeriods = request.WorkDay.WorkingPeriods.Select(x => new { x.StartTime.Date }).ToList();
+
+            if (workingPeriods?.Count > 0) {
+                var count = workingPeriods.GroupBy(x => x.Date).Count();
+
+                if (count == 1) {
+                    var date = workingPeriods.FirstOrDefault().Date;
+                    if (date != request.WorkDay.Date) {
+                        request.WorkDay.Date = date;
+                    }
+                }
             }
         }
     }
