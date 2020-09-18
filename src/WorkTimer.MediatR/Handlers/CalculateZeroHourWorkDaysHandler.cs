@@ -1,24 +1,34 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using WorkTimer.MediatR.Handlers.Shared;
 using WorkTimer.MediatR.Requests;
 using WorkTimer.Persistence.Data;
 
 namespace WorkTimer.MediatR.Handlers {
-    public class CalculateZeroHourWorkDaysHandler : IRequestHandler<CalculateZeroHourWorkDaysRequest, string> {
+    public class CalculateZeroHourWorkDaysHandler : TotalHoursBase, IRequestHandler<CalculateZeroHourWorkDaysRequest, string> {
+        private readonly ILogger<CalculateZeroHourWorkDaysHandler> _logger;
 
-        public CalculateZeroHourWorkDaysHandler(AppDbContext context, ILogger<CalculateZeroHourWorkDaysHandler> logger) {
-            Context = context;
-            Logger = logger;
+        public CalculateZeroHourWorkDaysHandler(AppDbContext context, ILogger<CalculateZeroHourWorkDaysHandler> logger) : base(context) {
+            _logger = logger;
         }
 
-        public AppDbContext Context { get; }
-        public ILogger<CalculateZeroHourWorkDaysHandler> Logger { get; }
-
         public Task<string> Handle(CalculateZeroHourWorkDaysRequest request, CancellationToken cancellationToken) {
-            throw new NotImplementedException();
+            var zeroHourDays = _context.WorkDays.Include(x => x.WorkingPeriods)
+                .Where(x => x.TotalHours == 0d)
+                .ToList();
+
+            foreach (var workday in zeroHourDays) {
+                UpdateTotalHoursOfWorkDay(workday);
+            }
+
+            _context.SaveChanges();
+
+            _logger.LogInformation($"Processed {zeroHourDays.Count} work days.");
+            return Task.FromResult($"Processed {zeroHourDays.Count} work days.");
         }
     }
 }

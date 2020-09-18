@@ -1,25 +1,33 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using WorkTimer.MediatR.Handlers.Shared;
 using WorkTimer.MediatR.Requests;
 using WorkTimer.Persistence.Data;
 
 namespace WorkTimer.MediatR.Handlers {
-    public class RecalculateAllMyWorkDaysHandler : IRequestHandler<RecalculateAllMyWorkDaysRequest, string> {
+    public class RecalculateAllMyWorkDaysHandler : TotalHoursBase, IRequestHandler<RecalculateAllMyWorkDaysRequest, string> {
+        private readonly ILogger<RecalculateAllMyWorkDaysHandler> _logger;
 
-        public RecalculateAllMyWorkDaysHandler(AppDbContext context, ILogger<RecalculateAllMyWorkDaysHandler> logger) {
-            Context = context;
-            Logger = logger;
+        public RecalculateAllMyWorkDaysHandler(AppDbContext context, ILogger<RecalculateAllMyWorkDaysHandler> logger) : base(context) {
+            _logger = logger;
         }
-
-        public AppDbContext Context { get; }
-        public ILogger<RecalculateAllMyWorkDaysHandler> Logger { get; }
 
         public Task<string> Handle(RecalculateAllMyWorkDaysRequest request, CancellationToken cancellationToken) {
-            throw new NotImplementedException();
-        }
+            var workdays = _context.WorkDays.Include(x => x.WorkingPeriods)
+                .Where(x => x.Contract.UserId == request.User.Id).ToList();
 
+            foreach (var workDay in workdays) {
+                UpdateTotalHoursOfWorkDay(workDay);
+            }
+
+            _context.SaveChanges();
+
+            _logger.LogInformation($"Processed {workdays.Count} work days.");
+            return Task.FromResult($"Processed {workdays.Count} work days.");
+        }
     }
 }

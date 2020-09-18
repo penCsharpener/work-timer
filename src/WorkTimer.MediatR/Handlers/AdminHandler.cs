@@ -34,7 +34,7 @@ namespace WorkTimer.MediatR.Handlers {
                     messageText.Append(await _mediator.Send(new RecalculateAllUsersHoursRequest()));
                 }
 
-                return new AdminResponse() { HasError = false, Message = "Batch jobs ran successfully." };
+                return new AdminResponse() { HasError = false, Message = "Batch jobs ran successfully:" + messageText.ToString() };
             } catch (Exception ex) {
                 _logger.LogError(ex, "Could not complete admin request.");
                 return AdminResponse.ErrorMessage("An error occurred.");
