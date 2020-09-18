@@ -27,12 +27,12 @@ namespace WorkTimer.MediatR.Handlers {
 
             var allHours = _context.WorkingPeriods.Include(x => x.WorkDay).ThenInclude(x => x.Contract)
                 .Where(x => x.WorkDay.Contract.UserId == request.User.Id && x.WorkDay.Contract.IsCurrent)
-                .Select(x => new { x.WorkDay.Id, x.WorkDay.TotalHours, HoursPerDay = ((double)x.WorkDay.Contract.HoursPerWeek / 5d) })
+                .Select(x => new { x.WorkDay.Id, x.WorkDay.WorkDayType, x.WorkDay.TotalHours, HoursPerDay = ((double)x.WorkDay.Contract.HoursPerWeek / 5d) })
                 .Distinct()
                 .ToList();
 
             var count = allHours.Count;
-            var totalOverHours = allHours.Sum(x => x.TotalHours - x.HoursPerDay);
+            var totalOverHours = allHours.Sum(x => (x.TotalHours - (x.HoursPerDay * x.WorkDayType.GetWorkHourMultiplier())));
 
             var results = MapDisplayModel(request).ToList();
 

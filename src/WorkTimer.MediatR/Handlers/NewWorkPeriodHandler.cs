@@ -6,78 +6,83 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WorkTimer.Domain.Models;
+using WorkTimer.MediatR.Handlers.Shared;
 using WorkTimer.MediatR.Requests;
 using WorkTimer.Persistence.Data;
 using static Nager.Date.DateSystem;
 
 namespace WorkTimer.MediatR.Handlers {
-    public class NewWorkPeriodHandler : IRequestHandler<NewWorkPeriodRequest, bool> {
-        private readonly AppDbContext _context;
+    public class NewWorkPeriodHandler : TotalHoursBase, IRequestHandler<NewWorkPeriodRequest, bool> {
         private readonly ILogger<NewWorkPeriodHandler> _logger;
+        private WorkDay _workDayToday;
 
-        public NewWorkPeriodHandler(AppDbContext context, ILogger<NewWorkPeriodHandler> logger) {
-            _context = context;
+        public NewWorkPeriodHandler(AppDbContext context, ILogger<NewWorkPeriodHandler> logger) : base(context) {
             _logger = logger;
         }
 
         public Task<bool> Handle(NewWorkPeriodRequest request, CancellationToken cancellationToken) {
             try {
-                var workDayToday = _context.WorkDays.Include(x => x.Contract)
-                    .Where(x => x.Contract.UserId == request.User.Id && x.Contract.IsCurrent)
-                    .OrderByDescending(x => x.Date)
-                    .Take(1)
-                    .FirstOrDefault();
-
-                if (workDayToday == null) {
-                    var contract = _context.Contracts.Where(x => x.UserId == request.User.Id && x.IsCurrent).FirstOrDefault();
-
-                    if (contract == null) {
-                        return Task.FromResult(false);
-                    }
-
-                    workDayToday = new WorkDay {
-                        ContractId = contract.Id,
-                        Date = DateTime.Now.Date,
-                        WorkDayType = GetWorkdayTypeToday(),
-                    };
-                    _context.WorkDays.Add(workDayToday);
-                    _context.SaveChanges();
+                if (!GetOrCreateWorkday(request.User.Id)) {
+                    return Task.FromResult(false);
                 }
 
-                WorkDay newWorkDay = null;
-                if (workDayToday.Date.Date < DateTime.Now.Date) {
-                    newWorkDay = new WorkDay {
-                        ContractId = workDayToday.ContractId,
-                        Date = DateTime.Now.Date,
-                        WorkDayType = GetWorkdayTypeToday(),
-                    };
-
-                    _context.WorkDays.Add(newWorkDay);
-                    _context.SaveChanges();
-                }
-
-                var unfinished = workDayToday.WorkingPeriods?.FirstOrDefault(x => !x.EndTime.HasValue);
-                if (unfinished != null) {
-                    unfinished.EndTime = DateTime.Now;
-
-                    _context.WorkingPeriods.Update(unfinished);
-                    _context.SaveChanges();
+                if (HasOngoingWorkingPeriod()) {
                     return Task.FromResult(true);
                 }
 
                 _context.WorkingPeriods.Add(new WorkingPeriod {
                     Comment = request.Comment,
                     StartTime = DateTime.Now,
-                    WorkDayId = newWorkDay?.Id ?? workDayToday.Id
+                    WorkDayId = _workDayToday.Id
                 });
+
+                UpdateTotalHoursOfWorkDay(_workDayToday);
 
                 _context.SaveChanges();
 
                 return Task.FromResult(true);
-            } catch (System.Exception ex) {
+            } catch (Exception ex) {
                 _logger.LogError(ex, "new work period could not be created");
                 return Task.FromResult(false);
             }
+        }
+
+        private bool GetOrCreateWorkday(int userId) {
+            _workDayToday = _context.WorkDays.Include(x => x.WorkingPeriods).Include(x => x.Contract)
+                    .Where(x => x.Contract.UserId == userId && x.Contract.IsCurrent && x.Date == DateTime.Today)
+                    .Take(1)
+                    .FirstOrDefault();
+
+            if (_workDayToday == null) {
+                var contract = _context.Contracts.Where(x => x.UserId == userId && x.IsCurrent).FirstOrDefault();
+
+                if (contract == null) {
+                    return false;
+                }
+
+                _workDayToday = new WorkDay {
+                    ContractId = contract.Id,
+                    Date = DateTime.Now.Date,
+                    WorkDayType = GetWorkdayTypeToday(),
+                };
+                _context.WorkDays.Add(_workDayToday);
+                _context.SaveChanges();
+            }
+
+            return true;
+        }
+
+        private bool HasOngoingWorkingPeriod() {
+            var unfinished = _workDayToday.WorkingPeriods?.FirstOrDefault(x => !x.EndTime.HasValue);
+            if (unfinished != null) {
+                unfinished.EndTime = DateTime.Now;
+
+                _context.WorkingPeriods.Update(unfinished);
+                _context.SaveChanges();
+                return true;
+            }
+
+            return false;
         }
 
         public static WorkDayType GetWorkdayTypeToday() {

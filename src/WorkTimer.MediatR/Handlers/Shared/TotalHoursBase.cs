@@ -21,7 +21,7 @@ namespace WorkTimer.MediatR.Handlers.Shared {
 
         protected void UpdateTotalHoursOfWorkDay(WorkDay workday) {
             if (workday?.WorkingPeriods.Count > 0) {
-                var totalHours = workday.WorkingPeriods.Sum(x => (x.EndTime.Value - x.StartTime).TotalHours);
+                var totalHours = workday.WorkingPeriods.Where(x => x.EndTime.HasValue).Sum(x => (x.EndTime.Value - x.StartTime).TotalHours);
                 workday.TotalHours = totalHours;
                 _context.WorkDays.Update(workday);
             }
