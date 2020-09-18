@@ -14,7 +14,7 @@ namespace WorkTimer.Persistence.Extensions {
         }
 
         public static void AddEntityFramework(this IServiceCollection services, IConfiguration configuration) {
-            services.AddDbContext<AppDbContext>(options => options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<AppDbContext>(options => options.UseSqlite(configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Transient);
             services.AddDefaultIdentity<AppUser>(options => {
                 options.SignIn.RequireConfirmedAccount = true;
                 options.Password = configuration.GetSection(nameof(PasswordOptions)).Get<PasswordOptions>();
