@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WorkTimer.Blazor.Areas.Identity;
 using WorkTimer.Blazor.Extensions;
+using WorkTimer.Blazor.Services;
 using WorkTimer.Domain.Models;
 using WorkTimer.Persistence.Extensions;
 
@@ -28,6 +29,7 @@ namespace WorkTimer.Blazor {
             services.AddWorkTimerServices();
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<AppUser>>();
+            services.AddScoped<TokenProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
