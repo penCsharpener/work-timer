@@ -1,6 +1,8 @@
 ﻿@page "/"
 @namespace WorkTimer.Blazor.Pages
 @using WorkTimer.Blazor.Services
+@using System.Globalization
+@using Microsoft.AspNetCore.Localization
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     Layout = null;
@@ -21,6 +23,8 @@
 </head>
 <body>
     @{
+        this.HttpContext.Response.Cookies.Append(CookieRequestCultureProvider.DefaultCookieName,
+            CookieRequestCultureProvider.MakeCookieValue(new RequestCulture("de-DE")));
         var appState = new InitialApplicationState(Xsrf.GetAndStoreTokens(HttpContext).RequestToken);
     }
     <app>

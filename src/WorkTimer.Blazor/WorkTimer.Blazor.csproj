@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net5</TargetFramework>
     <UserSecretsId>aspnet-WorkTimer.Blazor-66f73240-e8c1-4b5e-8bd8-2eade45bd8ba</UserSecretsId>
+    <Version>1.0.1.0</Version>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
     <Nullable>Enable</Nullable>
   </PropertyGroup>
 
