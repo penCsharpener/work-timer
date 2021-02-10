@@ -25,6 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D8AAFD8A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTimer.Seeding.Tests", "tests\WorkTimer.Seeding.Tests\WorkTimer.Seeding.Tests.csproj", "{845F8A62-F0FB-4445-8886-79A66B7C8F6F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkTimer.MediatRTests", "tests\WorkTimer.MediatRTests\WorkTimer.MediatRTests.csproj", "{66597961-E5AD-4837-83A3-CB5E43B5AB1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{845F8A62-F0FB-4445-8886-79A66B7C8F6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{845F8A62-F0FB-4445-8886-79A66B7C8F6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{845F8A62-F0FB-4445-8886-79A66B7C8F6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66597961-E5AD-4837-83A3-CB5E43B5AB1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66597961-E5AD-4837-83A3-CB5E43B5AB1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66597961-E5AD-4837-83A3-CB5E43B5AB1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66597961-E5AD-4837-83A3-CB5E43B5AB1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,6 +72,7 @@ Global
 		{9D9597A2-275A-4AA8-9D18-1ADA351F7A96} = {14B07CCB-83D2-4EA6-824B-4CCCBD6D933A}
 		{DBAACA40-B030-4065-8F50-5017313B7FDC} = {14B07CCB-83D2-4EA6-824B-4CCCBD6D933A}
 		{845F8A62-F0FB-4445-8886-79A66B7C8F6F} = {D8AAFD8A-E9BA-41A4-AC66-0149FA24BB08}
+		{66597961-E5AD-4837-83A3-CB5E43B5AB1D} = {D8AAFD8A-E9BA-41A4-AC66-0149FA24BB08}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {11478E0A-1753-4FE2-AC81-F0C4E43EB48C}

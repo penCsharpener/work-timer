@@ -11,15 +11,19 @@ using WorkTimer.Blazor.Services;
 using WorkTimer.Domain.Models;
 using WorkTimer.Persistence.Extensions;
 
-namespace WorkTimer.Blazor {
-    public class Startup {
-        public Startup(IConfiguration configuration) {
+namespace WorkTimer.Blazor
+{
+    public class Startup
+    {
+        public Startup(IConfiguration configuration)
+        {
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
 
-        public void ConfigureServices(IServiceCollection services) {
+        public void ConfigureServices(IServiceCollection services)
+        {
             services.AddEntityFramework(Configuration);
             services.AddHttpContextAccessor();
             services.AddRazorPages();
@@ -30,17 +34,22 @@ namespace WorkTimer.Blazor {
             services.AddScoped<TokenProvider>();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
-            if (env.IsDevelopment()) {
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
                 app.UseDeveloperExceptionPage();
-            } else {
+            }
+            else
+            {
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
 
             app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto });
 
-            if (Configuration?.GetValue<string>("ApplicationSettings:LaunchUrls")?.Contains("https") == true) {
+            if (Configuration?.GetValue<string>("ApplicationSettings:LaunchUrls")?.Contains("https") == true)
+            {
                 app.UseHttpsRedirection();
             }
 
@@ -51,7 +60,8 @@ namespace WorkTimer.Blazor {
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => {
+            app.UseEndpoints(endpoints =>
+            {
                 endpoints.MapControllers();
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
