@@ -4,7 +4,7 @@ using WorkTimer.Domain.Models;
 namespace WorkTimer.Domain.Extensions {
     public static class WorkDayExtensions {
         public static double GetContractedHoursPerDay(this WorkDay workDay) {
-            var contractedHours = workDay.Contract?.HoursPerWeek ?? 0;
+            int contractedHours = workDay.Contract?.HoursPerWeek ?? 0;
 
             return contractedHours / (double)5;
         }
@@ -18,8 +18,7 @@ namespace WorkTimer.Domain.Extensions {
         }
 
         public static double GetWorkHourMultiplier(this WorkDayType workDayType) {
-            return workDayType switch
-            {
+            return workDayType switch {
                 WorkDayType.HalfVacation => 0.5,
                 WorkDayType.Workday => 1,
                 WorkDayType.Undefined => 1,

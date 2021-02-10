@@ -9,8 +9,8 @@ using WorkTimer.MediatR.Responses;
 
 namespace WorkTimer.MediatR.Handlers {
     public class AdminHandler : IRequestHandler<AdminRequest, AdminResponse> {
-        private readonly IMediator _mediator;
         private readonly ILogger<AdminHandler> _logger;
+        private readonly IMediator _mediator;
 
         public AdminHandler(IMediator mediator, ILogger<AdminHandler> logger) {
             _mediator = mediator;
@@ -19,8 +19,7 @@ namespace WorkTimer.MediatR.Handlers {
 
         public async Task<AdminResponse> Handle(AdminRequest request, CancellationToken cancellationToken) {
             try {
-
-                var messageText = new StringBuilder();
+                StringBuilder messageText = new StringBuilder();
 
                 if (request.CalculateZeroHourWorkDays) {
                     messageText.Append(await _mediator.Send(new CalculateZeroHourWorkDaysRequest()));
@@ -34,9 +33,10 @@ namespace WorkTimer.MediatR.Handlers {
                     messageText.Append(await _mediator.Send(new RecalculateAllUsersHoursRequest()));
                 }
 
-                return new AdminResponse() { HasError = false, Message = "Batch jobs ran successfully:" + messageText.ToString() };
+                return new AdminResponse { HasError = false, Message = "Batch jobs ran successfully:" + messageText };
             } catch (Exception ex) {
                 _logger.LogError(ex, "Could not complete admin request.");
+
                 return AdminResponse.ErrorMessage("An error occurred.");
             }
         }

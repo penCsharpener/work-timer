@@ -20,23 +20,22 @@ namespace WorkTimer.MediatR.Handlers {
         }
 
         public Task<IndexResponse> Handle(IndexRequest request, CancellationToken cancellationToken) {
-
             if (request.User == null) {
                 return Task.FromResult(new IndexResponse());
             }
 
             var allHours = _context.WorkingPeriods.Include(x => x.WorkDay).ThenInclude(x => x.Contract)
                 .Where(x => x.WorkDay.Contract.UserId == request.User.Id && x.WorkDay.Contract.IsCurrent)
-                .Select(x => new { x.WorkDay.Id, x.WorkDay.WorkDayType, x.WorkDay.TotalHours, HoursPerDay = ((double)x.WorkDay.Contract.HoursPerWeek / 5d) })
+                .Select(x => new { x.WorkDay.Id, x.WorkDay.WorkDayType, x.WorkDay.TotalHours, HoursPerDay = (double)x.WorkDay.Contract.HoursPerWeek / 5d })
                 .Distinct()
                 .ToList();
 
-            var count = allHours.Count;
-            var totalOverHours = allHours.Sum(x => (x.TotalHours - (x.HoursPerDay * x.WorkDayType.GetWorkHourMultiplier())));
+            int count = allHours.Count;
+            double totalOverHours = allHours.Sum(x => x.TotalHours - (x.HoursPerDay * x.WorkDayType.GetWorkHourMultiplier()));
 
-            var results = MapDisplayModel(request).ToList();
+            List<DisplayWorkDayModel> results = MapDisplayModel(request).ToList();
 
-            var mostRecent = _context.WorkingPeriods.Include(x => x.WorkDay).ThenInclude(x => x.Contract)
+            List<WorkingPeriod> mostRecent = _context.WorkingPeriods.Include(x => x.WorkDay).ThenInclude(x => x.Contract)
                 .Where(x => x.WorkDay.Contract.UserId == request.User.Id && x.WorkDay.Contract.IsCurrent)
                 .OrderByDescending(x => x.StartTime)
                 .Take(5)
@@ -51,24 +50,23 @@ namespace WorkTimer.MediatR.Handlers {
         }
 
         private IEnumerable<DisplayWorkDayModel> MapDisplayModel(IndexRequest request) {
-            var entities = _context.WorkDays.Include(x => x.Contract).Include(x => x.WorkingPeriods)
+            IEnumerable<WorkDay> entities = _context.WorkDays.Include(x => x.Contract).Include(x => x.WorkingPeriods)
                 .Where(x => x.Contract.UserId == request.User.Id && x.Contract.IsCurrent)
                 .OrderByDescending(x => x.Date)
                 .Skip(request.PagingFilter.SkippedItems)
                 .Take(request.PagingFilter.PageSize)
                 .AsEnumerable();
 
-            foreach (var workday in entities) {
-
-                var contractedHours = workday.GetContractedHoursPerDay();
-                var secondsWorked = TimeSpan.FromHours(workday.TotalHours).TotalSeconds;
-                var overHoursSeconds = secondsWorked - (contractedHours * 60 * 60 * workday.WorkDayType.GetWorkHourMultiplier());
+            foreach (WorkDay workday in entities) {
+                double contractedHours = workday.GetContractedHoursPerDay();
+                double secondsWorked = TimeSpan.FromHours(workday.TotalHours).TotalSeconds;
+                double overHoursSeconds = secondsWorked - (contractedHours * 60 * 60 * workday.WorkDayType.GetWorkHourMultiplier());
 
                 yield return new DisplayWorkDayModel(workday) {
                     HasOngoingWorkingDay = workday.WorkingPeriods.Any(y => !y.EndTime.HasValue),
                     ContractedHours = contractedHours,
                     WorkHours = TimeSpan.FromSeconds(secondsWorked),
-                    Overhours = TimeSpan.FromSeconds(overHoursSeconds),
+                    Overhours = TimeSpan.FromSeconds(overHoursSeconds)
                 };
             }
         }

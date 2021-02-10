@@ -18,7 +18,6 @@ namespace WorkTimer.MediatR.Handlers {
 
         public Task<bool> Handle(DeleteWorkingPeriodRequest request, CancellationToken cancellationToken) {
             try {
-
                 if (request.WorkingPeriod == null) {
                     return Task.FromResult(false);
                 }
@@ -27,9 +26,9 @@ namespace WorkTimer.MediatR.Handlers {
                 _context.SaveChanges();
 
                 return Task.FromResult(true);
-
             } catch (Exception ex) {
                 _logger.LogError(ex, $"Working period with id {request.WorkingPeriod.Id} of User '{request.User?.Id}' could not be deleted");
+
                 return Task.FromResult(false);
             }
         }

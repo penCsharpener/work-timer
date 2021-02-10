@@ -10,9 +10,9 @@ using WorkTimer.Persistence.Data;
 
 namespace WorkTimer.MediatR.Pipelines {
     public class UserIdPipeline<TIn, TOut> : IPipelineBehavior<TIn, TOut> {
-        private readonly HttpContext httpContext;
         private readonly AppDbContext _context;
         private readonly ILogger<UserIdPipeline<TIn, TOut>> _logger;
+        private readonly HttpContext httpContext;
 
         public UserIdPipeline(IHttpContextAccessor accessor, AppDbContext context, ILogger<UserIdPipeline<TIn, TOut>> logger) {
             httpContext = accessor.HttpContext;
@@ -23,13 +23,15 @@ namespace WorkTimer.MediatR.Pipelines {
         public async Task<TOut> Handle(TIn request, CancellationToken cancellationToken, RequestHandlerDelegate<TOut> next) {
             if (httpContext?.User?.Claims == null) {
                 _logger.LogError("no user or claims in httpContext");
+
                 return await next();
             }
 
-            var claim = httpContext.User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
+            Claim? claim = httpContext.User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
 
             if (string.IsNullOrEmpty(claim?.Value)) {
                 _logger.LogError("no matching claim found");
+
                 return await next();
             }
 

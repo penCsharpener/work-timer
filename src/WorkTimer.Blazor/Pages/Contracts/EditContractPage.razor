@@ -1,27 +1,28 @@
 ﻿@page "/contracts/{ContractId:int}"
-@inject global::MediatR.IMediator Mediator
+@using global::MediatR
+@inject IMediator Mediator
 @inject NavigationManager Navi
 @attribute [Authorize]
 
 <h3>Edit Contract</h3>
 
 <EditForm Model="@Model" OnValidSubmit="@HandleValidSubmitAsync">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
     <div class="form-group">
         <label for="txtName">Name</label>
-        <InputText class="form-control" id="txtName" @bind-Value="@Model.Name" />
+        <InputText class="form-control" id="txtName" @bind-Value="@Model.Name"/>
     </div>
     <div class="form-group">
         <label for="txtEmployer">Employer</label>
-        <InputText class="form-control" id="txtEmployer" @bind-Value="@Model.Employer" />
+        <InputText class="form-control" id="txtEmployer" @bind-Value="@Model.Employer"/>
     </div>
     <div class="form-group">
         <label for="numHoursPerWeek">Contracted hours per week</label>
-        <InputNumber class="form-control" id="numHoursPerWeek" @bind-Value="@Model.HoursPerWeek" />
+        <InputNumber class="form-control" id="numHoursPerWeek" @bind-Value="@Model.HoursPerWeek"/>
     </div>
     <div class="form-group form-check">
-        <InputCheckbox class="form-check-input" id="chkIsCurrent" @bind-Value="@Model.IsCurrent" />
+        <InputCheckbox class="form-check-input" id="chkIsCurrent" @bind-Value="@Model.IsCurrent"/>
         <label class="form-check-label" for="chkIsCurrent">Is currently active contract</label>
     </div>
 
@@ -35,15 +36,20 @@
     [Parameter]
     public int ContractId { get; set; }
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync()
+    {
         Model = await Mediator.Send(new GetContractRequest(ContractId));
     }
 
-    private async Task HandleValidSubmitAsync() {
+    private async Task HandleValidSubmitAsync()
+    {
         var result = await Mediator.Send(Model);
-        if (result) {
+        if (result)
+        {
             Navi.NavigateTo("contracts");
-        } else {
+        }
+        else
+        {
             Navi.NavigateTo($"contracts/{ContractId}");
         }
     }

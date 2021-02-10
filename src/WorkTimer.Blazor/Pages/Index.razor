@@ -1,16 +1,17 @@
 ﻿@page "/"
-@inject global::MediatR.IMediator Mediator
+@using global::MediatR
+@inject IMediator Mediator
 @inject NavigationManager Navi;
 @attribute [Authorize]
 
 <h1 class="mb-2">Timer</h1>
 
 <EditForm class="d-flex mb-3" Model="@NewPeriodModel" OnValidSubmit="@HandleValidSubmitAsync">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
     <div class="form-group d-flex flex-row form-work-period-comment mr-3">
         <label class="mr-3" for="periodComment">Comment</label>
-        <InputText id="periodComment" @bind-Value="@NewPeriodModel.Comment" />
+        <InputText id="periodComment" @bind-Value="@NewPeriodModel.Comment"/>
     </div>
     <MatButton Type="submit" Class="btn btn-primary" Raised="true">@dayButtonText</MatButton>
 </EditForm>
@@ -19,31 +20,34 @@
 
 <table class="table table-striped table-hover table-sm">
     <thead>
-        <tr>
-            <th class="workperiod-id-column" scope="col">Id</th>
-            <th scope="col">Start Time</th>
-            <th scope="col">End Time</th>
-            <th scope="col">Length</th>
-            <th class="workperiod-comment-column" scope="col">Comment</th>
-            <th scope="col">Edit</th>
-        </tr>
+    <tr>
+        <th class="workperiod-id-column" scope="col">Id</th>
+        <th scope="col">Start Time</th>
+        <th scope="col">End Time</th>
+        <th scope="col">Length</th>
+        <th class="workperiod-comment-column" scope="col">Comment</th>
+        <th scope="col">Edit</th>
+    </tr>
     </thead>
     <tbody>
-        @foreach (var period in IndexResponse.MostRecentWorkPeriods) {
-            <tr>
-                <th class="workperiod-id-column" scope="row">@period.Id</th>
-                <td>@period.StartTime.ToString()</td>
-                <td>@period.EndTime.ToString()</td>
-                <td>@period.GetWorkTime().ToTimeString()</td>
-                <td class="workperiod-comment-column">@period.Comment</td>
-                <td onclick="location.href='workday/@period.WorkDayId/workperiod/@period.Id'"><span class="oi oi-pencil" title="oi-pencil" aria-hidden="true"></span></td>
-            </tr>
-        }
+    @foreach (var period in IndexResponse.MostRecentWorkPeriods)
+    {
+        <tr>
+            <th class="workperiod-id-column" scope="row">@period.Id</th>
+            <td>@period.StartTime.ToString()</td>
+            <td>@period.EndTime.ToString()</td>
+            <td>@period.GetWorkTime().ToTimeString()</td>
+            <td class="workperiod-comment-column">@period.Comment</td>
+            <td onclick="location.href = 'workday/@period.WorkDayId/workperiod/@period.Id'">
+                <span class="oi oi-pencil" title="oi-pencil" aria-hidden="true"></span>
+            </td>
+        </tr>
+    }
     </tbody>
 </table>
 
-@if (IndexResponse?.WorkDays?.Items.Any() == true) {
-
+@if (IndexResponse?.WorkDays?.Items.Any() == true)
+{
     <h3>Total Overhours</h3>
 
     <div class="d-flex flex-row justify-content-between">
@@ -56,23 +60,26 @@
 
     <table class="table table-striped table-hover table-sm">
         <thead>
-            <tr>
-                <th scope="col">Date</th>
-                <th scope="col">Time worked</th>
-                <th scope="col">Overhours</th>
-            </tr>
+        <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Time worked</th>
+            <th scope="col">Overhours</th>
+        </tr>
         </thead>
         <tbody>
-            @foreach (var workDay in IndexResponse.WorkDays.Items) {
-                <tr onclick="location.href='workday/@workDay.Id'">
-                    <td>@workDay.Date.DayOfWeek.ToString(), @workDay.Date.ToString("dd.MM.yyyy")</td>
-                    <td>@workDay.GetWorkTime().ToTimeString()</td>
-                    <td>@workDay.Overhours.ToTimeString()</td>
-                </tr>
-            }
+        @foreach (var workDay in IndexResponse.WorkDays.Items)
+        {
+            <tr onclick="location.href = 'workday/@workDay.Id'">
+                <td>@workDay.Date.DayOfWeek.ToString(), @workDay.Date.ToString("dd.MM.yyyy")</td>
+                <td>@workDay.GetWorkTime().ToTimeString()</td>
+                <td>@workDay.Overhours.ToTimeString()</td>
+            </tr>
+        }
         </tbody>
     </table>
-} else {
+}
+else
+{
     @CheckForContracts()
 }
 
@@ -85,15 +92,17 @@
     public string dayButtonText;
 
     int pageSize = 25;
-    int pageIndex = 0;
+    int pageIndex;
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync()
+    {
         IndexResponse = await Mediator.Send(new IndexRequest(pageIndex, pageSize));
         EvaluateButtonText();
         await base.OnInitializedAsync();
     }
 
-    private async Task HandleValidSubmitAsync() {
+    private async Task HandleValidSubmitAsync()
+    {
         var result = await Mediator.Send(NewPeriodModel);
         NewPeriodModel = new NewWorkPeriodRequest();
         IndexResponse = await Mediator.Send(new IndexRequest());
@@ -101,21 +110,26 @@
         Navi.NavigateTo("/");
     }
 
-    private string CheckForContracts() {
+    private string CheckForContracts()
+    {
         var contract = Mediator.Send(new ContractListRequest()).GetAwaiter().GetResult();
-        if (contract?.Contracts?.Any() == false) {
+        if (contract?.Contracts?.Any() == false)
+        {
             Navi.NavigateTo("/contracts/add");
         }
         return "";
     }
 
-    private void EvaluateButtonText() {
+    private void EvaluateButtonText()
+    {
         dayButtonText = IndexResponse.HasOngoingWorkPeriod ? "Stop" : "Start";
     }
 
-    async Task OnPage(MatPaginatorPageEvent e) {
+    async Task OnPage(MatPaginatorPageEvent e)
+    {
         pageSize = e.PageSize;
         pageIndex = e.PageIndex;
         IndexResponse = await Mediator.Send(new IndexRequest(pageIndex, pageSize));
     }
+
 }

@@ -4,11 +4,10 @@
     }
 
     public class InitialApplicationState {
-
-        public string? XsrfToken { get; private set; }
-
         public InitialApplicationState(string? xsrfToken) {
             XsrfToken = xsrfToken;
         }
+
+        public string? XsrfToken { get; }
     }
 }

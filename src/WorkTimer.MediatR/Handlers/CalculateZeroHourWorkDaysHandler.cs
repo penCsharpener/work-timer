@@ -1,9 +1,11 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using WorkTimer.Domain.Models;
 using WorkTimer.MediatR.Handlers.Shared;
 using WorkTimer.MediatR.Requests;
 using WorkTimer.Persistence.Data;
@@ -17,17 +19,18 @@ namespace WorkTimer.MediatR.Handlers {
         }
 
         public Task<string> Handle(CalculateZeroHourWorkDaysRequest request, CancellationToken cancellationToken) {
-            var zeroHourDays = _context.WorkDays.Include(x => x.WorkingPeriods)
+            List<WorkDay> zeroHourDays = _context.WorkDays.Include(x => x.WorkingPeriods)
                 .Where(x => x.TotalHours == 0d)
                 .ToList();
 
-            foreach (var workday in zeroHourDays) {
+            foreach (WorkDay workday in zeroHourDays) {
                 UpdateTotalHoursOfWorkDay(workday);
             }
 
             _context.SaveChanges();
 
             _logger.LogInformation($"Processed {zeroHourDays.Count} work days.");
+
             return Task.FromResult($"Processed {zeroHourDays.Count} work days.");
         }
     }

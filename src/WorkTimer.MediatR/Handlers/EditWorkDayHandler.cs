@@ -24,7 +24,6 @@ namespace WorkTimer.MediatR.Handlers {
                 _context.SaveChanges();
 
                 return Task.FromResult(true);
-
             } catch (Exception ex) {
                 _logger.LogError(ex, $"Could not update work day with id {request.WorkDay.Id}");
 
@@ -36,10 +35,11 @@ namespace WorkTimer.MediatR.Handlers {
             var workingPeriods = request.WorkDay.WorkingPeriods.Select(x => new { x.StartTime.Date }).ToList();
 
             if (workingPeriods?.Count > 0) {
-                var count = workingPeriods.GroupBy(x => x.Date).Count();
+                int count = workingPeriods.GroupBy(x => x.Date).Count();
 
                 if (count == 1) {
-                    var date = workingPeriods.FirstOrDefault().Date;
+                    DateTime date = workingPeriods.FirstOrDefault().Date;
+
                     if (date != request.WorkDay.Date) {
                         request.WorkDay.Date = date;
                     }

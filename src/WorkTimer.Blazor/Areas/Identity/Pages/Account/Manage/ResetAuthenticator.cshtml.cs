@@ -7,9 +7,9 @@ using WorkTimer.Domain.Models;
 
 namespace WorkTimer.Blazor.Areas.Identity.Pages.Account.Manage {
     public class ResetAuthenticatorModel : PageModel {
-        readonly UserManager<AppUser> _userManager;
+        private readonly ILogger<ResetAuthenticatorModel> _logger;
         private readonly SignInManager<AppUser> _signInManager;
-        readonly ILogger<ResetAuthenticatorModel> _logger;
+        private readonly UserManager<AppUser> _userManager;
 
         public ResetAuthenticatorModel(
             UserManager<AppUser> userManager,
@@ -24,7 +24,8 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account.Manage {
         public string StatusMessage { get; set; }
 
         public async Task<IActionResult> OnGet() {
-            var user = await _userManager.GetUserAsync(User);
+            AppUser? user = await _userManager.GetUserAsync(User);
+
             if (user == null) {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
@@ -33,7 +34,8 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account.Manage {
         }
 
         public async Task<IActionResult> OnPostAsync() {
-            var user = await _userManager.GetUserAsync(User);
+            AppUser? user = await _userManager.GetUserAsync(User);
+
             if (user == null) {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }

@@ -1,12 +1,13 @@
 ﻿@page "/admin"
+@using global::MediatR
 @attribute [Authorize(Roles = "Admin")]
-@inject global::MediatR.IMediator Mediator
+@inject IMediator Mediator
 
 <h3>Administration</h3>
 
 <EditForm class="form-inline" Model="@RequestModel" OnValidSubmit="@HandleValidSubmitAsync">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
     <ul class="nav flex-column">
         <li class="nav-item px-3">
             <MatCheckbox @bind-Value="RequestModel.CalculateZeroHourWorkDays">Calculate Zero Hour Days</MatCheckbox>
@@ -34,11 +35,11 @@
 
     public AdminResponse ResponseModel { get; set; } = new AdminResponse();
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync() { }
 
-    }
-
-    private async Task HandleValidSubmitAsync() {
+    private async Task HandleValidSubmitAsync()
+    {
         ResponseModel = await Mediator.Send(RequestModel);
     }
+
 }

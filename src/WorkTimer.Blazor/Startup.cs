@@ -38,9 +38,7 @@ namespace WorkTimer.Blazor {
                 app.UseHsts();
             }
 
-            app.UseForwardedHeaders(new ForwardedHeadersOptions {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });
+            app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto });
 
             if (Configuration?.GetValue<string>("ApplicationSettings:LaunchUrls")?.Contains("https") == true) {
                 app.UseHttpsRedirection();

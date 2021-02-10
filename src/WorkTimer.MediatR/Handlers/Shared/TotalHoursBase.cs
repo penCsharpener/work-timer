@@ -12,16 +12,17 @@ namespace WorkTimer.MediatR.Handlers.Shared {
         }
 
         protected void UpdateTotalHoursOfWorkDay(int workdayId) {
-            var workday = _context.WorkDays.Include(x => x.WorkingPeriods)
-                                .Where(x => x.Id == workdayId && x.WorkingPeriods.Any(wp => wp.EndTime.HasValue))
-                                .Select(x => x)
-                                .FirstOrDefault();
+            WorkDay? workday = _context.WorkDays.Include(x => x.WorkingPeriods)
+                .Where(x => x.Id == workdayId && x.WorkingPeriods.Any(wp => wp.EndTime.HasValue))
+                .Select(x => x)
+                .FirstOrDefault();
+
             UpdateTotalHoursOfWorkDay(workday);
         }
 
         protected void UpdateTotalHoursOfWorkDay(WorkDay workday) {
             if (workday?.WorkingPeriods.Count > 0) {
-                var totalHours = workday.WorkingPeriods.Where(x => x.EndTime.HasValue).Sum(x => (x.EndTime.Value - x.StartTime).TotalHours);
+                double totalHours = workday.WorkingPeriods.Where(x => x.EndTime.HasValue).Sum(x => (x.EndTime.Value - x.StartTime).TotalHours);
                 workday.TotalHours = totalHours;
                 _context.WorkDays.Update(workday);
             }

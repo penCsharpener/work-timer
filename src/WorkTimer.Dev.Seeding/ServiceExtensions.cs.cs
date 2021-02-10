@@ -8,8 +8,8 @@ using WorkTimer.Persistence.Data;
 namespace WorkTimer.Dev.Seeding {
     public static class ServiceExtensions {
         public static async Task SeedDatabaseAsync(this IServiceProvider provider) {
-            var context = provider.GetRequiredService<AppDbContext>();
-            var userManager = provider.GetRequiredService<UserManager<AppUser>>();
+            AppDbContext context = provider.GetRequiredService<AppDbContext>();
+            UserManager<AppUser> userManager = provider.GetRequiredService<UserManager<AppUser>>();
 
             if (!await context.SeedUsers(userManager)) {
                 context.Contracts.AddRange(Contracts.GetEntities());

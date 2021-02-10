@@ -9,8 +9,8 @@ using WorkTimer.Domain.Models;
 namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
     [AllowAnonymous]
     public class LogoutModel : PageModel {
-        private readonly SignInManager<AppUser> _signInManager;
         private readonly ILogger<LogoutModel> _logger;
+        private readonly SignInManager<AppUser> _signInManager;
 
         public LogoutModel(SignInManager<AppUser> signInManager, ILogger<LogoutModel> logger) {
             _signInManager = signInManager;
@@ -20,6 +20,7 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
         public async Task<IActionResult> OnPost() {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
+
             return RedirectToPage("Login");
         }
     }

@@ -22,9 +22,9 @@ namespace WorkTimer.MediatR.Handlers {
                 _context.SaveChanges();
 
                 return Task.FromResult(true);
-
             } catch (Exception ex) {
                 _logger.LogError(ex, "Could not update working period with id " + request.WorkingPeriod.Id);
+
                 return Task.FromResult(false);
             }
         }

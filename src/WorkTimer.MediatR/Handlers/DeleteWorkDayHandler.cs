@@ -18,7 +18,6 @@ namespace WorkTimer.MediatR.Handlers {
 
         public Task<bool> Handle(DeleteWorkDayRequest request, CancellationToken cancellationToken) {
             try {
-
                 if (request.WorkDay == null) {
                     return Task.FromResult(false);
                 }
@@ -27,9 +26,9 @@ namespace WorkTimer.MediatR.Handlers {
                 _context.SaveChanges();
 
                 return Task.FromResult(true);
-
             } catch (Exception ex) {
                 _logger.LogError(ex, $"Work day with id {request.WorkDay.Id} of User '{request.User?.Id}' could not be deleted");
+
                 return Task.FromResult(false);
             }
         }

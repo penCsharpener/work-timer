@@ -1,20 +1,24 @@
 ﻿@inject NavigationManager Navi
 
 @code {
+
     [CascadingParameter]
     private Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync()
+    {
         var authenticationState = await AuthenticationStateTask;
 
-        if (authenticationState?.User?.Identity is null || !authenticationState.User.Identity.IsAuthenticated) {
+        if (authenticationState?.User?.Identity is null || !authenticationState.User.Identity.IsAuthenticated)
+        {
             var returnUrl = Navi.ToBaseRelativePath(Navi.Uri);
 
-            try {
+            try
+            {
                 Navi.NavigateTo("/Identity/Account/Login", true);
-            } catch {
-
             }
+            catch { }
         }
     }
+
 }

@@ -1,9 +1,11 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using WorkTimer.Domain.Models;
 using WorkTimer.MediatR.Handlers.Shared;
 using WorkTimer.MediatR.Requests;
 using WorkTimer.Persistence.Data;
@@ -17,15 +19,16 @@ namespace WorkTimer.MediatR.Handlers {
         }
 
         public Task<string> Handle(RecalculateAllUsersHoursRequest request, CancellationToken cancellationToken) {
-            var workdays = _context.WorkDays.Include(x => x.WorkingPeriods).ToList();
+            List<WorkDay> workdays = _context.WorkDays.Include(x => x.WorkingPeriods).ToList();
 
-            foreach (var workDay in workdays) {
+            foreach (WorkDay workDay in workdays) {
                 UpdateTotalHoursOfWorkDay(workDay);
             }
 
             _context.SaveChanges();
 
             _logger.LogInformation($"Processed {workdays.Count} work days.");
+
             return Task.FromResult($"Processed {workdays.Count} work days.");
         }
     }

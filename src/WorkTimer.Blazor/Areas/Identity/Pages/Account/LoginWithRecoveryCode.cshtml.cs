@@ -7,12 +7,13 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using WorkTimer.Domain.Models;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
     [AllowAnonymous]
     public class LoginWithRecoveryCodeModel : PageModel {
-        private readonly SignInManager<AppUser> _signInManager;
         private readonly ILogger<LoginWithRecoveryCodeModel> _logger;
+        private readonly SignInManager<AppUser> _signInManager;
 
         public LoginWithRecoveryCodeModel(SignInManager<AppUser> signInManager, ILogger<LoginWithRecoveryCodeModel> logger) {
             _signInManager = signInManager;
@@ -24,19 +25,12 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
 
         public string ReturnUrl { get; set; }
 
-        public class InputModel {
-            [BindProperty]
-            [Required]
-            [DataType(DataType.Text)]
-            [Display(Name = "Recovery Code")]
-            public string RecoveryCode { get; set; }
-        }
-
         public async Task<IActionResult> OnGetAsync(string returnUrl = null) {
             // Ensure the user has gone through the username & password screen first
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            AppUser? user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+
             if (user == null) {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                throw new InvalidOperationException("Unable to load two-factor authentication user.");
             }
 
             ReturnUrl = returnUrl;
@@ -49,27 +43,40 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
                 return Page();
             }
 
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            AppUser? user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+
             if (user == null) {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                throw new InvalidOperationException("Unable to load two-factor authentication user.");
             }
 
-            var recoveryCode = Input.RecoveryCode.Replace(" ", string.Empty);
+            string? recoveryCode = Input.RecoveryCode.Replace(" ", string.Empty);
 
-            var result = await _signInManager.TwoFactorRecoveryCodeSignInAsync(recoveryCode);
+            SignInResult? result = await _signInManager.TwoFactorRecoveryCodeSignInAsync(recoveryCode);
 
             if (result.Succeeded) {
                 _logger.LogInformation("User with ID '{UserId}' logged in with a recovery code.", user.Id);
+
                 return LocalRedirect(returnUrl ?? Url.Content("~/"));
             }
+
             if (result.IsLockedOut) {
                 _logger.LogWarning("User with ID '{UserId}' account locked out.", user.Id);
+
                 return RedirectToPage("./Lockout");
-            } else {
-                _logger.LogWarning("Invalid recovery code entered for user with ID '{UserId}' ", user.Id);
-                ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
-                return Page();
             }
+
+            _logger.LogWarning("Invalid recovery code entered for user with ID '{UserId}' ", user.Id);
+            ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
+
+            return Page();
+        }
+
+        public class InputModel {
+            [BindProperty]
+            [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "Recovery Code")]
+            public string RecoveryCode { get; set; }
         }
     }
 }

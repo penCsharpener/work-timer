@@ -3,6 +3,8 @@ using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using WorkTimer.Domain.Models;
+using WorkTimer.MediatR.Models;
 using WorkTimer.MediatR.Requests;
 using WorkTimer.MediatR.Responses;
 using WorkTimer.Persistence.Data;
@@ -18,17 +20,12 @@ namespace WorkTimer.MediatR.Handlers {
         }
 
         public Task<GetWorkingPeriodResponse> Handle(GetWorkingPeriodRequest request, CancellationToken cancellationToken) {
-            var workingPeriod = _context.WorkingPeriods.Where(x => x.WorkDayId == request.WorkDayId && x.Id == request.WorkingPeriodId)
+            WorkingPeriod? workingPeriod = _context.WorkingPeriods.Where(x => x.WorkDayId == request.WorkDayId && x.Id == request.WorkingPeriodId)
                 .SingleOrDefault();
 
             if (workingPeriod != null) {
                 return Task.FromResult(new GetWorkingPeriodResponse {
-                    WorkingPeriod = workingPeriod,
-                    UserContext = new Models.UserContext {
-                        User = request.User,
-                        UserEmail = request.UserEmail,
-                        UserIsAdmin = request.UserIsAdmin
-                    }
+                    WorkingPeriod = workingPeriod, UserContext = new UserContext { User = request.User, UserEmail = request.UserEmail, UserIsAdmin = request.UserIsAdmin }
                 });
             }
 

@@ -4,9 +4,11 @@ using WorkTimer.Domain.Models;
 
 namespace WorkTimer.Persistence.Data {
     public class AppDbContext : IdentityDbContext<AppUser, AppRole, int> {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        }
+        public DbSet<WorkingPeriod> WorkingPeriods { get; set; }
+        public DbSet<WorkDay> WorkDays { get; set; }
+        public DbSet<Contract> Contracts { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             base.OnConfiguring(optionsBuilder);
@@ -15,10 +17,6 @@ namespace WorkTimer.Persistence.Data {
             optionsBuilder.EnableDetailedErrors();
 #endif
         }
-
-        public DbSet<WorkingPeriod> WorkingPeriods { get; set; }
-        public DbSet<WorkDay> WorkDays { get; set; }
-        public DbSet<Contract> Contracts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             base.OnModelCreating(modelBuilder);

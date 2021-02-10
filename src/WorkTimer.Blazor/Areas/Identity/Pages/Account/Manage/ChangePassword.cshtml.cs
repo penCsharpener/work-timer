@@ -5,11 +5,12 @@ using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using WorkTimer.Domain.Models;
+
 namespace WorkTimer.Blazor.Areas.Identity.Pages.Account.Manage {
     public class ChangePasswordModel : PageModel {
-        private readonly UserManager<AppUser> _userManager;
-        private readonly SignInManager<AppUser> _signInManager;
         private readonly ILogger<ChangePasswordModel> _logger;
+        private readonly SignInManager<AppUser> _signInManager;
+        private readonly UserManager<AppUser> _userManager;
 
         public ChangePasswordModel(
             UserManager<AppUser> userManager,
@@ -25,6 +26,50 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account.Manage {
 
         [TempData]
         public string StatusMessage { get; set; }
+
+        public async Task<IActionResult> OnGetAsync() {
+            AppUser? user = await _userManager.GetUserAsync(User);
+
+            if (user == null) {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            bool hasPassword = await _userManager.HasPasswordAsync(user);
+
+            if (!hasPassword) {
+                return RedirectToPage("./SetPassword");
+            }
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostAsync() {
+            if (!ModelState.IsValid) {
+                return Page();
+            }
+
+            AppUser? user = await _userManager.GetUserAsync(User);
+
+            if (user == null) {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            IdentityResult? changePasswordResult = await _userManager.ChangePasswordAsync(user, Input.OldPassword, Input.NewPassword);
+
+            if (!changePasswordResult.Succeeded) {
+                foreach (var error in changePasswordResult.Errors) {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+
+                return Page();
+            }
+
+            await _signInManager.RefreshSignInAsync(user);
+            _logger.LogInformation("User changed their password successfully.");
+            StatusMessage = "Your password has been changed.";
+
+            return RedirectToPage();
+        }
 
         public class InputModel {
             [Required]
@@ -42,45 +87,6 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account.Manage {
             [Display(Name = "Confirm new password")]
             [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
-        }
-
-        public async Task<IActionResult> OnGetAsync() {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
-
-            var hasPassword = await _userManager.HasPasswordAsync(user);
-            if (!hasPassword) {
-                return RedirectToPage("./SetPassword");
-            }
-
-            return Page();
-        }
-
-        public async Task<IActionResult> OnPostAsync() {
-            if (!ModelState.IsValid) {
-                return Page();
-            }
-
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
-
-            var changePasswordResult = await _userManager.ChangePasswordAsync(user, Input.OldPassword, Input.NewPassword);
-            if (!changePasswordResult.Succeeded) {
-                foreach (var error in changePasswordResult.Errors) {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-                return Page();
-            }
-
-            await _signInManager.RefreshSignInAsync(user);
-            _logger.LogInformation("User changed their password successfully.");
-            StatusMessage = "Your password has been changed.";
-
-            return RedirectToPage();
         }
     }
 }
