@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WorkTimer.Domain.Models;
@@ -14,26 +16,67 @@ namespace WorkTimer.MediatRTests.Handlers
     public class IndexHandlerTests
     {
         private readonly IndexHandler _testObject;
+        private readonly DbContextOptions<AppDbContext> _options;
 
         public IndexHandlerTests()
         {
-            var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+            _options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
 
-            using (var context = new AppDbContext(options))
+            using (var context = new AppDbContext(_options))
             {
                 context.WorkDays.AddRange(GetData());
                 context.SaveChanges();
             }
 
-            _testObject = new IndexHandler(new AppDbContext(options));
+            _testObject = new IndexHandler(new AppDbContext(_options));
         }
 
         [Fact]
-        public async Task Handler_Works()
+        public async Task Handler_Calculates_Hours()
         {
             var request = new IndexRequest() { User = new AppUser { Id = 1 } };
 
             var response = await _testObject.Handle(request, CancellationToken.None);
+            response.TotalOverHours.TotalHours.Should().Be(-0.083299999972222219);
+            response.WorkDays.Count.Should().Be(2);
+            response.MostRecentWorkPeriods.Count.Should().Be(5);
+            response.HasOngoingWorkPeriod.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task Handler_Ignores_Incomplete_Periods()
+        {
+            using (var context = new AppDbContext(_options))
+            {
+                var incompleteWorkday = new WorkDay()
+                {
+                    Id = 3,
+                    ContractId = 1,
+                    Date = new DateTime(2021, 02, 03),
+                    WorkDayType = WorkDayType.Workday,
+                    TotalHours = 4.5,
+                    WorkingPeriods = new List<WorkingPeriod>() {
+                    new WorkingPeriod { Id = 6, StartTime = new DateTime(2021, 02, 03, 8, 20, 0), EndTime = new DateTime(2021, 02, 03, 12, 50, 0) },
+                    new WorkingPeriod { Id = 7, StartTime = new DateTime(2021, 02, 03, 15, 40, 0) },
+                }
+                };
+                context.WorkDays.Add(incompleteWorkday);
+                context.SaveChanges();
+            }
+
+            var request = new IndexRequest() { User = new AppUser { Id = 1 } };
+
+            var response = await _testObject.Handle(request, CancellationToken.None);
+            response.TotalOverHours.TotalHours.Should().Be(-0.08329999997222222);
+            response.WorkDays.Count.Should().Be(3);
+            response.WorkDays.Items.FirstOrDefault(x => x.Id == 1).Overhours.TotalHours.Should().Be(-0.5);
+            response.WorkDays.Items.FirstOrDefault(x => x.Id == 2).Overhours.TotalHours.Should().Be(0.41669999997222223);
+            response.WorkDays.Items.FirstOrDefault(x => x.Id == 3).Overhours.TotalHours.Should().Be(-3.5);
+            response.WorkDays.Items.FirstOrDefault(x => x.Id == 1).WorkHours.TotalHours.Should().Be(7.5);
+            response.WorkDays.Items.FirstOrDefault(x => x.Id == 2).WorkHours.TotalHours.Should().Be(8.4167);
+            response.WorkDays.Items.FirstOrDefault(x => x.Id == 3).WorkHours.TotalHours.Should().Be(4.5);
+            response.MostRecentWorkPeriods.Count.Should().Be(5);
+            response.HasOngoingWorkPeriod.Should().BeTrue();
         }
 
         private WorkDay[] GetData()
@@ -53,7 +96,7 @@ namespace WorkTimer.MediatRTests.Handlers
                     new WorkingPeriod { Id = 3, StartTime = new DateTime(2021, 02, 02, 8, 20, 0), EndTime = new DateTime(2021, 02, 02, 12, 50, 0) },
                     new WorkingPeriod { Id = 4, StartTime = new DateTime(2021, 02, 02, 15, 40, 0), EndTime = new DateTime(2021, 02, 02, 17, 10, 0) },
                     new WorkingPeriod { Id = 5, StartTime = new DateTime(2021, 02, 02, 22, 10, 0), EndTime = new DateTime(2021, 02, 03, 0, 35, 0) }
-                }  }
+                }  },
             };
         }
 
