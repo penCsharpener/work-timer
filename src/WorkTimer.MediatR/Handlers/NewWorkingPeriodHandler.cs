@@ -15,34 +15,33 @@ using static Nager.Date.DateSystem;
 
 namespace WorkTimer.MediatR.Handlers
 {
-    public class NewWorkPeriodHandler : TotalHoursBase, IRequestHandler<NewWorkPeriodRequest, bool>
+    public class NewWorkingPeriodHandler : TotalHoursBase, IRequestHandler<NewWorkingPeriodRequest, bool>
     {
         private readonly INow _now;
-        private readonly ILogger<NewWorkPeriodHandler> _logger;
+        private readonly ILogger<NewWorkingPeriodHandler> _logger;
         private WorkDay _workDayToday;
 
-        public NewWorkPeriodHandler(AppDbContext context, INow now, ILogger<NewWorkPeriodHandler> logger) : base(context)
+        public NewWorkingPeriodHandler(AppDbContext context, INow now, ILogger<NewWorkingPeriodHandler> logger) : base(context)
         {
             _now = now;
             _logger = logger;
         }
 
-        public Task<bool> Handle(NewWorkPeriodRequest request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(NewWorkingPeriodRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 _workDayToday = _context.WorkDays.Include(x => x.WorkingPeriods).Include(x => x.Contract)
-                .Where(x => (x.Contract.UserId == request.User.Id && x.Contract.IsCurrent) && x.Date == _now.Now.Date || x.WorkingPeriods.Any(wp => !wp.EndTime.HasValue))
-                .FirstOrDefault();
+                .FirstOrDefault(x => (x.Contract.UserId == request.User.Id && x.Contract.IsCurrent) && x.Date == _now.Now.Date || x.WorkingPeriods.Any(wp => !wp.EndTime.HasValue));
 
                 if (_workDayToday != null && HasOngoingWorkingPeriod())
                 {
-                    return Task.FromResult(true);
+                    return true;
                 }
 
                 if (!GetOrCreateWorkday(request.User.Id))
                 {
-                    return Task.FromResult(false);
+                    return false;
                 }
 
                 _context.WorkingPeriods.Add(new WorkingPeriod { Comment = request.Comment, StartTime = _now.Now, WorkDayId = _workDayToday.Id });
@@ -51,13 +50,13 @@ namespace WorkTimer.MediatR.Handlers
 
                 _context.SaveChanges();
 
-                return Task.FromResult(true);
+                return true;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "new work period could not be created");
 
-                return Task.FromResult(false);
+                return false;
             }
         }
 
@@ -65,14 +64,12 @@ namespace WorkTimer.MediatR.Handlers
         {
             if (_workDayToday == null)
             {
-                Contract? contract = _context.Contracts.Where(x => x.UserId == userId && x.IsCurrent).FirstOrDefault();
+                Contract? contract = _context.Contracts.FirstOrDefault(x => x.UserId == userId && x.IsCurrent);
 
                 if (contract == null)
                 {
                     return false;
                 }
-
-
 
                 _workDayToday = new WorkDay { ContractId = contract.Id, Date = _now.Now.Date, WorkDayType = GetWorkdayTypeToday(_now) };
                 _context.WorkDays.Add(_workDayToday);

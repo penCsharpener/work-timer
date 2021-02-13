@@ -87,7 +87,7 @@ else
 
     public IndexResponse IndexResponse { get; set; }
 
-    public NewWorkPeriodRequest NewPeriodModel { get; set; } = new NewWorkPeriodRequest();
+    public NewWorkingPeriodRequest NewPeriodModel { get; set; } = new NewWorkingPeriodRequest();
 
     public string dayButtonText;
 
@@ -104,7 +104,7 @@ else
     private async Task HandleValidSubmitAsync()
     {
         var result = await Mediator.Send(NewPeriodModel);
-        NewPeriodModel = new NewWorkPeriodRequest();
+        NewPeriodModel = new NewWorkingPeriodRequest();
         IndexResponse = await Mediator.Send(new IndexRequest());
         EvaluateButtonText();
         Navi.NavigateTo("/");

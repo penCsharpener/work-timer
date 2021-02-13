@@ -17,7 +17,7 @@ namespace WorkTimer.MediatRTests.Handlers
 {
     public class NewWorkPeriodHandlerTests
     {
-        private readonly NewWorkPeriodHandler _testObject;
+        private readonly NewWorkingPeriodHandler _testObject;
         private readonly DbContextOptions<AppDbContext> _options;
         private static MockNow _now = new MockNow();
 
@@ -31,7 +31,7 @@ namespace WorkTimer.MediatRTests.Handlers
                 context.SaveChanges();
             }
 
-            _testObject = new NewWorkPeriodHandler(new AppDbContext(_options), _now, Substitute.For<ILogger<NewWorkPeriodHandler>>());
+            _testObject = new NewWorkingPeriodHandler(new AppDbContext(_options), _now, Substitute.For<ILogger<NewWorkingPeriodHandler>>());
         }
 
         [Fact]
@@ -45,7 +45,7 @@ namespace WorkTimer.MediatRTests.Handlers
                 context.WorkingPeriods.Count().Should().Be(0);
             }
 
-            var request = new NewWorkPeriodRequest()
+            var request = new NewWorkingPeriodRequest()
             {
                 User = new AppUser { Id = 1 },
                 Comment = "Test Comment"
@@ -73,7 +73,7 @@ namespace WorkTimer.MediatRTests.Handlers
                 context.SaveChanges();
             }
 
-            var request = new NewWorkPeriodRequest()
+            var request = new NewWorkingPeriodRequest()
             {
                 User = new AppUser { Id = 1 },
                 Comment = "Test Comment"
@@ -102,7 +102,7 @@ namespace WorkTimer.MediatRTests.Handlers
                 context.SaveChanges();
             }
 
-            var request = new NewWorkPeriodRequest()
+            var request = new NewWorkingPeriodRequest()
             {
                 User = new AppUser { Id = 1 },
                 Comment = "Test Comment"
@@ -131,7 +131,7 @@ namespace WorkTimer.MediatRTests.Handlers
                 context.SaveChanges();
             }
 
-            var request = new NewWorkPeriodRequest()
+            var request = new NewWorkingPeriodRequest()
             {
                 User = new AppUser { Id = 1 },
                 Comment = "Test Comment"
