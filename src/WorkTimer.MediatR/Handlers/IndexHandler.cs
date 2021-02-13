@@ -30,7 +30,7 @@ namespace WorkTimer.MediatR.Handlers
             }
 
             var allHours = _context.WorkingPeriods.Include(x => x.WorkDay).ThenInclude(x => x.Contract)
-                .Where(x => x.WorkDay.Contract.UserId == request.User.Id && x.WorkDay.Contract.IsCurrent/* && x.WorkDay.WorkingPeriods.All(x => x.EndTime.HasValue)*/)
+                .Where(x => x.WorkDay.Contract.UserId == request.User.Id && x.WorkDay.Contract.IsCurrent && x.WorkDay.WorkingPeriods.All(x => x.EndTime.HasValue))
                 .Select(x => new { x.WorkDay.Id, x.WorkDay.WorkDayType, x.WorkDay.TotalHours, HoursPerDay = (double) x.WorkDay.Contract.HoursPerWeek / 5d })
                 .Distinct()
                 .Select(x => new TotalHoursCalculationModel(x.TotalHours, x.HoursPerDay, x.WorkDayType.GetWorkHourMultiplier()))

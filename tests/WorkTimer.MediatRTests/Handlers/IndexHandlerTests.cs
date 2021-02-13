@@ -68,7 +68,7 @@ namespace WorkTimer.MediatRTests.Handlers
 
             var response = await _testObject.Handle(request, CancellationToken.None);
             response.TotalOverHours.TotalHours.Should().Be(-0.08329999997222222);
-            response.WorkDays.Count.Should().Be(3);
+            response.WorkDays.Count.Should().Be(2);
             response.WorkDays.Items.FirstOrDefault(x => x.Id == 1).Overhours.TotalHours.Should().Be(-0.5);
             response.WorkDays.Items.FirstOrDefault(x => x.Id == 2).Overhours.TotalHours.Should().Be(0.41669999997222223);
             response.WorkDays.Items.FirstOrDefault(x => x.Id == 3).Overhours.TotalHours.Should().Be(-3.5);
