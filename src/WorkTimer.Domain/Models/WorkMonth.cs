@@ -5,6 +5,7 @@ namespace WorkTimer.Domain.Models
     public class WorkMonth
     {
         public int Id { get; set; }
+        public int UserId { get; set; }
         public int DaysWorked { get; set; }
         public int DaysOffWork { get; set; }
         public double TotalOverhours { get; set; }

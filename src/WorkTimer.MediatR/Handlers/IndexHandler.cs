@@ -13,7 +13,7 @@ using WorkTimer.Persistence.Data;
 
 namespace WorkTimer.MediatR.Handlers
 {
-    public class IndexHandler : IRequestHandler<IndexRequest, IndexResponse>
+    public partial class IndexHandler : IRequestHandler<IndexRequest, IndexResponse>
     {
         private readonly AppDbContext _context;
 
@@ -31,9 +31,8 @@ namespace WorkTimer.MediatR.Handlers
 
             var allHours = _context.WorkingPeriods.Include(x => x.WorkDay).ThenInclude(x => x.Contract)
                 .Where(x => x.WorkDay.Contract.UserId == request.User.Id && x.WorkDay.Contract.IsCurrent && x.WorkDay.WorkingPeriods.All(x => x.EndTime.HasValue))
-                .Select(x => new { x.WorkDay.Id, x.WorkDay.WorkDayType, x.WorkDay.TotalHours, HoursPerDay = (double) x.WorkDay.Contract.HoursPerWeek / 5d })
+                .Select(x => new TotalHoursCalculationModel(x.WorkDay.TotalHours, x.WorkDay.Contract.HoursPerWeek / 5d, x.WorkDay.WorkDayType.GetWorkHourMultiplier()))
                 .Distinct()
-                .Select(x => new TotalHoursCalculationModel(x.TotalHours, x.HoursPerDay, x.WorkDayType.GetWorkHourMultiplier()))
                 .ToList();
 
             int count = allHours.Count;
@@ -80,7 +79,5 @@ namespace WorkTimer.MediatR.Handlers
                 };
             }
         }
-
-        internal record TotalHoursCalculationModel(double TotalHours, double HoursPerDay, double WorkHourMultiplier);
     }
 }

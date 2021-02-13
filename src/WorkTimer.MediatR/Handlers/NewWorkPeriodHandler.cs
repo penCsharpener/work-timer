@@ -72,6 +72,8 @@ namespace WorkTimer.MediatR.Handlers
                     return false;
                 }
 
+
+
                 _workDayToday = new WorkDay { ContractId = contract.Id, Date = _now.Now.Date, WorkDayType = GetWorkdayTypeToday(_now) };
                 _context.WorkDays.Add(_workDayToday);
                 _context.SaveChanges();

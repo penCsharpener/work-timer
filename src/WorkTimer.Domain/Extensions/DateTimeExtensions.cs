@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace WorkTimer.Domain.Extensions
 {
     public static class DateTimeExtensions
     {
+        private static Calendar _calendar = new CultureInfo("de-DE").Calendar;
+
         public static IEnumerable<DateTime> GetWholeWeek(this DateTime dateTime)
         {
             DateTime weekStart = dateTime;
@@ -22,6 +25,23 @@ namespace WorkTimer.Domain.Extensions
             }
 
             return list;
+        }
+
+        public static int GetWeekNumber(this DateTime dateTime)
+        {
+            return _calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
+        }
+
+        public static int GetWeekNumber(int year, int calendarWeek, out DateTime dayInThatWeek)
+        {
+            dayInThatWeek = new DateTime(year, 01, 01);
+
+            while (calendarWeek != _calendar.GetWeekOfYear(dayInThatWeek, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday) || dayInThatWeek.Year >= (year + 2))
+            {
+                dayInThatWeek = dayInThatWeek.AddDays(7);
+            }
+
+            return _calendar.GetWeekOfYear(dayInThatWeek, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
         }
     }
 }
