@@ -24,7 +24,7 @@ namespace WorkTimer.Seeding.Tests
             list.Count.Should().Be(5);
             list.Sum(x => x.WorkingPeriods.Count).Should().Be(13);
             var totalHours = list.Sum(x => x.TotalHours);
-            totalHours.Should().Be(38.783333333333331);
+            totalHours.Should().Be(43.949999999999996);
         }
     }
 }

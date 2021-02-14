@@ -23,7 +23,7 @@ namespace WorkTimer.Seeding.Tests
             var expectedDate = new DateTime(2021, 2, 5);
             list.All(x => x.StartTime.Date == expectedDate && x.EndTime.Value.Date == expectedDate);
             list[0].StartTime.Should().Be(new DateTime(2021, 2, 5, 8, 1, 0));
-            list[2].EndTime.Value.Should().Be(new DateTime(2021, 2, 5, 18, 26, 0));
+            list[2].EndTime.Value.Should().Be(new DateTime(2021, 2, 5, 19, 43, 0));
         }
     }
 }

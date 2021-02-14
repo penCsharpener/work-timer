@@ -67,7 +67,7 @@ namespace WorkTimer.MediatR.Handlers.Stats
 
             try
             {
-                if (request.CalendarWeek == 0 && request.DaysInWeek?.Count == 0)
+                if (request.CalendarWeek == 0 && request.DaysInWeek == null || request.DaysInWeek?.Count == 0)
                 {
                     await ProcessAllWorkWeeks(request);
                 }
@@ -99,34 +99,68 @@ namespace WorkTimer.MediatR.Handlers.Stats
             var lastWeek = lastDay.GetWeekNumber();
             var workWeeks = new List<WorkWeek>();
 
-            for (int year = firstWeek; year <= lastWeek; year++)
-            {
-                for (int w = 0; w <= 52; w++)
-                {
-                    WorkWeek workWeek;
-                    if (existingWorkWeeks.FirstOrDefault(x => x.WeekNumber == w && x.WeekStart.Year == year) is { } existingWeek)
-                    {
-                        workWeek = existingWeek;
-                    }
-                    else
-                    {
-                        DateTimeExtensions.GetWeekNumber(year, w, out var weekStart);
-
-                        workWeek = new WorkWeek
-                        {
-                            WeekNumber = w,
-                            WeekStart = weekStart.GetWholeWeek().First(),
-                            UserId = request.User.Id,
-                        };
-                    }
-
-                    workWeeks.Add(workWeek);
-                }
-            }
-
-            _context.WorkWeeks.AddRange(workWeeks.Where(x => x.Id == 0));
+            AssignExistingWorkWeeks(workDays, existingWorkWeeks);
+            CreateMissingWorkWeeks(workDays, existingWorkWeeks, request.User);
 
             await _context.SaveChangesAsync();
+
+            UpdateStats(workDays, existingWorkWeeks, request.User);
+
+            await _context.SaveChangesAsync();
+        }
+
+        private void AssignExistingWorkWeeks(IEnumerable<WorkDay> workdays, IEnumerable<WorkWeek> weeks)
+        {
+            foreach (var day in workdays)
+            {
+                var firstDay = day.Date.GetWholeWeek().First();
+                if (weeks.FirstOrDefault(x => x.WeekStart.Date == firstDay.Date) is { } week)
+                {
+                    day.WorkWeekId = week.Id;
+                }
+            }
+        }
+
+        private void CreateMissingWorkWeeks(IEnumerable<WorkDay> workdays, List<WorkWeek> weeks, AppUser user)
+        {
+            foreach (var day in workdays)
+            {
+                var firstDay = day.Date.GetWholeWeek().First();
+                var matchingWeek = weeks.FirstOrDefault(x => x.WeekStart.Date == firstDay.Date);
+                if (matchingWeek == null)
+                {
+                    var week = new WorkWeek
+                    {
+                        UserId = user.Id,
+                        WeekStart = firstDay,
+                        WeekNumber = firstDay.GetWeekNumber(),
+                    };
+
+                    _context.WorkWeeks.Add(week);
+                    weeks.Add(week);
+
+                    day.WorkWeek = week;
+                }
+                else
+                {
+                    day.WorkWeek = matchingWeek;
+                }
+            }
+        }
+
+        private void UpdateStats(IEnumerable<WorkDay> workdays, List<WorkWeek> weeks, AppUser user)
+        {
+            var requiredDailyhours = (user.Contracts.FirstOrDefault(x => x.IsCurrent)?.HoursPerWeek ?? 0) / 5d;
+
+            foreach (var week in weeks)
+            {
+                var days = workdays.Where(x => x.WorkWeekId == week.Id).ToList();
+
+                week.TotalHours = days.Sum(x => x.TotalHours);
+                week.TotalOverhours = days.Sum(x => x.TotalHours - requiredDailyhours);
+                week.DaysWorked = days.Count(x => x.WorkDayType == WorkDayType.Workday);
+                week.DaysOffWork = 7 - week.DaysWorked;
+            }
         }
 
         public async Task ProcessSpecificWorkWeek(RecalculateMyWeeksRequest request)
@@ -141,6 +175,18 @@ namespace WorkTimer.MediatR.Handlers.Stats
             var daysWorked = workDays.Count(x => x.WorkDayType == Domain.Models.WorkDayType.Workday);
 
             var workWeek = await _context.WorkWeeks.FirstOrDefaultAsync(x => x.UserId == request.User.Id && x.WeekNumber == request.CalendarWeek);
+
+            if (workWeek == null)
+            {
+                workWeek = new WorkWeek
+                {
+                    WeekNumber = request.CalendarWeek,
+                    WeekStart = request.DaysInWeek.First(),
+                    UserId = request.User.Id
+                };
+
+                _context.WorkWeeks.Add(workWeek);
+            }
 
             workWeek.TotalHours = totalHours;
             workWeek.TotalOverhours = totalOverhours;

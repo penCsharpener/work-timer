@@ -14,6 +14,16 @@ namespace WorkTimer.Dev.Seeding
             _contractId = contractId;
         }
 
+        public WorkDaySeeder AddWorkDayRange(string startDateString, string endDateString)
+        {
+            if (DateTime.TryParse(startDateString, out var startDate) && DateTime.TryParse(endDateString, out var endDate))
+            {
+                AddWorkDayRange(startDate, endDate);
+            }
+
+            return this;
+        }
+
         public WorkDaySeeder AddWorkDayRange(DateTime startDate, DateTime endDate)
         {
             var date = startDate.Date;
@@ -22,7 +32,6 @@ namespace WorkTimer.Dev.Seeding
             while (date <= endDate)
             {
                 AddWorkDay(date, GetPeriodCountRandomly());
-
 
                 date = date.AddDays(1);
             }
@@ -34,7 +43,7 @@ namespace WorkTimer.Dev.Seeding
         {
             if (date.ToWorkDayType() == WorkDayType.Workday)
             {
-                var wd = new WorkDay { ContractId = _contractId, Date = date.Date, WorkingPeriods = new WorkingPeriodSeeder(0, date.Date, numberOfPeriods).Seed() };
+                var wd = new WorkDay { ContractId = _contractId, Date = date.Date, WorkingPeriods = new WorkingPeriodSeeder(0, date.Date, numberOfPeriods).Seed(), WorkDayType = date.ToWorkDayType() };
 
                 _list.Add(wd.CalculateTotalHours());
             }

@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\WorkTimer.Dev.Seeding\WorkTimer.Dev.Seeding.csproj" />
     <ProjectReference Include="..\..\src\WorkTimer.MediatR\WorkTimer.MediatR.csproj" />
   </ItemGroup>
 

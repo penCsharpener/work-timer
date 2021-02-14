@@ -19,7 +19,7 @@ namespace WorkTimer.Dev.Seeding
             {
                 for (int i = 1; i <= countPeriods; i++)
                 {
-                    AddPeriod(_random.Next(10, 50), _random.Next(2 * 60, 3 * 60 + 40));
+                    AddPeriod(_random.Next(10, 50), _random.Next(2 * 60, 4 * 60 + 20));
                 }
             }
         }
