@@ -14,5 +14,6 @@ namespace WorkTimer.Domain.Models
         public int WeekNumber { get; set; }
         public DateTime WeekStart { get; set; }
         public ICollection<WorkDay>? WorkDays { get; set; }
+        public AppUser User { get; set; }
     }
 }
