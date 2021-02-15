@@ -18,13 +18,14 @@ namespace WorkTimer.Seeding.Tests
         [Fact]
         public void WorkDaySeeder_Creates_WorkDays_And_Periods()
         {
-            _testObject.AddWorkDayRange(DateTime.Today.AddDays(-7), DateTime.Today);
+            var date = new DateTime(2021, 2, 12);
+            _testObject.AddWorkDayRange(date.AddDays(-6), date);
 
             var list = _testObject.Seed();
             list.Count.Should().Be(5);
             list.Sum(x => x.WorkingPeriods.Count).Should().Be(13);
             var totalHours = list.Sum(x => x.TotalHours);
-            totalHours.Should().Be(43.949999999999996);
+            totalHours.Should().Be(46.11666666666666);
         }
     }
 }

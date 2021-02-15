@@ -18,6 +18,9 @@
         <li class="nav-item px-3">
             <MatCheckbox @bind-Value="RequestModel.RecalculateAllUsersHours">Recalculate all user's work days</MatCheckbox>
         </li>
+        <li class="nav-item px-3">
+            <MatCheckbox @bind-Value="RequestModel.RecalculateAllWorkMonths">Recalculate all work months</MatCheckbox>
+        </li>
     </ul>
     <div class="d-block">
         <MatButton Type="submit" Class="btn btn-primary" Raised="true">Run Batch Tasks</MatButton>

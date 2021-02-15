@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTimer.Seeding.Tests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTimer.MediatRTests", "tests\WorkTimer.MediatRTests\WorkTimer.MediatRTests.csproj", "{66597961-E5AD-4837-83A3-CB5E43B5AB1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkTimer.Domain.Tests", "tests\WorkTimer.Domain.Tests\WorkTimer.Domain.Tests.csproj", "{EA32D4EA-87F6-4E5D-9DAD-0909019926FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTimer.Domain.Tests", "tests\WorkTimer.Domain.Tests\WorkTimer.Domain.Tests.csproj", "{EA32D4EA-87F6-4E5D-9DAD-0909019926FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

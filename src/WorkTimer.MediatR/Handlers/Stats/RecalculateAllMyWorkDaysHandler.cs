@@ -10,19 +10,24 @@ using WorkTimer.MediatR.Handlers.Shared;
 using WorkTimer.MediatR.Requests;
 using WorkTimer.Persistence.Data;
 
-namespace WorkTimer.MediatR.Handlers {
-    public class RecalculateAllMyWorkDaysHandler : TotalHoursBase, IRequestHandler<RecalculateAllMyWorkDaysRequest, string> {
+namespace WorkTimer.MediatR.Handlers.Stats
+{
+    public class RecalculateAllMyWorkDaysHandler : TotalHoursBase, IRequestHandler<RecalculateAllMyWorkDaysRequest, string>
+    {
         private readonly ILogger<RecalculateAllMyWorkDaysHandler> _logger;
 
-        public RecalculateAllMyWorkDaysHandler(AppDbContext context, ILogger<RecalculateAllMyWorkDaysHandler> logger) : base(context) {
+        public RecalculateAllMyWorkDaysHandler(AppDbContext context, ILogger<RecalculateAllMyWorkDaysHandler> logger) : base(context)
+        {
             _logger = logger;
         }
 
-        public Task<string> Handle(RecalculateAllMyWorkDaysRequest request, CancellationToken cancellationToken) {
+        public Task<string> Handle(RecalculateAllMyWorkDaysRequest request, CancellationToken cancellationToken)
+        {
             List<WorkDay> workdays = _context.WorkDays.Include(x => x.WorkingPeriods)
                 .Where(x => x.Contract.UserId == request.User.Id).ToList();
 
-            foreach (WorkDay workDay in workdays) {
+            foreach (WorkDay workDay in workdays)
+            {
                 UpdateTotalHoursOfWorkDay(workDay);
             }
 

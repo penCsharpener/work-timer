@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using WorkTimer.Domain.Models;
 
 namespace WorkTimer.Domain.Extensions
 {
@@ -42,6 +43,42 @@ namespace WorkTimer.Domain.Extensions
             }
 
             return _calendar.GetWeekOfYear(dayInThatWeek, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
+        }
+
+        public static double GetRequiredHoursForMonth(Contract contract, int year, int month)
+        {
+            var date = new DateTime(year, month, 1);
+            var result = 0d;
+            var hoursPerDay = contract.HoursPerWeek / 5d;
+
+            while (date.Month == month)
+            {
+                result += date.DayOfWeek == DayOfWeek.Sunday || date.DayOfWeek == DayOfWeek.Saturday ? 0 : hoursPerDay;
+
+                date = date.AddDays(1);
+            }
+
+            return Math.Round(result, 2);
+        }
+
+        public static int GetTotalDaysInMonth(int month)
+        {
+            return month switch
+            {
+                1 => 31,
+                2 => 28,
+                3 => 31,
+                4 => 30,
+                5 => 31,
+                6 => 30,
+                7 => 31,
+                8 => 31,
+                9 => 30,
+                10 => 31,
+                11 => 30,
+                12 => 31,
+                _ => 0
+            };
         }
     }
 }
