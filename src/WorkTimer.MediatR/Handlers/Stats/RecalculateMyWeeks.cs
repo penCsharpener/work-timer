@@ -95,10 +95,6 @@ namespace WorkTimer.MediatR.Handlers.Stats
             var firstDay = workDays.Select(x => x.Date).Min();
             var lastDay = workDays.Select(x => x.Date).Max();
 
-            var firstWeek = firstDay.GetWeekNumber();
-            var lastWeek = lastDay.GetWeekNumber();
-            var workWeeks = new List<WorkWeek>();
-
             AssignExistingWorkWeeks(workDays, existingWorkWeeks);
             CreateMissingWorkWeeks(workDays, existingWorkWeeks, request.User);
 
@@ -158,6 +154,7 @@ namespace WorkTimer.MediatR.Handlers.Stats
 
                 week.TotalHours = days.Sum(x => x.TotalHours);
                 week.TotalOverhours = days.Sum(x => x.TotalHours - requiredDailyhours);
+                week.TotalRequiredHours = days.Sum(x => x.RequiredHours);
                 week.DaysWorked = days.Count(x => x.WorkDayType == WorkDayType.Workday);
                 week.DaysOffWork = 7 - week.DaysWorked;
             }
@@ -170,7 +167,8 @@ namespace WorkTimer.MediatR.Handlers.Stats
                                     .ToListAsync();
 
             var totalHours = workDays.Sum(x => CalculateTotalHoursFromWorkDay(x));
-            var totalOverhours = workDays.Sum(x => CalculateTotalOverhoursFromWorkDay(x));
+            var totalOverhours = workDays.Sum(x => x.GetOverhours());
+            var totalRequiredHours = workDays.Sum(x => x.RequiredHours);
             var daysOffWork = workDays.Count(x => x.WorkDayType != Domain.Models.WorkDayType.Workday && x.WorkDayType != Domain.Models.WorkDayType.Undefined);
             var daysWorked = workDays.Count(x => x.WorkDayType == Domain.Models.WorkDayType.Workday);
 
@@ -190,6 +188,7 @@ namespace WorkTimer.MediatR.Handlers.Stats
 
             workWeek.TotalHours = totalHours;
             workWeek.TotalOverhours = totalOverhours;
+            workWeek.TotalRequiredHours = totalRequiredHours;
             workWeek.DaysOffWork = daysOffWork;
             workWeek.DaysWorked = daysWorked;
 

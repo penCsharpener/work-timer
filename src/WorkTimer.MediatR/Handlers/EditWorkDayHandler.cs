@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using WorkTimer.Domain.Extensions;
 using WorkTimer.MediatR.Handlers.Shared;
 using WorkTimer.MediatR.Responses;
 using WorkTimer.Persistence.Data;
@@ -23,8 +24,10 @@ namespace WorkTimer.MediatR.Handlers
         {
             try
             {
+                var contract = _context.Contracts.FirstOrDefault(x => x.Id == request.WorkDay.ContractId);
                 CorrectWorkDayDateBasedOnPeriods(request);
                 UpdateTotalHoursOfWorkDay(request.WorkDay);
+                request.WorkDay.RequiredHours = request.WorkDay.GetRequiredHoursForDay(contract.HoursPerWeek);
 
                 _context.WorkDays.Update(request.WorkDay);
                 _context.SaveChanges();

@@ -30,14 +30,14 @@ namespace WorkTimer.Domain.Tests.Extensions
         [Fact]
         public void GetContractedHoursPerDay_Returns_Hours_Per_Day()
         {
-            _testObject.GetContractedHoursPerDay().Should().Be(8);
+            _testObject.Contract.GetContractedHoursPerDay().Should().Be(8);
         }
 
         [Fact]
         public void GetContractedHoursPerDay_Returns_Zero_For_Missing_Contract()
         {
             _testObject.Contract = null;
-            _testObject.GetContractedHoursPerDay().Should().Be(0);
+            _testObject.Contract.GetContractedHoursPerDay().Should().Be(0);
         }
 
         [Fact]

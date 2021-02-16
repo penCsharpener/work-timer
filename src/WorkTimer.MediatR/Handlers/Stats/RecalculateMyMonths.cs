@@ -64,7 +64,7 @@ namespace WorkTimer.MediatR.Handlers.Stats
             }
             catch (System.Exception ex)
             {
-
+                _logger.LogError(ex, "Failed to update monthly stats.");
             }
 
             return response;
@@ -110,14 +110,12 @@ namespace WorkTimer.MediatR.Handlers.Stats
 
         private void UpdateStats(List<WorkDay> workDays, List<WorkMonth> existingMonths, Contract contract)
         {
-            var requiredDailyhours = (contract?.HoursPerWeek ?? 0) / 5d;
-
             foreach (var month in existingMonths)
             {
                 var days = workDays.Where(x => x.WorkMonthId == month.Id).ToList();
 
                 month.TotalHours = days.Sum(x => x.TotalHours);
-                month.TotalOverhours = days.Sum(x => x.TotalHours - requiredDailyhours);
+                month.TotalOverhours = days.Sum(x => x.GetOverhours());
                 month.DaysWorked = days.Count(x => x.WorkDayType == WorkDayType.Workday);
                 month.DaysOffWork = DateTimeExtensions.GetTotalDaysInMonth(month.Month) - month.DaysWorked;
             }

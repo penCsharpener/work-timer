@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using WorkTimer.Domain.Extensions;
 using WorkTimer.Domain.Models;
 using WorkTimer.MediatR.Handlers.Shared;
 using WorkTimer.MediatR.Requests;
@@ -23,11 +24,12 @@ namespace WorkTimer.MediatR.Handlers.Stats
 
         public Task<string> Handle(RecalculateAllUsersHoursRequest request, CancellationToken cancellationToken)
         {
-            List<WorkDay> workdays = _context.WorkDays.Include(x => x.WorkingPeriods).ToList();
+            List<WorkDay> workdays = _context.WorkDays.Include(x => x.Contract).Include(x => x.WorkingPeriods).ToList();
 
             foreach (WorkDay workDay in workdays)
             {
                 UpdateTotalHoursOfWorkDay(workDay);
+                workDay.RequiredHours = workDay.GetRequiredHoursForDay(workDay.Contract.HoursPerWeek);
             }
 
             _context.SaveChanges();

@@ -12,7 +12,7 @@ namespace WorkTimer.Seeding.Tests
 
         public WorkDaySeederTests()
         {
-            _testObject = new WorkDaySeeder(1);
+            _testObject = new WorkDaySeeder(new Domain.Models.Contract { Id = 1, HoursPerWeek = 40 });
         }
 
         [Fact]

@@ -6,11 +6,23 @@ namespace WorkTimer.Domain.Extensions
 {
     public static class WorkDayExtensions
     {
-        public static double GetContractedHoursPerDay(this WorkDay workDay)
+        public static double GetContractedHoursPerDay(this Contract contract)
         {
-            int contractedHours = workDay.Contract?.HoursPerWeek ?? 0;
+            int contractedHours = contract?.HoursPerWeek ?? 0;
 
-            return contractedHours / (double) 5;
+            return contractedHours / 5d;
+        }
+
+        public static double GetRequiredHoursForDay(this WorkDay workDay, int hoursPerWeek)
+        {
+            var dailyHours = hoursPerWeek / 5d;
+
+            return dailyHours * workDay.GetWorkHourMultiplier();
+        }
+
+        public static double GetOverhours(this WorkDay workDay)
+        {
+            return workDay.TotalHours - workDay.RequiredHours;
         }
 
         public static TimeSpan GetWorkTime(this WorkDay workDay)

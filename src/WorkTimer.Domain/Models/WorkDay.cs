@@ -10,6 +10,7 @@ namespace WorkTimer.Domain.Models
         public WorkDayType WorkDayType { get; set; }
         public int ContractId { get; set; }
         public double TotalHours { get; set; }
+        public double RequiredHours { get; set; }
         public int? WorkWeekId { get; set; }
         public int? WorkMonthId { get; set; }
 

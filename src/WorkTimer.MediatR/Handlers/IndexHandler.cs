@@ -31,12 +31,12 @@ namespace WorkTimer.MediatR.Handlers
 
             var allHours = _context.WorkingPeriods.Include(x => x.WorkDay).ThenInclude(x => x.Contract)
                 .Where(x => x.WorkDay.Contract.UserId == request.User.Id && x.WorkDay.Contract.IsCurrent && x.WorkDay.WorkingPeriods.All(x => x.EndTime.HasValue))
-                .Select(x => new TotalHoursCalculationModel(x.WorkDay.TotalHours, x.WorkDay.Contract.HoursPerWeek / 5d, x.WorkDay.WorkDayType.GetWorkHourMultiplier()))
+                .Select(x => new TotalHoursCalculationModel(x.WorkDay.TotalHours, x.WorkDay.RequiredHours))
                 .Distinct()
                 .ToList();
 
             int count = allHours.Count;
-            double totalOverHours = allHours.Sum(x => x.TotalHours - (x.HoursPerDay * x.WorkHourMultiplier));
+            double totalOverHours = allHours.Sum(x => x.TotalHours - x.RequiredHours);
 
             List<DisplayWorkDayModel> results = MapDisplayModel(request).ToList();
 
@@ -66,7 +66,7 @@ namespace WorkTimer.MediatR.Handlers
 
             foreach (var workDay in workDays)
             {
-                double contractedHours = workDay.GetContractedHoursPerDay();
+                double contractedHours = workDay.Contract.GetContractedHoursPerDay();
                 double secondsWorked = TimeSpan.FromHours(workDay.TotalHours).TotalSeconds;
                 double overHoursSeconds = secondsWorked - (contractedHours * 60 * 60 * workDay.WorkDayType.GetWorkHourMultiplier());
 

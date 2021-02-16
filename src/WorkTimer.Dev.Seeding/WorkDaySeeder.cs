@@ -7,11 +7,11 @@ namespace WorkTimer.Dev.Seeding
 {
     public class WorkDaySeeder : Seeder<WorkDay>
     {
-        private readonly int _contractId;
+        private readonly Contract _contract;
 
-        public WorkDaySeeder(int contractId)
+        public WorkDaySeeder(Contract contract)
         {
-            _contractId = contractId;
+            _contract = contract;
         }
 
         public WorkDaySeeder AddWorkDayRange(string startDateString, string endDateString)
@@ -43,7 +43,8 @@ namespace WorkTimer.Dev.Seeding
         {
             if (date.ToWorkDayType() == WorkDayType.Workday)
             {
-                var wd = new WorkDay { ContractId = _contractId, Date = date.Date, WorkingPeriods = new WorkingPeriodSeeder(0, date.Date, numberOfPeriods).Seed(), WorkDayType = date.ToWorkDayType() };
+                var wd = new WorkDay { ContractId = _contract.Id, Date = date.Date, WorkingPeriods = new WorkingPeriodSeeder(0, date.Date, numberOfPeriods).Seed(), WorkDayType = date.ToWorkDayType() };
+                wd.RequiredHours = wd.GetRequiredHoursForDay(_contract.HoursPerWeek);
 
                 _list.Add(wd.CalculateTotalHours());
             }

@@ -10,6 +10,7 @@ namespace WorkTimer.Domain.Models
         public int DaysWorked { get; set; }
         public int DaysOffWork { get; set; }
         public double TotalOverhours { get; set; }
+        public double TotalRequiredHours { get; set; }
         public double TotalHours { get; set; }
         public int WeekNumber { get; set; }
         public DateTime WeekStart { get; set; }

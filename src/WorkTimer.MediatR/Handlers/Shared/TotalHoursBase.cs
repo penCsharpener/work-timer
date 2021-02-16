@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using WorkTimer.Domain.Extensions;
 using WorkTimer.Domain.Models;
 using WorkTimer.Persistence.Data;
 
@@ -31,7 +30,6 @@ namespace WorkTimer.MediatR.Handlers.Shared
             {
                 double totalHours = workday.WorkingPeriods.Where(x => x.EndTime.HasValue).Sum(x => (x.EndTime.Value - x.StartTime).TotalHours);
                 workday.TotalHours = totalHours;
-                _context.WorkDays.Update(workday);
             }
         }
 
@@ -45,12 +43,6 @@ namespace WorkTimer.MediatR.Handlers.Shared
             workDay.TotalHours = workDay.WorkingPeriods.Where(x => x.EndTime.HasValue).Sum(x => (x.EndTime.Value - x.StartTime).TotalHours);
 
             return workDay.TotalHours;
-        }
-
-        protected double CalculateTotalOverhoursFromWorkDay(WorkDay workDay)
-        {
-            var totalHours = new TotalHoursCalculationModel(workDay.TotalHours, workDay.Contract.HoursPerWeek / 5d, workDay.WorkDayType.GetWorkHourMultiplier());
-            return totalHours.TotalHours - (totalHours.HoursPerDay * totalHours.WorkHourMultiplier);
         }
     }
 }

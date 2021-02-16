@@ -46,6 +46,7 @@ namespace WorkTimer.MediatR.Handlers
                 _context.WorkingPeriods.Add(new WorkingPeriod { Comment = request.Comment, StartTime = _now.Now, WorkDayId = _workDayToday.Id });
 
                 UpdateTotalHoursOfWorkDay(_workDayToday);
+                _workDayToday.RequiredHours = _workDayToday.GetRequiredHoursForDay(_workDayToday.Contract.HoursPerWeek);
 
                 _context.SaveChanges();
 
@@ -71,6 +72,7 @@ namespace WorkTimer.MediatR.Handlers
                 }
 
                 _workDayToday = new WorkDay { ContractId = contract.Id, Date = _now.Now.Date, WorkDayType = _now.Now.ToWorkDayType() };
+                _workDayToday.RequiredHours = _workDayToday.GetRequiredHoursForDay(contract.HoursPerWeek);
                 _context.WorkDays.Add(_workDayToday);
                 _context.SaveChanges();
             }

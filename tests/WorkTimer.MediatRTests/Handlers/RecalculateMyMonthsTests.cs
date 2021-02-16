@@ -41,7 +41,7 @@ namespace WorkTimer.MediatRTests.Handlers
 
             using (var context = new AppDbContext(_options))
             {
-                context.WorkDays.AddRange(new WorkDaySeeder(1).AddWorkDayRange("2020-01-01", "2021-02-14").Seed());
+                context.WorkDays.AddRange(new WorkDaySeeder(new Contract { Id = 1, HoursPerWeek = 40 }).AddWorkDayRange("2020-01-01", "2021-02-14").Seed());
                 context.SaveChanges();
 
                 user = await context.Users.Include(x => x.Contracts.Where(c => c.IsCurrent)).FirstOrDefaultAsync(x => x.Id == 1);
