@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkTimer.Persistence.Data;
 
 namespace WorkTimer.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210216050450_AddColumnRequiredHoursOnWorkday")]
+    partial class AddColumnRequiredHoursOnWorkday
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -149,14 +151,14 @@ namespace WorkTimer.Persistence.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "9b8eb2ce-088b-4905-90cb-c19597d4c167",
+                            ConcurrencyStamp = "8cd53aaf-8228-4747-b216-d3d45c17cc65",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "4d5bd4c3-3875-4787-b7e6-2a904c185560",
+                            ConcurrencyStamp = "43cbc523-5281-4e2b-9c25-188d146be0ae",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -317,9 +319,6 @@ namespace WorkTimer.Persistence.Migrations
                     b.Property<double>("TotalOverhours")
                         .HasColumnType("REAL");
 
-                    b.Property<double>("TotalRequiredHours")
-                        .HasColumnType("REAL");
-
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
 
@@ -350,9 +349,6 @@ namespace WorkTimer.Persistence.Migrations
                         .HasColumnType("REAL");
 
                     b.Property<double>("TotalOverhours")
-                        .HasColumnType("REAL");
-
-                    b.Property<double>("TotalRequiredHours")
                         .HasColumnType("REAL");
 
                     b.Property<int>("UserId")
