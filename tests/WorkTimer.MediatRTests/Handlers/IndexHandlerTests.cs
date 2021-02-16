@@ -87,12 +87,12 @@ namespace WorkTimer.MediatRTests.Handlers
 
             return new WorkDay[]
             {
-                new() { Id = 1, ContractId = 1, Contract = contract, Date = new DateTime(2021, 02, 01), WorkDayType = WorkDayType.Workday, TotalHours = 7.5, WorkingPeriods = new List<WorkingPeriod>()
+                new() { Id = 1, ContractId = 1, RequiredHours = 8, Contract = contract, Date = new DateTime(2021, 02, 01), WorkDayType = WorkDayType.Workday, TotalHours = 7.5, WorkingPeriods = new List<WorkingPeriod>()
                 {
                     new WorkingPeriod { Id = 1, StartTime = new DateTime(2021, 02, 01, 09, 0, 0), EndTime = new DateTime(2021, 02, 01, 12, 30, 0) },
                     new WorkingPeriod { Id = 2, StartTime = new DateTime(2021, 02, 01, 13, 0, 0), EndTime = new DateTime(2021, 02, 01, 17, 0, 0) }
                 }  },
-                new() { Id = 2, ContractId = 1, Contract = contract, Date = new DateTime(2021, 02, 02), WorkDayType = WorkDayType.Workday, TotalHours = 8.4167, WorkingPeriods = new List<WorkingPeriod>() {
+                new() { Id = 2, ContractId = 1, RequiredHours = 8, Contract = contract, Date = new DateTime(2021, 02, 02), WorkDayType = WorkDayType.Workday, TotalHours = 8.4167, WorkingPeriods = new List<WorkingPeriod>() {
                     new WorkingPeriod { Id = 3, StartTime = new DateTime(2021, 02, 02, 8, 20, 0), EndTime = new DateTime(2021, 02, 02, 12, 50, 0) },
                     new WorkingPeriod { Id = 4, StartTime = new DateTime(2021, 02, 02, 15, 40, 0), EndTime = new DateTime(2021, 02, 02, 17, 10, 0) },
                     new WorkingPeriod { Id = 5, StartTime = new DateTime(2021, 02, 02, 22, 10, 0), EndTime = new DateTime(2021, 02, 03, 0, 35, 0) }

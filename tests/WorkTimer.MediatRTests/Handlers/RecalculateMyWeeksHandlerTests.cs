@@ -89,14 +89,14 @@ namespace WorkTimer.MediatRTests.Handlers
 
         private void AddWorkDays(AppDbContext context)
         {
-            context.WorkDays.Add(new WorkDay { Id = 1, Date = new DateTime(2021, 2, 1), ContractId = 1, WorkDayType = WorkDayType.Workday, TotalHours = 1 });
-            context.WorkDays.Add(new WorkDay { Id = 2, Date = new DateTime(2021, 2, 2), ContractId = 1, WorkDayType = WorkDayType.Workday, TotalHours = 2 });
-            context.WorkDays.Add(new WorkDay { Id = 3, Date = new DateTime(2021, 2, 3), ContractId = 1, WorkDayType = WorkDayType.Workday, TotalHours = 3 });
-            context.WorkDays.Add(new WorkDay { Id = 4, Date = new DateTime(2021, 2, 4), ContractId = 1, WorkDayType = WorkDayType.Workday, TotalHours = 3 });
-            context.WorkDays.Add(new WorkDay { Id = 5, Date = new DateTime(2021, 2, 5), ContractId = 1, WorkDayType = WorkDayType.Workday, TotalHours = 3 });
-            context.WorkDays.Add(new WorkDay { Id = 6, Date = new DateTime(2021, 2, 6), ContractId = 1, WorkDayType = WorkDayType.Weekend, TotalHours = 3 });
-            context.WorkDays.Add(new WorkDay { Id = 7, Date = new DateTime(2021, 2, 7), ContractId = 1, WorkDayType = WorkDayType.Weekend, TotalHours = 3 });
-            context.WorkDays.Add(new WorkDay { Id = 8, Date = new DateTime(2021, 2, 8), ContractId = 1, WorkDayType = WorkDayType.Workday, TotalHours = 4 });
+            context.WorkDays.Add(new WorkDay { Id = 1, RequiredHours = 8, Date = new DateTime(2021, 2, 1), ContractId = 1, WorkDayType = WorkDayType.Workday, TotalHours = 1 });
+            context.WorkDays.Add(new WorkDay { Id = 2, RequiredHours = 8, Date = new DateTime(2021, 2, 2), ContractId = 1, WorkDayType = WorkDayType.Workday, TotalHours = 2 });
+            context.WorkDays.Add(new WorkDay { Id = 3, RequiredHours = 8, Date = new DateTime(2021, 2, 3), ContractId = 1, WorkDayType = WorkDayType.Workday, TotalHours = 3 });
+            context.WorkDays.Add(new WorkDay { Id = 4, RequiredHours = 8, Date = new DateTime(2021, 2, 4), ContractId = 1, WorkDayType = WorkDayType.Workday, TotalHours = 3 });
+            context.WorkDays.Add(new WorkDay { Id = 5, RequiredHours = 8, Date = new DateTime(2021, 2, 5), ContractId = 1, WorkDayType = WorkDayType.Workday, TotalHours = 3 });
+            context.WorkDays.Add(new WorkDay { Id = 6, RequiredHours = 0, Date = new DateTime(2021, 2, 6), ContractId = 1, WorkDayType = WorkDayType.Weekend, TotalHours = 3 });
+            context.WorkDays.Add(new WorkDay { Id = 7, RequiredHours = 0, Date = new DateTime(2021, 2, 7), ContractId = 1, WorkDayType = WorkDayType.Weekend, TotalHours = 3 });
+            context.WorkDays.Add(new WorkDay { Id = 8, RequiredHours = 8, Date = new DateTime(2021, 2, 8), ContractId = 1, WorkDayType = WorkDayType.Workday, TotalHours = 4 });
         }
     }
 }
