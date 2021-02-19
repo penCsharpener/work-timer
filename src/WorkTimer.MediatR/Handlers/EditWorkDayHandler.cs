@@ -24,7 +24,7 @@ namespace WorkTimer.MediatR.Handlers
         {
             try
             {
-                var contract = _context.Contracts.FirstOrDefault(x => x.Id == request.WorkDay.ContractId);
+                var contract = request.User.Contracts.FirstOrDefault();
                 CorrectWorkDayDateBasedOnPeriods(request);
                 UpdateTotalHoursOfWorkDay(request.WorkDay);
                 request.WorkDay.RequiredHours = request.WorkDay.GetRequiredHoursForDay(contract.HoursPerWeek);

@@ -1,0 +1,42 @@
+﻿@page "/blankWorkday"
+@using global::MediatR
+@using WorkTimer.MediatR
+@using WorkTimer.Domain.Models
+@inject IMediator Mediator
+@inject NavigationManager Navi;
+@attribute [Authorize]
+
+<h3>Create blank new Workday</h3>
+
+<EditForm class="d-flex mb-3" Model="@Model" OnValidSubmit="@HandleValidSubmitAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="my-2">
+        <label class="mx-3 mt-2 align-self-center" for="selWorkDayType">Date: </label>
+        <MatDatePicker @bind-Value="Model.Date"></MatDatePicker>
+    </div>
+
+    <div class="my-2">
+        <label class="mx-3 mt-2 align-self-center" for="selWorkDayType">Work day type: </label>
+        <MatBlazor.MatSelectItem class="mx-3" id="selWorkDayType" Items="WorkDayTypes" @bind-Value="Model.WorkDayType">
+        </MatBlazor.MatSelectItem>
+    </div>
+
+    <div class="my-2 mx-3">
+        <MatButton Type="submit" Class="btn btn-primary" Raised="true">Create</MatButton>
+    </div>
+</EditForm>
+
+@code {
+
+    public CreateBlankWorkDayCommand Model { get; set; } = new(DateTime.Today.AddDays(1));
+
+    public WorkDayType[] WorkDayTypes { get; set; } = Enum.GetValues(typeof(WorkDayType)).Cast<WorkDayType>().ToArray();
+
+    private async Task HandleValidSubmitAsync()
+    {
+        var response = await Mediator.Send(Model);
+
+        Navi.NavigateTo($"workday/{response.WorkDay.Id}");
+    }
+}
