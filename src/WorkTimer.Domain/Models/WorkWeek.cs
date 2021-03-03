@@ -6,7 +6,8 @@ namespace WorkTimer.Domain.Models
     public class WorkWeek
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
+        public int ContractId { get; set; }
+        public Contract Contract { get; set; }
         public int DaysWorked { get; set; }
         public int DaysOffWork { get; set; }
         public double TotalOverhours { get; set; }

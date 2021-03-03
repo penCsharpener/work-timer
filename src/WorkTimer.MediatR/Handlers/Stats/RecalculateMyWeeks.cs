@@ -86,11 +86,11 @@ namespace WorkTimer.MediatR.Handlers.Stats
 
         public async Task ProcessAllWorkWeeks(RecalculateMyWeeksRequest request)
         {
-            var workDays = await _context.WorkDays.Include(x => x.WorkingPeriods).Include(x => x.WorkWeek).Include(x => x.Contract)
-                                                  .Where(x => x.Contract.UserId == request.User.Id)
+            var workDays = await _context.WorkDays.Include(x => x.WorkingPeriods).Include(x => x.WorkWeek)
+                                                  .Where(x => x.ContractId == request.CurrentContract.Id)
                                                   .ToListAsync();
 
-            var existingWorkWeeks = await _context.WorkWeeks.Where(x => x.UserId == request.User.Id).ToListAsync();
+            var existingWorkWeeks = await _context.WorkWeeks.Where(x => x.ContractId == request.CurrentContract.Id).ToListAsync();
 
             var firstDay = workDays.Select(x => x.Date).Min();
             var lastDay = workDays.Select(x => x.Date).Max();
@@ -127,7 +127,7 @@ namespace WorkTimer.MediatR.Handlers.Stats
                 {
                     var week = new WorkWeek
                     {
-                        UserId = user.Id,
+                        ContractId = user.Id,
                         WeekStart = firstDay,
                         WeekNumber = firstDay.GetWeekNumber(),
                     };
@@ -172,7 +172,7 @@ namespace WorkTimer.MediatR.Handlers.Stats
             var daysOffWork = workDays.Count(x => x.WorkDayType != Domain.Models.WorkDayType.Workday && x.WorkDayType != Domain.Models.WorkDayType.Undefined);
             var daysWorked = workDays.Count(x => x.WorkDayType == Domain.Models.WorkDayType.Workday);
 
-            var workWeek = await _context.WorkWeeks.FirstOrDefaultAsync(x => x.UserId == request.User.Id && x.WeekNumber == request.CalendarWeek);
+            var workWeek = await _context.WorkWeeks.FirstOrDefaultAsync(x => x.ContractId == request.CurrentContract.Id && x.WeekNumber == request.CalendarWeek);
 
             if (workWeek == null)
             {
@@ -180,7 +180,7 @@ namespace WorkTimer.MediatR.Handlers.Stats
                 {
                     WeekNumber = request.CalendarWeek,
                     WeekStart = request.DaysInWeek.First(),
-                    UserId = request.User.Id
+                    ContractId = request.User.Id
                 };
 
                 _context.WorkWeeks.Add(workWeek);

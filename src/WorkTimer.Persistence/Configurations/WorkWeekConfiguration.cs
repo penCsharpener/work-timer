@@ -7,7 +7,7 @@ namespace WorkTimer.Domain.Models.Configurations
     {
         public void Configure(EntityTypeBuilder<WorkWeek> builder)
         {
-            builder.HasIndex(x => new { x.UserId, x.WeekStart }).IsUnique();
+            builder.HasIndex(x => new { x.ContractId, x.WeekStart }).IsUnique();
         }
     }
 }

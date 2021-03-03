@@ -8,7 +8,7 @@ namespace WorkTimer.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<WorkMonth> builder)
         {
-            builder.HasIndex(x => new { x.UserId, x.Month, x.Year }).IsUnique();
+            builder.HasIndex(x => new { x.ContractId, x.Month, x.Year }).IsUnique();
         }
     }
 }

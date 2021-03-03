@@ -46,6 +46,7 @@ namespace WorkTimer.MediatR.Pipelines
             {
                 userContext.UserEmail = claim.Value.ToUpper();
                 userContext.User = _context.Users.Include(x => x.Contracts.Where(c => c.IsCurrent)).Where(x => x.NormalizedEmail == userContext.UserEmail).SingleOrDefault();
+                userContext.CurrentContract = userContext.User.Contracts.FirstOrDefault();
             }
 
             return await next();

@@ -49,7 +49,7 @@ namespace WorkTimer.MediatR.Handlers.Stats
             try
             {
                 var contract = request.User.Contracts.FirstOrDefault(x => x.IsCurrent);
-                var existingMonths = await _context.WorkMonths.Where(x => x.UserId == request.User.Id).ToListAsync();
+                var existingMonths = await _context.WorkMonths.Where(x => x.ContractId == request.CurrentContract.Id).ToListAsync();
                 var workDays = await _context.WorkDays.Where(x => x.ContractId == contract.Id).ToListAsync();
 
                 AssignExistingWorkMonths(workDays, existingMonths);
@@ -91,7 +91,7 @@ namespace WorkTimer.MediatR.Handlers.Stats
                 {
                     var month = new WorkMonth
                     {
-                        UserId = user.Id,
+                        ContractId = user.Id,
                         Year = day.Date.Year,
                         Month = day.Date.Month,
                     };

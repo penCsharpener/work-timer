@@ -27,8 +27,8 @@ namespace WorkTimer.MediatRTests.Handlers
             {
                 context.Users.Add(new AppUser { Id = 1 });
                 context.Contracts.Add(new Contract { Id = 1, Employer = "e", Name = "e", HoursPerWeek = 40, IsCurrent = true, UserId = 1 });
-                context.WorkWeeks.Add(new WorkWeek { Id = 1, UserId = 1, WeekStart = new DateTime(2021, 2, 1), WeekNumber = 5 });
-                context.WorkWeeks.Add(new WorkWeek { Id = 2, UserId = 1, WeekStart = new DateTime(2021, 2, 8), WeekNumber = 6 });
+                context.WorkWeeks.Add(new WorkWeek { Id = 1, ContractId = 1, WeekStart = new DateTime(2021, 2, 1), WeekNumber = 5 });
+                context.WorkWeeks.Add(new WorkWeek { Id = 2, ContractId = 1, WeekStart = new DateTime(2021, 2, 8), WeekNumber = 6 });
                 context.SaveChanges();
             }
 
@@ -48,7 +48,7 @@ namespace WorkTimer.MediatRTests.Handlers
                 testWeek.TotalOverhours.Should().Be(0);
             }
 
-            var response = await _testObject.Handle(new RecalculateMyWeeksRequest(2021, 5) { User = new AppUser { Id = 1 } }, CancellationToken.None);
+            var response = await _testObject.Handle(new RecalculateMyWeeksRequest(2021, 5) { User = new AppUser { Id = 1 }, CurrentContract = new() { Id = 1 } }, CancellationToken.None);
 
             using (var context = new AppDbContext(_options))
             {
@@ -76,7 +76,7 @@ namespace WorkTimer.MediatRTests.Handlers
                 user = await context.Users.Include(x => x.Contracts.Where(c => c.IsCurrent)).FirstOrDefaultAsync(x => x.Id == 1);
             }
 
-            var response = await _testObject.Handle(new RecalculateMyWeeksRequest() { User = user }, CancellationToken.None);
+            var response = await _testObject.Handle(new RecalculateMyWeeksRequest() { User = user, CurrentContract = new() { Id = 1 } }, CancellationToken.None);
 
             using (var context = new AppDbContext(_options))
             {

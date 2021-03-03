@@ -40,12 +40,15 @@ namespace WorkTimer.MediatR.Handlers
             try
             {
                 var contract = request.User.Contracts.FirstOrDefault(x => x.IsCurrent);
-                response.Months = (await _context.WorkMonths.Include(x => x.WorkDays).ThenInclude(x => x.Contract).Where(x => x.UserId == request.User.Id)
+                var data = await _context.WorkMonths
+                    .Include(x => x.WorkDays)
+                    .Where(x => x.ContractId == request.CurrentContract.Id)
                     .Select(x => new { x.Id, x.DaysWorked, x.TotalOverhours, x.TotalHours, x.Year, x.Month, x.WorkDays })
-                    .ToListAsync())
-                    .Select(x => new WorkMonthsListModel(x.Id, x.DaysWorked, Math.Round(x.TotalOverhours, 1), Math.Round(x.TotalHours, 1), x.WorkDays.Sum(x => x.Contract.GetContractedHoursPerDay() * x.WorkDayType.GetWorkHourMultiplier()), x.Year, x.Month))
-                    .OrderByDescending(x => x.Year).ThenByDescending(x => x.Month)
-                    .ToList();
+                    .ToListAsync();
+
+                response.Months = data.Select(x => new WorkMonthsListModel(x.Id, x.DaysWorked, Math.Round(x.TotalOverhours, 1), Math.Round(x.TotalHours, 1), x.WorkDays.Sum(x => x.Contract.GetContractedHoursPerDay() * x.WorkDayType.GetWorkHourMultiplier()), x.Year, x.Month))
+                   .OrderByDescending(x => x.Year).ThenByDescending(x => x.Month)
+                   .ToList();
             }
             catch (Exception ex)
             {

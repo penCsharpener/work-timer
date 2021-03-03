@@ -27,7 +27,7 @@ namespace WorkTimer.MediatRTests.Handlers
             {
                 context.Users.Add(new AppUser { Id = 1 });
                 context.Contracts.Add(new Contract { Id = 1, Employer = "e", Name = "e", HoursPerWeek = 40, IsCurrent = true, UserId = 1 });
-                context.WorkMonths.Add(new WorkMonth { Id = 1, Year = 2021, Month = 2, UserId = 1 });
+                context.WorkMonths.Add(new WorkMonth { Id = 1, Year = 2021, Month = 2, ContractId = 1 });
                 context.SaveChanges();
             }
 
@@ -47,7 +47,7 @@ namespace WorkTimer.MediatRTests.Handlers
                 user = await context.Users.Include(x => x.Contracts.Where(c => c.IsCurrent)).FirstOrDefaultAsync(x => x.Id == 1);
             }
 
-            var response = await _testObject.Handle(new RecalculateMyMonthsRequest() { User = user }, CancellationToken.None);
+            var response = await _testObject.Handle(new RecalculateMyMonthsRequest() { User = user, CurrentContract = user.Contracts.First() }, CancellationToken.None);
 
             using (var context = new AppDbContext(_options))
             {
