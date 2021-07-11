@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\WorkTimer.Messaging\WorkTimer.Messaging.csproj" />
     <ProjectReference Include="..\WorkTimer.Persistence\WorkTimer.Persistence.csproj" />
   </ItemGroup>
 

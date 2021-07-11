@@ -33,6 +33,7 @@
     <ProjectReference Include="..\WorkTimer.Dev.Seeding\WorkTimer.Dev.Seeding.csproj" />
     <ProjectReference Include="..\WorkTimer.Domain\WorkTimer.Domain.csproj" />
     <ProjectReference Include="..\WorkTimer.MediatR\WorkTimer.MediatR.csproj" />
+    <ProjectReference Include="..\WorkTimer.Messaging\WorkTimer.Messaging.csproj" />
     <ProjectReference Include="..\WorkTimer.Persistence\WorkTimer.Persistence.csproj" />
   </ItemGroup>
 

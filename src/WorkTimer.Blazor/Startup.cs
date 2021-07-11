@@ -1,3 +1,4 @@
+using EasyNetQ;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -27,6 +28,7 @@ namespace WorkTimer.Blazor
             services.AddEntityFramework(Configuration);
             services.AddHttpContextAccessor();
             services.AddRazorPages();
+            services.AddSingleton(_ => RabbitHutch.CreateBus(Configuration.GetConnectionString("RabbitMqConnection")));
             services.AddServerSideBlazor();
             services.AddWorkTimerServices();
             services.AddDatabaseDeveloperPageExceptionFilter();

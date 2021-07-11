@@ -7,20 +7,23 @@ using System.Threading.Tasks;
 using WorkTimer.Domain.Extensions;
 using WorkTimer.MediatR.Handlers.Shared;
 using WorkTimer.MediatR.Responses;
+using WorkTimer.Messaging.Abstractions;
 using WorkTimer.Persistence.Data;
 
 namespace WorkTimer.MediatR.Handlers
 {
     public class EditWorkDayHandler : TotalHoursBase, IRequestHandler<GetWorkDayDetailsResponse, bool>
     {
+        private readonly IMessageService _messageService;
         private readonly ILogger<EditWorkDayHandler> _logger;
 
-        public EditWorkDayHandler(AppDbContext context, ILogger<EditWorkDayHandler> logger) : base(context)
+        public EditWorkDayHandler(AppDbContext context, IMessageService messageService, ILogger<EditWorkDayHandler> logger) : base(context)
         {
+            _messageService = messageService;
             _logger = logger;
         }
 
-        public Task<bool> Handle(GetWorkDayDetailsResponse request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(GetWorkDayDetailsResponse request, CancellationToken cancellationToken)
         {
             try
             {
@@ -31,14 +34,15 @@ namespace WorkTimer.MediatR.Handlers
 
                 _context.WorkDays.Update(request.WorkDay);
                 _context.SaveChanges();
+                await _messageService.RecalculateStatsAsync(request.User.Id);
 
-                return Task.FromResult(true);
+                return true;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Could not update work day with id {request.WorkDay.Id}");
 
-                return Task.FromResult(false);
+                return false;
             }
         }
 

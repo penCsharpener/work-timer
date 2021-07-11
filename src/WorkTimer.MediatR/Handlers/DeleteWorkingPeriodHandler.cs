@@ -1,22 +1,23 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WorkTimer.MediatR.Handlers.Shared;
 using WorkTimer.MediatR.Requests;
+using WorkTimer.Messaging.Abstractions;
 using WorkTimer.Persistence.Data;
 
 namespace WorkTimer.MediatR.Handlers
 {
     public class DeleteWorkingPeriodHandler : TotalHoursBase, IRequestHandler<DeleteWorkingPeriodRequest, bool>
     {
+        private readonly IMessageService _messageService;
         private readonly ILogger<DeleteWorkingPeriodHandler> _logger;
 
-        public DeleteWorkingPeriodHandler(AppDbContext context, ILogger<DeleteWorkingPeriodHandler> logger) : base(context)
+        public DeleteWorkingPeriodHandler(AppDbContext context, IMessageService messageService, ILogger<DeleteWorkingPeriodHandler> logger) : base(context)
         {
+            _messageService = messageService;
             _logger = logger;
         }
 
@@ -32,11 +33,7 @@ namespace WorkTimer.MediatR.Handlers
                 _context.WorkingPeriods.Remove(request.WorkingPeriod);
 
                 await _context.SaveChangesAsync();
-
-                var workDay = await _context.WorkDays.Include(x => x.WorkingPeriods).FirstOrDefaultAsync(x => x.WorkingPeriods.Any(wp => wp.WorkDayId == request.WorkingPeriod.WorkDayId));
-                workDay.TotalHours = CalculateTotalHoursFromWorkDay(workDay);
-
-                await _context.SaveChangesAsync();
+                await _messageService.RecalculateStatsAsync(request.User.Id);
 
                 return true;
             }

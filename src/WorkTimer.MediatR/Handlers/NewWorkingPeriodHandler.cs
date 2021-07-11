@@ -10,18 +10,21 @@ using WorkTimer.Domain.Models;
 using WorkTimer.MediatR.Handlers.Shared;
 using WorkTimer.MediatR.Requests;
 using WorkTimer.MediatR.Services.Abstractions;
+using WorkTimer.Messaging.Abstractions;
 using WorkTimer.Persistence.Data;
 
 namespace WorkTimer.MediatR.Handlers
 {
     public class NewWorkingPeriodHandler : TotalHoursBase, IRequestHandler<NewWorkingPeriodRequest, bool>
     {
+        private readonly IMessageService _messageService;
         private readonly INow _now;
         private readonly ILogger<NewWorkingPeriodHandler> _logger;
         private WorkDay _workDayToday;
 
-        public NewWorkingPeriodHandler(AppDbContext context, INow now, ILogger<NewWorkingPeriodHandler> logger) : base(context)
+        public NewWorkingPeriodHandler(AppDbContext context, IMessageService messageService, INow now, ILogger<NewWorkingPeriodHandler> logger) : base(context)
         {
+            _messageService = messageService;
             _now = now;
             _logger = logger;
         }
@@ -45,7 +48,8 @@ namespace WorkTimer.MediatR.Handlers
 
                 _context.WorkingPeriods.Add(new WorkingPeriod { Comment = request.Comment, StartTime = _now.Now, WorkDayId = _workDayToday.Id });
 
-                UpdateTotalHoursOfWorkDay(_workDayToday);
+                await _messageService.RecalculateStatsAsync(request.User.Id);
+                //UpdateTotalHoursOfWorkDay(_workDayToday);
                 _workDayToday.RequiredHours = _workDayToday.GetRequiredHoursForDay(_workDayToday.Contract.HoursPerWeek);
 
                 _context.SaveChanges();
