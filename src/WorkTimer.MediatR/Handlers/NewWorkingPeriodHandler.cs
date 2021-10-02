@@ -2,20 +2,21 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using WorkTimer.Domain.Extensions;
 using WorkTimer.Domain.Models;
 using WorkTimer.MediatR.Handlers.Shared;
 using WorkTimer.MediatR.Requests;
+using WorkTimer.MediatR.Responses;
 using WorkTimer.MediatR.Services.Abstractions;
 using WorkTimer.Messaging.Abstractions;
 using WorkTimer.Persistence.Data;
 
 namespace WorkTimer.MediatR.Handlers
 {
-    public class NewWorkingPeriodHandler : TotalHoursBase, IRequestHandler<NewWorkingPeriodRequest, bool>
+    public class NewWorkingPeriodHandler : TotalHoursBase, IRequestHandler<NewWorkingPeriodRequest, EmptyResult>
     {
         private readonly IMessageService _messageService;
         private readonly INow _now;
@@ -29,76 +30,56 @@ namespace WorkTimer.MediatR.Handlers
             _logger = logger;
         }
 
-        public async Task<bool> Handle(NewWorkingPeriodRequest request, CancellationToken cancellationToken)
+        public async Task<EmptyResult> Handle(NewWorkingPeriodRequest request, CancellationToken cancellationToken)
         {
-            try
+            if (request.CurrentContract == null)
             {
-                _workDayToday = _context.WorkDays.Include(x => x.WorkingPeriods).Include(x => x.Contract)
-                .FirstOrDefault(x => (x.Contract.UserId == request.User.Id && x.Contract.IsCurrent) && x.Date == _now.Now.Date || x.WorkingPeriods.Any(wp => !wp.EndTime.HasValue));
-
-                if (_workDayToday != null && HasOngoingWorkingPeriod())
-                {
-                    return true;
-                }
-
-                if (!GetOrCreateWorkday(request.User.Id))
-                {
-                    return false;
-                }
-
-                _context.WorkingPeriods.Add(new WorkingPeriod { Comment = request.Comment, StartTime = _now.Now, WorkDayId = _workDayToday.Id });
-
-                await _messageService.RecalculateStatsAsync(request.User.Id);
-                //UpdateTotalHoursOfWorkDay(_workDayToday);
-                _workDayToday.RequiredHours = _workDayToday.GetRequiredHoursForDay(_workDayToday.Contract.HoursPerWeek);
-
-                _context.SaveChanges();
-
-                return true;
+                throw new ArgumentNullException(nameof(Contract));
             }
-            catch (Exception ex)
+
+            var unfinishedWorkingPeriod = await _context.WorkingPeriods.FirstOrDefaultAsync(x => x.WorkDay.Contract.UserId == request.User.Id && x.WorkDay.Contract.IsCurrent && x.EndTime == null);
+
+            if (unfinishedWorkingPeriod is not null)
             {
-                _logger.LogError(ex, "new work period could not be created");
-
-                return false;
+                unfinishedWorkingPeriod.EndTime = _now.Now;
+                return await SaveChangesAndRecalculateStatsAsync(request.User.Id);
             }
+
+            var workDayToday = await _context.WorkDays.Include(x => x.WorkingPeriods)
+                                                      .Include(x => x.Contract)
+                                                      .FirstOrDefaultAsync(x => x.Contract.UserId == request.User.Id && x.Contract.IsCurrent && x.Date == _now.Now.Date);
+
+            if (workDayToday is null)
+            {
+                workDayToday = CreateWorkday(request.CurrentContract);
+            }
+
+            workDayToday.WorkingPeriods.Add(new() { Comment = request.Comment, StartTime = _now.Now });
+            workDayToday.RequiredHours = workDayToday.GetRequiredHoursForDay(request.CurrentContract.HoursPerWeek);
+
+            return await SaveChangesAndRecalculateStatsAsync(request.User.Id);
         }
 
-        private bool GetOrCreateWorkday(int userId)
+        private async Task<EmptyResult> SaveChangesAndRecalculateStatsAsync(int userId)
         {
-            if (_workDayToday == null)
-            {
-                Contract? contract = _context.Contracts.FirstOrDefault(x => x.UserId == userId && x.IsCurrent);
+            await _context.SaveChangesAsync();
+            await _messageService.RecalculateStatsAsync(userId);
 
-                if (contract == null)
-                {
-                    return false;
-                }
-
-                _workDayToday = new WorkDay { ContractId = contract.Id, Date = _now.Now.Date, WorkDayType = _now.Now.ToWorkDayType() };
-                _workDayToday.RequiredHours = _workDayToday.GetRequiredHoursForDay(contract.HoursPerWeek);
-                _context.WorkDays.Add(_workDayToday);
-                _context.SaveChanges();
-            }
-
-            return true;
+            return EmptyResult.Empty;
         }
 
-        private bool HasOngoingWorkingPeriod()
+        private WorkDay CreateWorkday(Contract currentContract)
         {
-            WorkingPeriod? unfinished = _workDayToday.WorkingPeriods?.FirstOrDefault(x => !x.EndTime.HasValue);
-
-            if (unfinished != null)
+            if (currentContract == null)
             {
-                unfinished.EndTime = _now.Now;
-
-                _context.WorkingPeriods.Update(unfinished);
-                _context.SaveChanges();
-
-                return true;
+                throw new ArgumentNullException(nameof(Contract));
             }
 
-            return false;
+            _workDayToday = new WorkDay { ContractId = currentContract.Id, Date = _now.Now.Date, WorkDayType = _now.Now.ToWorkDayType(), WorkingPeriods = new List<WorkingPeriod>() };
+            _workDayToday.RequiredHours = _workDayToday.GetRequiredHoursForDay(currentContract.HoursPerWeek);
+            _context.WorkDays.Add(_workDayToday);
+
+            return _workDayToday;
         }
     }
 }

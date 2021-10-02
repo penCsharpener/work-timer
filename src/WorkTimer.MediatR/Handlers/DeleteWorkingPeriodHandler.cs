@@ -33,7 +33,7 @@ namespace WorkTimer.MediatR.Handlers
                 _context.WorkingPeriods.Remove(request.WorkingPeriod);
 
                 await _context.SaveChangesAsync();
-                await _messageService.RecalculateStatsAsync(request.User.Id);
+                await _messageService.UpdateTotalHoursFromWorkDayAsync(request.WorkingPeriod.WorkDayId);
 
                 return true;
             }

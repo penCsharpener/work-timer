@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -27,14 +28,19 @@ namespace WorkTimer.MediatR.Handlers
         {
             try
             {
-                var contract = request.User.Contracts.FirstOrDefault();
-                CorrectWorkDayDateBasedOnPeriods(request);
-                UpdateTotalHoursOfWorkDay(request.WorkDay);
-                request.WorkDay.RequiredHours = request.WorkDay.GetRequiredHoursForDay(contract.HoursPerWeek);
+                var workDay = await _context.WorkDays.FirstOrDefaultAsync(wd => wd.Id == request.WorkDay.Id);
+                workDay.RequiredHours = request.WorkDay.GetRequiredHoursForDay(request.CurrentContract.HoursPerWeek);
+                workDay.WorkDayType = request.WorkDay.WorkDayType;
+                workDay.ContractId = request.WorkDay.ContractId;
 
-                _context.WorkDays.Update(request.WorkDay);
-                _context.SaveChanges();
-                await _messageService.RecalculateStatsAsync(request.User.Id);
+                var hasChanges = _context.ChangeTracker.HasChanges();
+
+                if (hasChanges)
+                {
+                    await _messageService.UpdateOnEditWorkdayAsync(request.WorkDay.Id, request.User.Id);
+                }
+
+                await _context.SaveChangesAsync();
 
                 return true;
             }

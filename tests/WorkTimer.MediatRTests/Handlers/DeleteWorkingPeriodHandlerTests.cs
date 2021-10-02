@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using WorkTimer.Domain.Models;
 using WorkTimer.MediatR.Handlers;
 using WorkTimer.MediatR.Requests;
+using WorkTimer.Messaging.Abstractions;
 using WorkTimer.Persistence.Data;
 using Xunit;
 
@@ -19,6 +20,7 @@ namespace WorkTimer.MediatRTests.Handlers
     {
         private readonly DeleteWorkingPeriodHandler _testObject;
         private readonly DbContextOptions<AppDbContext> _options;
+        private readonly IMessageService _messageService;
 
         public DeleteWorkingPeriodHandlerTests()
         {
@@ -44,7 +46,8 @@ namespace WorkTimer.MediatRTests.Handlers
                 context.SaveChanges();
             }
 
-            _testObject = new DeleteWorkingPeriodHandler(new AppDbContext(_options), Substitute.For<ILogger<DeleteWorkingPeriodHandler>>());
+            _messageService = Substitute.For<IMessageService>();
+            _testObject = new DeleteWorkingPeriodHandler(new AppDbContext(_options), _messageService, Substitute.For<ILogger<DeleteWorkingPeriodHandler>>());
         }
 
         [Fact]

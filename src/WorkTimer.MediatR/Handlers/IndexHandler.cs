@@ -22,21 +22,16 @@ namespace WorkTimer.MediatR.Handlers
             _context = context;
         }
 
-        public Task<IndexResponse> Handle(IndexRequest request, CancellationToken cancellationToken)
+        public async Task<IndexResponse> Handle(IndexRequest request, CancellationToken cancellationToken)
         {
-            if (request.User == null)
+            if (request.User == null || request.CurrentContract == null)
             {
-                return Task.FromResult(new IndexResponse());
+                return new IndexResponse();
             }
 
-            var allHours = _context.WorkingPeriods.Include(x => x.WorkDay).ThenInclude(x => x.Contract)
+            var count = await _context.WorkingPeriods
                 .Where(x => x.WorkDay.Contract.UserId == request.User.Id && x.WorkDay.Contract.IsCurrent && x.WorkDay.WorkingPeriods.All(x => x.EndTime.HasValue))
-                .Select(x => new TotalHoursCalculationModel(x.WorkDay.TotalHours, x.WorkDay.RequiredHours))
-                .Distinct()
-                .ToList();
-
-            int count = allHours.Count;
-            double totalOverHours = allHours.Sum(x => x.TotalHours - x.RequiredHours);
+                .CountAsync();
 
             List<DisplayWorkDayModel> results = MapDisplayModel(request).ToList();
 
@@ -46,13 +41,13 @@ namespace WorkTimer.MediatR.Handlers
                 .Take(5)
                 .ToList();
 
-            return Task.FromResult(new IndexResponse
+            return new IndexResponse
             {
                 WorkDays = new PagedResult<DisplayWorkDayModel>(results, count),
-                TotalOverHours = TimeSpan.FromHours(totalOverHours),
+                TotalOverHours = request.CurrentContract?.TotalOverhours ?? TimeSpan.Zero,
                 MostRecentWorkPeriods = mostRecent,
                 HasOngoingWorkPeriod = results.Any(x => x.HasOngoingWorkingDay)
-            });
+            };
         }
 
         private IEnumerable<DisplayWorkDayModel> MapDisplayModel(IndexRequest request)

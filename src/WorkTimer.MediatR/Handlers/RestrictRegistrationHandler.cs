@@ -8,56 +8,70 @@ using System.Threading.Tasks;
 using WorkTimer.MediatR.Models;
 using WorkTimer.MediatR.Requests;
 
-namespace WorkTimer.MediatR.Handlers {
-    public class RestrictRegistrationHandler : IRequestHandler<RestrictRegistrationRequest, bool> {
+namespace WorkTimer.MediatR.Handlers
+{
+    public class RestrictRegistrationHandler : IRequestHandler<RestrictRegistrationRequest, bool>
+    {
         private readonly RestrictRegistration _config;
         private readonly ILogger<RestrictRegistrationHandler> _logger;
 
-        public RestrictRegistrationHandler(IConfiguration config, ILogger<RestrictRegistrationHandler> logger) {
+        public RestrictRegistrationHandler(IConfiguration config, ILogger<RestrictRegistrationHandler> logger)
+        {
             _config = config.GetSection("ApplicationSettings:RestrictRegistration").Get<RestrictRegistration>();
             _logger = logger;
         }
 
-        public Task<bool> Handle(RestrictRegistrationRequest request, CancellationToken cancellationToken) {
-            try {
+        public Task<bool> Handle(RestrictRegistrationRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
                 string userDomain = request.UserEmail.Split('@', StringSplitOptions.RemoveEmptyEntries)[1];
 
-                if (_config.TotalLockDown) {
-                    _logger.LogInformation($"{request.UserEmail} was blocked (total lock down).");
+                if (_config.TotalLockDown)
+                {
+                    _logger.LogInformation("{UserEmail} was blocked (total lock down).", request.UserEmail);
 
                     return Task.FromResult(false);
                 }
 
                 // if no mails are explicitely permitted, we permit all emails except those that are explicitely blocked
-                if (_config.PermittedDomains.Length == 0 && _config.PermittedEmails.Length == 0) {
+                if (_config.PermittedDomains?.Length == 0 && _config.PermittedEmails?.Length == 0)
+                {
                     return Task.FromResult(CheckBlocked(request.UserEmail, userDomain));
                 }
 
-                if (_config.PermittedEmails.Any(x => x.Equals(request.UserEmail, StringComparison.InvariantCultureIgnoreCase))) {
+                if (_config.PermittedEmails?.Any(x => x.Equals(request.UserEmail, StringComparison.InvariantCultureIgnoreCase)) == true)
+                {
                     return Task.FromResult(true);
                 }
 
-                if (_config.PermittedDomains.Any(x => x.Equals(userDomain, StringComparison.InvariantCultureIgnoreCase))) {
+                if (_config.PermittedDomains?.Any(x => x.Equals(userDomain, StringComparison.InvariantCultureIgnoreCase)) == true)
+                {
                     return Task.FromResult(true);
                 }
 
                 return Task.FromResult(CheckBlocked(request.UserEmail, userDomain));
-            } catch (Exception ex) {
-                _logger.LogError(ex, $"{request.UserEmail}: Registration restrictions could not be checked.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "{UserEmail}: Registration restrictions could not be checked.", request.UserEmail);
 
                 return Task.FromResult(false);
             }
         }
 
-        public bool CheckBlocked(string userEmail, string userDomain) {
-            if (_config.BlockedEmails.Any(x => userEmail.Equals(x, StringComparison.InvariantCultureIgnoreCase))) {
-                _logger.LogInformation($"{userEmail} was blocked (blocked email).");
+        public bool CheckBlocked(string userEmail, string userDomain)
+        {
+            if (_config.BlockedEmails?.Any(x => userEmail.Equals(x, StringComparison.InvariantCultureIgnoreCase)) == true)
+            {
+                _logger.LogInformation("{userEmail} was blocked (blocked email).", userEmail);
 
                 return false;
             }
 
-            if (_config.BlockedDomains.Any(x => userDomain.Equals(x, StringComparison.InvariantCultureIgnoreCase))) {
-                _logger.LogInformation($"{userEmail} was blocked (blocked domain).");
+            if (_config.BlockedDomains?.Any(x => userDomain.Equals(x, StringComparison.InvariantCultureIgnoreCase)) == true)
+            {
+                _logger.LogInformation("{userEmail} was blocked (blocked domain).", userEmail);
 
                 return false;
             }

@@ -31,19 +31,22 @@
     </tr>
     </thead>
     <tbody>
-    @foreach (var period in IndexResponse.MostRecentWorkPeriods)
-    {
-        <tr>
-            <th class="workperiod-id-column" scope="row">@period.Id</th>
-            <td>@period.StartTime.ToString()</td>
-            <td>@period.EndTime.ToString()</td>
-            <td>@period.GetWorkTime().ToTimeString()</td>
-            <td class="workperiod-comment-column">@period.Comment</td>
-            <td onclick="location.href = 'workday/@period.WorkDayId/workperiod/@period.Id'">
-                <span class="oi oi-pencil" title="oi-pencil" aria-hidden="true"></span>
-            </td>
-        </tr>
-    }
+        @if (IndexResponse?.MostRecentWorkPeriods != null)
+        {
+            @foreach (var period in IndexResponse.MostRecentWorkPeriods)
+            {
+                <tr>
+                    <th class="workperiod-id-column" scope="row">@period.Id</th>
+                    <td>@period.StartTime.ToString()</td>
+                    <td>@period.EndTime.ToString()</td>
+                    <td>@period.GetWorkTime().ToTimeString()</td>
+                    <td class="workperiod-comment-column">@period.Comment</td>
+                    <td onclick="location.href = 'workday/@period.WorkDayId/workperiod/@period.Id'">
+                        <span class="oi oi-pencil" title="oi-pencil" aria-hidden="true"></span>
+                    </td>
+                </tr>
+            }
+        }
     </tbody>
 </table>
 
@@ -106,7 +109,7 @@ else
 
     private async Task HandleValidSubmitAsync()
     {
-        var result = await Mediator.Send(NewPeriodModel);
+        await Mediator.Send(NewPeriodModel);
         NewPeriodModel = new NewWorkingPeriodRequest();
         IndexResponse = await Mediator.Send(new IndexRequest());
         EvaluateButtonText();

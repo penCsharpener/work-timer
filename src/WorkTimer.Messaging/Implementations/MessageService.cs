@@ -16,7 +16,17 @@ namespace WorkTimer.Messaging.Implementations
 
         public async Task RecalculateStatsAsync(int userId)
         {
-            await _bus.PubSub.PublishAsync(new RecalculateStatsMessage { UserId = userId });
+            await _bus.PubSub.PublishAsync(new RecalculateStatsMessage(userId));
+        }
+
+        public async Task UpdateTotalHoursFromWorkDayAsync(int workDayId)
+        {
+            await _bus.PubSub.PublishAsync(new UpdateTotalHoursFromWorkDayMessage(workDayId));
+        }
+
+        public async Task UpdateOnEditWorkdayAsync(int workdayId, int userId)
+        {
+            await _bus.PubSub.PublishAsync(new UpdateOnEditWorkdayMessage(workdayId, userId));
         }
     }
 }

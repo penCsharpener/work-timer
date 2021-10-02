@@ -1,7 +1,6 @@
 ﻿using Nager.Date;
 using System;
 using WorkTimer.Domain.Models;
-using static Nager.Date.DateSystem;
 
 namespace WorkTimer.Domain.Extensions
 {
@@ -9,12 +8,12 @@ namespace WorkTimer.Domain.Extensions
     {
         public static WorkDayType ToWorkDayType(this DateTime date)
         {
-            if (IsPublicHoliday(date, CountryCode.DE, "DE-SN"))
+            if (DateSystem.IsPublicHoliday(date, CountryCode.DE, "DE-SN"))
             {
                 return WorkDayType.BankHoliday;
             }
 
-            if (IsWeekend(date, CountryCode.DE))
+            if (DateSystem.IsWeekend(date, CountryCode.DE))
             {
                 return WorkDayType.Weekend;
             }

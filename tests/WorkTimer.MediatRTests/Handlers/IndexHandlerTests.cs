@@ -34,11 +34,11 @@ namespace WorkTimer.MediatRTests.Handlers
         [Fact]
         public async Task Handler_Calculates_Hours()
         {
-            var request = new IndexRequest() { User = new AppUser { Id = 1 } };
+            var request = new IndexRequest() { User = new AppUser { Id = 1 }, CurrentContract = new() { HoursPerWeek = 40, TotalOverhours = TimeSpan.FromHours(-0.0832999) } };
 
             var response = await _testObject.Handle(request, CancellationToken.None);
-            response.TotalOverHours.TotalHours.Should().Be(-0.083299999972222219);
-            response.WorkDays.Count.Should().Be(2);
+            response.TotalOverHours.TotalHours.Should().BeApproximately(-0.0832999, 0.000002);
+            response.WorkDays.Count.Should().Be(5);
             response.MostRecentWorkPeriods.Count.Should().Be(5);
             response.HasOngoingWorkPeriod.Should().BeFalse();
         }
@@ -64,13 +64,13 @@ namespace WorkTimer.MediatRTests.Handlers
                 context.SaveChanges();
             }
 
-            var request = new IndexRequest() { User = new AppUser { Id = 1 } };
+            var request = new IndexRequest() { User = new AppUser { Id = 1 }, CurrentContract = new() { HoursPerWeek = 40, TotalOverhours = TimeSpan.FromHours(-0.0832999) } };
 
             var response = await _testObject.Handle(request, CancellationToken.None);
-            response.TotalOverHours.TotalHours.Should().Be(-0.08329999997222222);
-            response.WorkDays.Count.Should().Be(2);
+            response.TotalOverHours.TotalHours.Should().BeApproximately(-0.0832999, 0.000002);
+            response.WorkDays.Count.Should().Be(5);
             response.WorkDays.Items.FirstOrDefault(x => x.Id == 1).Overhours.TotalHours.Should().Be(-0.5);
-            response.WorkDays.Items.FirstOrDefault(x => x.Id == 2).Overhours.TotalHours.Should().Be(0.41669999997222223);
+            response.WorkDays.Items.FirstOrDefault(x => x.Id == 2).Overhours.TotalHours.Should().BeApproximately(0.4166999, 0.000002);
             response.WorkDays.Items.FirstOrDefault(x => x.Id == 3).Overhours.TotalHours.Should().Be(-3.5);
             response.WorkDays.Items.FirstOrDefault(x => x.Id == 1).WorkHours.TotalHours.Should().Be(7.5);
             response.WorkDays.Items.FirstOrDefault(x => x.Id == 2).WorkHours.TotalHours.Should().Be(8.4167);

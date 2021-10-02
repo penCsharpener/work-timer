@@ -37,6 +37,11 @@ namespace WorkTimer.MediatR.Handlers
         {
             var response = new GetWorkMonthsResponse();
 
+            if (request.User == null || request.CurrentContract == null)
+            {
+                return response;
+            }
+
             try
             {
                 var contract = request.User.Contracts.FirstOrDefault(x => x.IsCurrent);

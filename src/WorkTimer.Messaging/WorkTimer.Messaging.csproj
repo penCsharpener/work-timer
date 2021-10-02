@@ -12,4 +12,10 @@
     <ProjectReference Include="..\WorkTimer.Persistence\WorkTimer.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>WorkTimer.Integration</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
 </Project>

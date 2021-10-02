@@ -3,11 +3,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NETCore.MailKit.Extensions;
+using NETCore.MailKit.Infrastructure.Internal;
 using WorkTimer.Blazor.Areas.Identity;
 using WorkTimer.Blazor.Extensions;
+using WorkTimer.Blazor.Middleware;
 using WorkTimer.Blazor.Services;
 using WorkTimer.Domain.Models;
 using WorkTimer.Persistence.Extensions;
@@ -25,6 +29,8 @@ namespace WorkTimer.Blazor
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var mailSettings = Configuration.GetSection("MailKitOptions").Get<MailKitOptions>();
+            var passwordOptions = Configuration.GetSection(nameof(PasswordOptions)).Get<PasswordOptions>();
             services.AddEntityFramework(Configuration);
             services.AddHttpContextAccessor();
             services.AddRazorPages();
@@ -34,6 +40,9 @@ namespace WorkTimer.Blazor
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<AppUser>>();
             services.AddScoped<TokenProvider>();
+            services.AddSingleton(mailSettings);
+            services.AddSingleton(passwordOptions);
+            services.AddMailKit(options => options.UseMailKit(mailSettings));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -55,6 +64,7 @@ namespace WorkTimer.Blazor
                 app.UseHttpsRedirection();
             }
 
+            app.UseMiddleware<ExceptionMiddleware>();
             app.UseStaticFiles();
 
             app.UseRouting();

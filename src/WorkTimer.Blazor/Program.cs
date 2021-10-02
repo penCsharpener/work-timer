@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using System;
 using System.Threading.Tasks;
-using WorkTimer.Dev.Seeding;
 using WorkTimer.Persistence.Extensions;
 
 namespace WorkTimer.Blazor
@@ -22,12 +21,12 @@ namespace WorkTimer.Blazor
                 .AddUserSecrets<Program>(true, true)
                 .Build();
 
-            try
-            {
-                Log.Logger = new LoggerConfiguration()
+            Log.Logger = new LoggerConfiguration()
                     .ReadFrom.Configuration(LaunchSettings)
                     .CreateLogger();
 
+            try
+            {
                 Log.Information("Starting up");
 
                 IHost? host = CreateHostBuilder(args).Build();
@@ -39,7 +38,6 @@ namespace WorkTimer.Blazor
                     try
                     {
                         await sp.MigrateDatabaseAsync();
-                        await sp.SeedDatabaseAsync();
                     }
                     catch (Exception ex)
                     {

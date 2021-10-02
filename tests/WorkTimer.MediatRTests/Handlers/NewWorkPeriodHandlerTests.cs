@@ -10,6 +10,7 @@ using WorkTimer.Domain.Models;
 using WorkTimer.MediatR.Handlers;
 using WorkTimer.MediatR.Requests;
 using WorkTimer.MediatR.Services.Abstractions;
+using WorkTimer.Messaging.Abstractions;
 using WorkTimer.Persistence.Data;
 using Xunit;
 
@@ -19,6 +20,7 @@ namespace WorkTimer.MediatRTests.Handlers
     {
         private readonly NewWorkingPeriodHandler _testObject;
         private readonly DbContextOptions<AppDbContext> _options;
+        private readonly IMessageService _messageService;
         private static MockNow _now = new MockNow();
 
         public NewWorkPeriodHandlerTests()
@@ -31,7 +33,8 @@ namespace WorkTimer.MediatRTests.Handlers
                 context.SaveChanges();
             }
 
-            _testObject = new NewWorkingPeriodHandler(new AppDbContext(_options), _now, Substitute.For<ILogger<NewWorkingPeriodHandler>>());
+            _messageService = Substitute.For<IMessageService>();
+            _testObject = new NewWorkingPeriodHandler(new AppDbContext(_options), _messageService, _now, Substitute.For<ILogger<NewWorkingPeriodHandler>>());
         }
 
         [Fact]
@@ -48,11 +51,11 @@ namespace WorkTimer.MediatRTests.Handlers
             var request = new NewWorkingPeriodRequest()
             {
                 User = new AppUser { Id = 1 },
-                Comment = "Test Comment"
+                Comment = "Test Comment",
+                CurrentContract = GetContract()
             };
 
-            var response = await _testObject.Handle(request, CancellationToken.None);
-            response.Should().BeTrue();
+            await _testObject.Handle(request, CancellationToken.None);
 
             using (var context = new AppDbContext(_options))
             {
@@ -76,11 +79,11 @@ namespace WorkTimer.MediatRTests.Handlers
             var request = new NewWorkingPeriodRequest()
             {
                 User = new AppUser { Id = 1 },
-                Comment = "Test Comment"
+                Comment = "Test Comment",
+                CurrentContract = GetContract()
             };
 
-            var response = await _testObject.Handle(request, CancellationToken.None);
-            response.Should().BeTrue();
+            await _testObject.Handle(request, CancellationToken.None);
 
             using (var context = new AppDbContext(_options))
             {
@@ -105,7 +108,8 @@ namespace WorkTimer.MediatRTests.Handlers
             var request = new NewWorkingPeriodRequest()
             {
                 User = new AppUser { Id = 1 },
-                Comment = "Test Comment"
+                Comment = "Test Comment",
+                CurrentContract = GetContract()
             };
 
             var response = await _testObject.Handle(request, CancellationToken.None);
@@ -134,7 +138,8 @@ namespace WorkTimer.MediatRTests.Handlers
             var request = new NewWorkingPeriodRequest()
             {
                 User = new AppUser { Id = 1 },
-                Comment = "Test Comment"
+                Comment = "Test Comment",
+                CurrentContract = GetContract()
             };
 
             var response = await _testObject.Handle(request, CancellationToken.None);
@@ -143,7 +148,7 @@ namespace WorkTimer.MediatRTests.Handlers
             {
                 context.WorkDays.Count().Should().Be(1);
                 context.WorkingPeriods.Count().Should().Be(1);
-                context.WorkingPeriods.Count(x => !x.EndTime.HasValue).Should().Be(0);
+                context.WorkingPeriods.ToList()[0].EndTime.HasValue.Should().BeTrue();
             }
         }
 
@@ -157,6 +162,11 @@ namespace WorkTimer.MediatRTests.Handlers
             }
 
             public DateTime Now => _now;
+        }
+
+        private Contract GetContract()
+        {
+            return new Contract { Id = 1, Employer = "e", Name = "e", HoursPerWeek = 40, IsCurrent = true, UserId = 1 };
         }
     }
 }

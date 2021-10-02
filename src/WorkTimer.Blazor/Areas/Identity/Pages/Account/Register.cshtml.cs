@@ -2,24 +2,27 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using NETCore.MailKit.Core;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using WorkTimer.Blazor.Validation;
 using WorkTimer.Domain.Models;
 using WorkTimer.MediatR.Requests;
 
-namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
+namespace WorkTimer.Blazor.Areas.Identity.Pages.Account
+{
     [AllowAnonymous]
-    public class RegisterModel : PageModel {
-        private readonly IEmailSender _emailSender;
+    public class RegisterModel : PageModel
+    {
+        private readonly IEmailService _emailSender;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IMediator _mediator;
         private readonly SignInManager<AppUser> _signInManager;
@@ -29,8 +32,9 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender,
-            IMediator mediator) {
+            IEmailService emailSender,
+            IMediator mediator)
+        {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
@@ -45,21 +49,25 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        public async Task OnGetAsync(string? returnUrl = null) {
+        public async Task OnGetAsync(string? returnUrl = null)
+        {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
-        public async Task<IActionResult> OnPostAsync(string? returnUrl = null) {
+        public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
+        {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             bool allowRegistration = await _mediator.Send(new RestrictRegistrationRequest(Input.Email));
 
-            if (ModelState.IsValid && allowRegistration) {
+            if (ModelState.IsValid && allowRegistration)
+            {
                 AppUser? user = new AppUser { UserName = Input.Email, Email = Input.Email };
                 IdentityResult? result = await _userManager.CreateAsync(user, Input.Password);
 
-                if (result.Succeeded) {
+                if (result.Succeeded)
+                {
                     _logger.LogInformation("User created a new account with password.");
 
                     string? code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -71,10 +79,12 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
                         new { area = "Identity", userId = user.Id, code, returnUrl },
                         Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                                                      $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await _emailSender.SendAsync(Input.Email, "Confirm your email",
+                                                 $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.",
+                                                 true);
 
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount) {
+                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                    {
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl });
                     }
 
@@ -83,12 +93,14 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
                     return LocalRedirect(returnUrl);
                 }
 
-                foreach (var error in result.Errors) {
+                foreach (var error in result.Errors)
+                {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
 
-            if (!allowRegistration) {
+            if (!allowRegistration)
+            {
                 ModelState.AddModelError("Email", "Email or domain not permitted.");
             }
 
@@ -96,14 +108,15 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
             return Page();
         }
 
-        public class InputModel {
+        public class InputModel
+        {
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [PasswordLength(ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.")]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }

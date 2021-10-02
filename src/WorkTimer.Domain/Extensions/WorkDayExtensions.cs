@@ -6,6 +6,16 @@ namespace WorkTimer.Domain.Extensions
 {
     public static class WorkDayExtensions
     {
+        public static bool IsUnfinishedWorkday(this WorkDay workday)
+        {
+            return workday.WorkingPeriods.Any(wp => !wp.EndTime.HasValue);
+        }
+
+        public static WorkingPeriod? GetOngoingWorkingPeriod(this WorkDay workDay)
+        {
+            return workDay.WorkingPeriods.FirstOrDefault(wp => wp.EndTime is null);
+        }
+
         public static double GetContractedHoursPerDay(this Contract contract)
         {
             int contractedHours = contract?.HoursPerWeek ?? 0;
