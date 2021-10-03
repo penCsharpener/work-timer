@@ -1,63 +1,83 @@
+using EasyNetQ;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Data.SQLite;
-using WorkTimer.Config;
-using WorkTimer.Contracts;
-using WorkTimer.Repositories;
-using WorkTimer.Services;
+using NETCore.MailKit.Extensions;
+using NETCore.MailKit.Infrastructure.Internal;
+using WorkTimer.Blazor.Areas.Identity;
+using WorkTimer.Blazor.Extensions;
+using WorkTimer.Blazor.Middleware;
+using WorkTimer.Blazor.Services;
+using WorkTimer.Domain.Models;
+using WorkTimer.Persistence.Extensions;
 
-namespace WorkTimer.Blazor {
-    public class Startup {
-        public Startup(IConfiguration configuration) {
+namespace WorkTimer.Blazor
+{
+    public class Startup
+    {
+        public Startup(IConfiguration configuration)
+        {
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services) {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            var mailSettings = Configuration.GetSection("MailKitOptions").Get<MailKitOptions>();
+            var passwordOptions = Configuration.GetSection(nameof(PasswordOptions)).Get<PasswordOptions>();
+            services.AddEntityFramework(Configuration);
+            services.AddHttpContextAccessor();
             services.AddRazorPages();
+            services.AddSingleton(_ => RabbitHutch.CreateBus(Configuration.GetConnectionString("RabbitMqConnection")));
             services.AddServerSideBlazor();
-            services.Configure<SqliteConfiguration>(Configuration.GetSection(nameof(SqliteConfiguration)));
-            services.AddScoped<IWorkPeriodWriter, WorkPeriodWriter>();
-            services.AddScoped<IWorkPeriodRepository, WorkPeriodRepository>();
-            services.AddScoped<IToggleTracking, ToggleTrackingService>();
-            services.AddScoped<IWriterWorkPeriod, WriterWorkPeriod>();
-            services.AddScoped<IWorkingDayRepository, WorkingDayRepository>();
-            services.AddScoped<IWorkBreakRepository, MockWorkBreakRepository>();
-            services.AddScoped<IDbInitService, DbInitService>();
-            services.AddSingleton<IDatabaseConnection<SQLiteConnection>, SqliteDatabaseConnectionService>();
-            //#if DEBUG
-            //            services.WireUpMockClasses();
-            //#else
-            //            services.AddScoped<IWorkingDayRepository, WorkingDayRepository>();
-            //#endif
+            services.AddWorkTimerServices();
+            services.AddDatabaseDeveloperPageExceptionFilter();
+            services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<AppUser>>();
+            services.AddScoped<TokenProvider>();
+            services.AddSingleton(mailSettings);
+            services.AddSingleton(passwordOptions);
+            services.AddMailKit(options => options.UseMailKit(mailSettings));
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
-            if (env.IsDevelopment()) {
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
                 app.UseDeveloperExceptionPage();
-            } else {
+            }
+            else
+            {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto });
+
+            if (Configuration?.GetValue<string>("ApplicationSettings:LaunchUrls")?.Contains("https") == true)
+            {
+                app.UseHttpsRedirection();
+            }
+
+            app.UseMiddleware<ExceptionMiddleware>();
             app.UseStaticFiles();
 
             app.UseRouting();
 
-            app.UseEndpoints(endpoints => {
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
-            
         }
     }
 }

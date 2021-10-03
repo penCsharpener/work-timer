@@ -1,10 +1,36 @@
-<Router AppAssembly="@typeof(Program).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-    </Found>
-    <NotFound>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <p>Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+﻿@using WorkTimer.Blazor.Services
+@inject TokenProvider TokenProvider
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(Program).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    <WorkTimer.Blazor.Pages.RedirectToLogin/>
+                </NotAuthorized>
+                <Authorizing>
+                    logging you in...
+                </Authorizing>
+            </AuthorizeRouteView>
+        </Found>
+        <NotFound>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p>Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+
+@code {
+
+    [Parameter]
+    public InitialApplicationState AppState { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        TokenProvider.XsrfToken = AppState.XsrfToken;
+
+        return base.OnInitializedAsync();
+    }
+
+}
