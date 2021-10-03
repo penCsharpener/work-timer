@@ -23,13 +23,6 @@ namespace WorkTimer.Blazor.Middleware
             {
                 await _next(context);
             }
-            catch (ObjectDisposedException ex)
-            {
-                if (ex.Message.Contains("'Renderer'"))
-                {
-                    await HandleObjectDisposedError(context, ex);
-                }
-            }
             catch (Exception ex)
             {
                 await HandleUnhandledError(context, ex);
