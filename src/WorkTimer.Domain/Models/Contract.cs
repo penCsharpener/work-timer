@@ -15,5 +15,6 @@ namespace WorkTimer.Domain.Models
 
         public ICollection<WorkDay> WorkDays { get; set; }
         public AppUser User { get; set; }
+        public ICollection<OverHoursCompensation> OverHoursCompensations { get; set; }
     }
 }
