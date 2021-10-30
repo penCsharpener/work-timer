@@ -49,7 +49,7 @@ namespace WorkTimer.Messaging
                         workDay.RequiredHours = workDay.GetRequiredHoursForDay(workDay.Contract.HoursPerWeek);
                     }
 
-                    await UpdateTotalOverhoursOfContract(context, message.UserId);
+                    await UpdateTotalOverhoursOfContract(context, workdays[0].Contract);
 
                     await context.SaveChangesAsync();
 
@@ -85,7 +85,7 @@ namespace WorkTimer.Messaging
 
                     workDay.TotalHours = CalculateTotalHoursFromWorkDay(workDay);
 
-                    await UpdateTotalOverhoursOfContract(context, workDay.Contract.UserId);
+                    await UpdateTotalOverhoursOfContract(context, workDay.Contract);
 
                     await context.SaveChangesAsync();
 
@@ -100,11 +100,11 @@ namespace WorkTimer.Messaging
             {
                 using (var context = scope.ServiceProvider.GetRequiredService<AppDbContext>())
                 {
-                    var workDay = await context.WorkDays.Include(x => x.WorkingPeriods).FirstOrDefaultAsync(x => x.WorkingPeriods.Any(wp => wp.WorkDayId == message.WorkdayId), cancellationToken);
+                    var workDay = await context.WorkDays.Include(wd => wd.Contract).Include(x => x.WorkingPeriods).FirstOrDefaultAsync(x => x.WorkingPeriods.Any(wp => wp.WorkDayId == message.WorkdayId), cancellationToken);
                     CorrectWorkDayDateBasedOnPeriods(workDay);
                     UpdateTotalHoursOfWorkDay(workDay);
 
-                    await UpdateTotalOverhoursOfContract(context, message.UserId);
+                    await UpdateTotalOverhoursOfContract(context, workDay.Contract);
 
                     await context.SaveChangesAsync();
 
@@ -164,19 +164,18 @@ namespace WorkTimer.Messaging
             }
         }
 
-        // TODO: instead of passing userId, pass contact of workday and update hours there directly
-        private async Task UpdateTotalOverhoursOfContract(AppDbContext context, int userId)
+        // TODO: instead of passing userId, pass contract of workday and update hours there directly
+        private async Task UpdateTotalOverhoursOfContract(AppDbContext context, Contract currentContract)
         {
-            var allHours = context.WorkingPeriods.Include(x => x.WorkDay).ThenInclude(x => x.Contract)
-                .Where(x => x.WorkDay.Contract.UserId == userId && x.WorkDay.Contract.IsCurrent && x.WorkDay.WorkingPeriods.All(x => x.EndTime.HasValue))
-                .Select(x => new TotalHoursCalculationModel(x.WorkDay.TotalHours, x.WorkDay.RequiredHours))
-                .Distinct()
-                .ToList();
+            var allHours = await context.WorkingPeriods.Include(x => x.WorkDay).ThenInclude(x => x.Contract)
+                .Where(x => x.WorkDay.Contract.UserId == currentContract.UserId && x.WorkDay.Contract.IsCurrent && x.WorkDay.WorkingPeriods.All(x => x.EndTime.HasValue))
+                .SumAsync(x => x.WorkDay.TotalHours - x.WorkDay.RequiredHours);
 
-            double totalOverHours = allHours.Sum(x => x.TotalHours - x.RequiredHours);
+            var overHoursCompensated = await context.OverHoursCompensations.Where(c => c.Contract.IsCurrent && c.Contract.UserId == currentContract.UserId).SumAsync(oh => oh.OverHours);
 
-            var currentContract = await context.Contracts.Where(c => c.UserId == userId && c.IsCurrent).FirstOrDefaultAsync();
-            currentContract.TotalOverhours = TimeSpan.FromHours(totalOverHours);
+            allHours -= overHoursCompensated;
+
+            currentContract.TotalOverhours = TimeSpan.FromHours(allHours);
         }
 
         internal record TotalHoursCalculationModel(double TotalHours, double RequiredHours);
