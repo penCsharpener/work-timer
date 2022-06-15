@@ -11,24 +11,24 @@
 
   <ItemGroup>
     <PackageReference Include="MatBlazor" Version="2.9.0-develop-042" />
-    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.0-rc.1.21452.15" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.0-rc.1.21452.15" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.0-rc.1.21452.15" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0-rc.1.21452.10">
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.0-rc.1.21464.1" />
-    <PackageReference Include="NETCore.MailKit" Version="2.0.3" />
-    <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
-    <PackageReference Include="Serilog.Exceptions" Version="7.0.0" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="3.2.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.6" />
+    <PackageReference Include="NETCore.MailKit" Version="2.1.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
+    <PackageReference Include="Serilog.Exceptions" Version="8.2.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
     <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-    <PackageReference Include="SQLitePCLRaw.core" Version="2.0.5-pre20210521085756" />
+    <PackageReference Include="SQLitePCLRaw.core" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>
