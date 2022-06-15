@@ -1,0 +1,39 @@
+﻿
+<MudDialog @bind-IsVisible="visible" Options="dialogOptions">
+  <TitleContent>
+    <MudText Typo="Typo.h6">
+      <MudIcon Icon="@Icons.Material.Filled.Delete" Class="mr-3" /> Delete Item
+    </MudText>
+  </TitleContent>
+  <DialogContent>
+    <p>Do you really want to delete this?</p>
+  </DialogContent>
+  <DialogActions>
+    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="SubmitAsync" Class="px-4">Yes</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CloseDialog" Class="px-4">No</MudButton>
+  </DialogActions>
+</MudDialog>
+
+@code {
+  [Parameter]
+  public Func<Task> DeleteEntity { get; set; }
+
+  private bool visible;
+  private int rating;
+
+  private void OpenDialog() => visible = true;
+
+  private void CloseDialog() => visible = false;
+
+  private async Task SubmitAsync() 
+  {
+    if (DeleteEntity is not null)
+    {
+      await DeleteEntity.Invoke();
+    }
+
+    visible = false; 
+  }
+
+  private DialogOptions dialogOptions = new() { FullWidth = true, CloseOnEscapeKey = true };
+}

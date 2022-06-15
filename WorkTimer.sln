@@ -31,7 +31,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTimer.Domain.Tests", "t
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTimer.Messaging", "src\WorkTimer.Messaging\WorkTimer.Messaging.csproj", "{6D27C65E-80B1-4D2A-992E-AA8D855A5D78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkTimer.Integration", "tests\WorkTimer.Integration\WorkTimer.Integration.csproj", "{DA9BE51B-0A3C-4235-8D53-582645CB3898}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTimer.Integration", "tests\WorkTimer.Integration\WorkTimer.Integration.csproj", "{DA9BE51B-0A3C-4235-8D53-582645CB3898}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

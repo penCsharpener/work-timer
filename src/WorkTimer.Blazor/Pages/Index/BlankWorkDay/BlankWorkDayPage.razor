@@ -6,37 +6,38 @@
 @inject NavigationManager Navi;
 @attribute [Authorize]
 
-<h3>Create blank new Workday</h3>
+<MudText Typo="Typo.h4">Create blank Workday</MudText>
 
-<EditForm class="d-flex mb-3" Model="@Model" OnValidSubmit="@HandleValidSubmitAsync">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="my-2">
-        <label class="mx-3 mt-2 align-self-center" for="selWorkDayType">Date: </label>
-        <MatDatePicker @bind-Value="Model.Date"></MatDatePicker>
-    </div>
+<EditForm class="d-flex flex-column gap-6" Model="@Model" OnValidSubmit="@HandleValidSubmitAsync">
+  <DataAnnotationsValidator />
+  <ValidationSummary />
 
-    <div class="my-2">
-        <label class="mx-3 mt-2 align-self-center" for="selWorkDayType">Work day type: </label>
-        <MatBlazor.MatSelectItem class="mx-3" id="selWorkDayType" Items="WorkDayTypes" @bind-Value="Model.WorkDayType">
-        </MatBlazor.MatSelectItem>
-    </div>
+  <div class="d-flex flex-row gap-6" >
+    <MudDatePicker Editable="true" Mask="@(new DateMask("dd.MM.yyyy"))" DateFormat="dd.MM.yyyy" @bind-Value="Model.Date" Label="Date"></MudDatePicker>
 
-    <div class="my-2 mx-3">
-        <MatButton Type="submit" Class="btn btn-primary" Raised="true">Create</MatButton>
-    </div>
+    <MudSelect T="WorkDayType" Label="Work day type" @bind-Value="Model.WorkDayType">
+      @foreach (var workdayType in WorkDayTypes)
+      {
+        <MudSelectItem Value="@workdayType">@workdayType.ToString()</MudSelectItem>
+      }
+    </MudSelect>
+  </div>
+
+  <div>
+    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled">Create</MudButton>
+  </div>
 </EditForm>
 
 @code {
 
-    public CreateBlankWorkDayCommand Model { get; set; } = new(DateTime.Today.AddDays(1));
+  public CreateBlankWorkDayCommand Model { get; set; } = new(DateTime.Today.AddDays(1));
 
-    public WorkDayType[] WorkDayTypes { get; set; } = Enum.GetValues(typeof(WorkDayType)).Cast<WorkDayType>().ToArray();
+  public WorkDayType[] WorkDayTypes { get; set; } = Enum.GetValues(typeof(WorkDayType)).Cast<WorkDayType>().ToArray();
 
-    private async Task HandleValidSubmitAsync()
-    {
-        var response = await Mediator.Send(Model);
+  private async Task HandleValidSubmitAsync()
+  {
+    var response = await Mediator.Send(Model);
 
-        Navi.NavigateTo($"workday/{response.WorkDay.Id}");
-    }
+    Navi.NavigateTo($"workday/{response.WorkDay.Id}");
+  }
 }
