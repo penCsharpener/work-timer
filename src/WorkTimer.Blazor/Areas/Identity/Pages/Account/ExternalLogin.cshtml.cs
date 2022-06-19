@@ -14,9 +14,11 @@ using System.Threading.Tasks;
 using WorkTimer.Domain.Models;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
-namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
+namespace WorkTimer.Blazor.Areas.Identity.Pages.Account
+{
     [AllowAnonymous]
-    public class ExternalLoginModel : PageModel {
+    public class ExternalLoginModel : PageModel
+    {
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
         private readonly SignInManager<AppUser> _signInManager;
@@ -26,7 +28,8 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
             SignInManager<AppUser> signInManager,
             UserManager<AppUser> userManager,
             ILogger<ExternalLoginModel> logger,
-            IEmailSender emailSender) {
+            IEmailSender emailSender)
+        {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
@@ -43,11 +46,13 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
         [TempData]
         public string ErrorMessage { get; set; }
 
-        public IActionResult OnGetAsync() {
+        public IActionResult OnGetAsync()
+        {
             return RedirectToPage("./Login");
         }
 
-        public IActionResult OnPost(string provider, string returnUrl = null) {
+        public IActionResult OnPost(string provider, string returnUrl = null)
+        {
             // Request a redirect to the external login provider.
             string? redirectUrl = Url.Page("./ExternalLogin", "Callback", new { returnUrl });
             AuthenticationProperties? properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
@@ -55,10 +60,12 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
             return new ChallengeResult(provider, properties);
         }
 
-        public async Task<IActionResult> OnGetCallbackAsync(string returnUrl = null, string remoteError = null) {
+        public async Task<IActionResult> OnGetCallbackAsync(string returnUrl = null, string remoteError = null)
+        {
             returnUrl = returnUrl ?? Url.Content("~/");
 
-            if (remoteError != null) {
+            if (remoteError != null)
+            {
                 ErrorMessage = $"Error from external provider: {remoteError}";
 
                 return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
@@ -66,7 +73,8 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
 
             ExternalLoginInfo? info = await _signInManager.GetExternalLoginInfoAsync();
 
-            if (info == null) {
+            if (info == null)
+            {
                 ErrorMessage = "Error loading external login information.";
 
                 return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
@@ -75,13 +83,15 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
             // Sign in the user with this external login provider if the user already has a login.
             SignInResult? result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false, true);
 
-            if (result.Succeeded) {
+            if (result.Succeeded)
+            {
                 _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
 
                 return LocalRedirect(returnUrl);
             }
 
-            if (result.IsLockedOut) {
+            if (result.IsLockedOut)
+            {
                 return RedirectToPage("./Lockout");
             }
 
@@ -89,33 +99,40 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
             ReturnUrl = returnUrl;
             ProviderDisplayName = info.ProviderDisplayName;
 
-            if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email)) {
+            if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+            {
                 Input = new InputModel { Email = info.Principal.FindFirstValue(ClaimTypes.Email) };
             }
 
             return Page();
         }
 
-        public async Task<IActionResult> OnPostConfirmationAsync(string returnUrl = null) {
-            returnUrl = returnUrl ?? Url.Content("~/");
+        public async Task<IActionResult> OnPostConfirmationAsync(string? returnUrl = null)
+        {
+            returnUrl ??= Url.Content("~/");
             // Get the information about the user from the external login provider
             ExternalLoginInfo? info = await _signInManager.GetExternalLoginInfoAsync();
 
-            if (info == null) {
+            if (info == null)
+            {
                 ErrorMessage = "Error loading external login information during confirmation.";
 
                 return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
 
-            if (ModelState.IsValid) {
-                AppUser? user = new AppUser { UserName = Input.Email, Email = Input.Email };
+            if (ModelState.IsValid)
+            {
+                AppUser? user = new()
+                { UserName = Input.Email, Email = Input.Email };
 
                 IdentityResult? result = await _userManager.CreateAsync(user);
 
-                if (result.Succeeded) {
+                if (result.Succeeded)
+                {
                     result = await _userManager.AddLoginAsync(user, info);
 
-                    if (result.Succeeded) {
+                    if (result.Succeeded)
+                    {
                         _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
 
                         string? userId = await _userManager.GetUserIdAsync(user);
@@ -132,7 +149,8 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
                                                           $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                         // If account confirmation is required, we need to show the link if we don't have a real email sender
-                        if (_userManager.Options.SignIn.RequireConfirmedAccount) {
+                        if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                        {
                             return RedirectToPage("./RegisterConfirmation", new { Input.Email });
                         }
 
@@ -142,7 +160,8 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
                     }
                 }
 
-                foreach (var error in result.Errors) {
+                foreach (IdentityError? error in result.Errors)
+                {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
@@ -153,7 +172,8 @@ namespace WorkTimer.Blazor.Areas.Identity.Pages.Account {
             return Page();
         }
 
-        public class InputModel {
+        public class InputModel
+        {
             [Required]
             [EmailAddress]
             public string Email { get; set; }

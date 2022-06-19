@@ -26,10 +26,7 @@ namespace WorkTimer.MediatR.Handlers.Stats
         }
     }
 
-    public class RecalculateMyMonthsResponse
-    {
-
-    }
+    public class RecalculateMyMonthsResponse { }
 
     public class RecalculateMyMonthsHandler : IRequestHandler<RecalculateMyMonthsRequest, RecalculateMyMonthsResponse>
     {
@@ -44,22 +41,22 @@ namespace WorkTimer.MediatR.Handlers.Stats
 
         public async Task<RecalculateMyMonthsResponse> Handle(RecalculateMyMonthsRequest request, CancellationToken cancellationToken)
         {
-            var response = new RecalculateMyMonthsResponse();
+            RecalculateMyMonthsResponse response = new();
 
             try
             {
-                var contract = request.User.Contracts.FirstOrDefault(x => x.IsCurrent);
-                var existingMonths = await _context.WorkMonths.Where(x => x.ContractId == request.CurrentContract.Id).ToListAsync();
-                var workDays = await _context.WorkDays.Where(x => x.ContractId == contract.Id).ToListAsync();
+                Contract contract = request.User.Contracts.FirstOrDefault(x => x.IsCurrent);
+                List<WorkMonth> existingMonths = await _context.WorkMonths.Where(x => x.ContractId == request.CurrentContract.Id).ToListAsync(cancellationToken);
+                List<WorkDay> workDays = await _context.WorkDays.Where(x => x.ContractId == contract.Id).ToListAsync(cancellationToken);
 
                 AssignExistingWorkMonths(workDays, existingMonths);
                 CreateMissingWorkMonths(workDays, existingMonths, request.User);
 
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
 
                 UpdateStats(workDays, existingMonths, contract);
 
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
 
             }
             catch (System.Exception ex)
@@ -72,9 +69,9 @@ namespace WorkTimer.MediatR.Handlers.Stats
 
         private void AssignExistingWorkMonths(List<WorkDay> workDays, List<WorkMonth> existingMonths)
         {
-            foreach (var day in workDays)
+            foreach (WorkDay day in workDays)
             {
-                if (existingMonths.FirstOrDefault(x => x.Month == day.Date.Month && x.Year == day.Date.Year) is { } month)
+                if (existingMonths.FirstOrDefault(x => x.Month == day.Date.Month && x.Year == day.Date.Year && x.ContractId == day.ContractId) is { } month)
                 {
                     day.WorkMonthId = month.Id;
                 }
@@ -83,15 +80,15 @@ namespace WorkTimer.MediatR.Handlers.Stats
 
         private void CreateMissingWorkMonths(List<WorkDay> workDays, List<WorkMonth> existingMonths, AppUser user)
         {
-            foreach (var day in workDays)
+            foreach (WorkDay day in workDays)
             {
-                var matchingMonth = existingMonths.FirstOrDefault(x => x.Month == day.Date.Month && x.Year == day.Date.Year);
+                WorkMonth matchingMonth = existingMonths.FirstOrDefault(x => x.Month == day.Date.Month && x.Year == day.Date.Year);
 
                 if (matchingMonth == null)
                 {
-                    var month = new WorkMonth
+                    WorkMonth month = new()
                     {
-                        ContractId = user.Id,
+                        ContractId = day.ContractId,
                         Year = day.Date.Year,
                         Month = day.Date.Month,
                     };
@@ -110,9 +107,9 @@ namespace WorkTimer.MediatR.Handlers.Stats
 
         private void UpdateStats(List<WorkDay> workDays, List<WorkMonth> existingMonths, Contract contract)
         {
-            foreach (var month in existingMonths)
+            foreach (WorkMonth month in existingMonths)
             {
-                var days = workDays.Where(x => x.WorkMonthId == month.Id).ToList();
+                List<WorkDay> days = workDays.Where(x => x.WorkMonthId == month.Id).ToList();
 
                 month.TotalHours = days.Sum(x => x.TotalHours);
                 month.TotalOverhours = days.Sum(x => x.GetOverhours());

@@ -5,44 +5,46 @@
 
 <h3>Administration</h3>
 
-<EditForm class="form-inline" Model="@RequestModel" OnValidSubmit="@HandleValidSubmitAsync">
+<EditForm Model="@RequestModel" OnValidSubmit="@HandleValidSubmitAsync">
     <DataAnnotationsValidator/>
     <ValidationSummary/>
-    <ul class="nav flex-column">
+
+    <ul class="d-flex flex-column justify-content-start align-items-start w-100">
         <li class="nav-item px-3">
-            <MatCheckbox @bind-Value="RequestModel.CalculateZeroHourWorkDays">Calculate Zero Hour Days</MatCheckbox>
+            <MudCheckBox @bind-Checked="RequestModel.CalculateZeroHourWorkDays">Calculate Zero Hour Days</MudCheckBox>
         </li>
         <li class="nav-item px-3">
-            <MatCheckbox @bind-Value="RequestModel.RecalculateAllMyWorkDays">Recalculate all my work days</MatCheckbox>
+            <MudCheckBox @bind-Checked="RequestModel.RecalculateAllMyWorkDays">Recalculate all my work days</MudCheckBox>
         </li>
         <li class="nav-item px-3">
-            <MatCheckbox @bind-Value="RequestModel.RecalculateAllUsersHours">Recalculate all user's work days</MatCheckbox>
+            <MudCheckBox @bind-Checked="RequestModel.RecalculateAllUsersHours">Recalculate all user's work days</MudCheckBox>
         </li>
         <li class="nav-item px-3">
-            <MatCheckbox @bind-Value="RequestModel.RecalculateAllWorkMonths">Recalculate all work months</MatCheckbox>
+            <MudCheckBox @bind-Checked="RequestModel.RecalculateAllWorkMonths">Recalculate all work months</MudCheckBox>
         </li>
     </ul>
-    <div class="d-block">
-        <MatButton Type="submit" Class="btn btn-primary" Raised="true">Run Batch Tasks</MatButton>
+    <div class="mt-4">
+        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled">Run Batch Tasks</MudButton>
     </div>
 </EditForm>
 
-
 <div class="container">
-    <p class="text-left @(ResponseModel.HasError ? "text-danger" : "text-info")">@ResponseModel.Message</p>
+  <MudText Class="mt-5 text-left" Style="@_errorTextStyle">@ResponseModel.Message</MudText>
 </div>
 
 @code {
 
-    public AdminRequest RequestModel { get; set; } = new AdminRequest();
+  public AdminRequest RequestModel { get; set; } = new AdminRequest();
 
-    public AdminResponse ResponseModel { get; set; } = new AdminResponse();
+  public AdminResponse ResponseModel { get; set; } = new AdminResponse();
 
-    protected override async Task OnInitializedAsync() { }
+  private string _errorTextStyle = "color: var(--mud-palette-info-text);";
 
-    private async Task HandleValidSubmitAsync()
-    {
-        ResponseModel = await Mediator.Send(RequestModel);
-    }
+  private async Task HandleValidSubmitAsync()
+  {
+    ResponseModel = await Mediator.Send(RequestModel);
+
+    _errorTextStyle = ResponseModel.HasError ? "color: var(--mud-palette-error);" : "color: var(--mud-palette-info-text);";
+  }
 
 }

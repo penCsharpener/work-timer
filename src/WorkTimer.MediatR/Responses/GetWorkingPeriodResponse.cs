@@ -3,32 +3,17 @@ using System;
 using WorkTimer.Domain.Models;
 using WorkTimer.MediatR.Models;
 
-namespace WorkTimer.MediatR.Responses {
-    public class GetWorkingPeriodResponse : IRequest<bool> {
+namespace WorkTimer.MediatR.Responses
+{
+    public class GetWorkingPeriodResponse : IRequest<bool>
+    {
         public WorkingPeriod WorkingPeriod { get; set; }
         public UserContext UserContext { get; set; }
 
-        public DateTime StartTime {
-            get => WorkingPeriod.StartTime.ToUniversalTime();
-            set => WorkingPeriod.StartTime = value;
-        }
+        public DateTime? StartDate { get; set; } = DateTime.Now;
+        public TimeSpan? StartTime { get; set; } = DateTime.Now.TimeOfDay;
 
-        public DateTime? EndTime {
-            get {
-                if (WorkingPeriod.EndTime.HasValue) {
-                    return WorkingPeriod.EndTime.Value.ToUniversalTime();
-                }
-
-                return WorkingPeriod.EndTime;
-            }
-
-            set {
-                if (value.HasValue) {
-                    WorkingPeriod.EndTime = value.Value;
-                } else {
-                    WorkingPeriod.EndTime = value;
-                }
-            }
-        }
+        public DateTime? EndDate { get; set; }
+        public TimeSpan? EndTime { get; set; }
     }
 }

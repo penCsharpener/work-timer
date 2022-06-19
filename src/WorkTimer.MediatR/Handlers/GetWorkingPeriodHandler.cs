@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Threading;
@@ -22,21 +23,25 @@ namespace WorkTimer.MediatR.Handlers
             _logger = logger;
         }
 
-        public Task<GetWorkingPeriodResponse> Handle(GetWorkingPeriodRequest request, CancellationToken cancellationToken)
+        public async Task<GetWorkingPeriodResponse> Handle(GetWorkingPeriodRequest request, CancellationToken cancellationToken)
         {
-            WorkingPeriod? workingPeriod = _context.WorkingPeriods.Where(x => x.WorkDayId == request.WorkDayId && x.Id == request.WorkingPeriodId)
-                .SingleOrDefault();
+            WorkingPeriod workingPeriod = await _context.WorkingPeriods.Where(x => x.WorkDayId == request.WorkDayId && x.Id == request.WorkingPeriodId)
+                .SingleOrDefaultAsync();
 
             if (workingPeriod != null)
             {
-                return Task.FromResult(new GetWorkingPeriodResponse
+                return new GetWorkingPeriodResponse
                 {
                     WorkingPeriod = workingPeriod,
+                    StartDate = workingPeriod.StartTime.Date,
+                    StartTime = workingPeriod.StartTime.TimeOfDay,
+                    EndDate = workingPeriod.EndTime?.Date,
+                    EndTime = workingPeriod.EndTime?.TimeOfDay,
                     UserContext = new UserContext { User = request.User, UserEmail = request.UserEmail, UserIsAdmin = request.UserIsAdmin, CurrentContract = request.CurrentContract }
-                });
+                };
             }
 
-            return Task.FromResult(default(GetWorkingPeriodResponse));
+            return default;
         }
     }
 }

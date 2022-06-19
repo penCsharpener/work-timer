@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MudBlazor.Services;
 using NETCore.MailKit.Extensions;
 using NETCore.MailKit.Infrastructure.Internal;
 using WorkTimer.Blazor.Areas.Identity;
@@ -29,8 +30,8 @@ namespace WorkTimer.Blazor
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var mailSettings = Configuration.GetSection("MailKitOptions").Get<MailKitOptions>();
-            var passwordOptions = Configuration.GetSection(nameof(PasswordOptions)).Get<PasswordOptions>();
+            MailKitOptions? mailSettings = Configuration.GetSection("MailKitOptions").Get<MailKitOptions>();
+            PasswordOptions? passwordOptions = Configuration.GetSection(nameof(PasswordOptions)).Get<PasswordOptions>();
             services.AddEntityFramework(Configuration);
             services.AddHttpContextAccessor();
             services.AddRazorPages();
@@ -43,6 +44,7 @@ namespace WorkTimer.Blazor
             services.AddSingleton(mailSettings);
             services.AddSingleton(passwordOptions);
             services.AddMailKit(options => options.UseMailKit(mailSettings));
+            services.AddMudServices();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

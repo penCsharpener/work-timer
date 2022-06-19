@@ -11,20 +11,20 @@ using WorkTimer.Persistence.Data;
 
 namespace WorkTimer.MediatR.Pipelines
 {
-    public class UserIdPipeline<TIn, TOut> : IPipelineBehavior<TIn, TOut>
+    public class UserIdPipeline<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
         private readonly AppDbContext _context;
-        private readonly ILogger<UserIdPipeline<TIn, TOut>> _logger;
+        private readonly ILogger<UserIdPipeline<TRequest, TResponse>> _logger;
         private readonly HttpContext httpContext;
 
-        public UserIdPipeline(IHttpContextAccessor accessor, AppDbContext context, ILogger<UserIdPipeline<TIn, TOut>> logger)
+        public UserIdPipeline(IHttpContextAccessor accessor, AppDbContext context, ILogger<UserIdPipeline<TRequest, TResponse>> logger)
         {
             httpContext = accessor.HttpContext;
             _context = context;
             _logger = logger;
         }
 
-        public async Task<TOut> Handle(TIn request, CancellationToken cancellationToken, RequestHandlerDelegate<TOut> next)
+        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
             if (httpContext?.User?.Claims == null)
             {
