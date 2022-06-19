@@ -8,64 +8,60 @@ using System;
 using System.Threading.Tasks;
 using WorkTimer.Persistence.Extensions;
 
-namespace WorkTimer.Blazor
+namespace WorkTimer.Blazor;
+
+public sealed class Program
 {
-    public sealed class Program
+    public static IConfiguration? LaunchSettings { get; private set; }
+
+    public static async Task Main(string[] args)
     {
-        public static IConfiguration? LaunchSettings { get; private set; }
+        LaunchSettings = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", false, true)
+            .AddUserSecrets<Program>(true, true)
+            .Build();
 
-        public static async Task Main(string[] args)
+        Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(LaunchSettings)
+                .CreateLogger();
+
+        try
         {
-            LaunchSettings = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", false, true)
-                .AddUserSecrets<Program>(true, true)
-                .Build();
+            Log.Information("Starting up");
 
-            Log.Logger = new LoggerConfiguration()
-                    .ReadFrom.Configuration(LaunchSettings)
-                    .CreateLogger();
+            var host = CreateHostBuilder(args).Build();
 
-            try
+            using (var scope = host.Services.CreateScope())
             {
-                Log.Information("Starting up");
+                var sp = scope.ServiceProvider;
 
-                IHost? host = CreateHostBuilder(args).Build();
-
-                using (IServiceScope? scope = host.Services.CreateScope())
+                try
                 {
-                    IServiceProvider? sp = scope.ServiceProvider;
-
-                    try
-                    {
-                        await sp.MigrateDatabaseAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        ILogger<Program>? logger = sp.GetRequiredService<ILogger<Program>>();
-                        logger.LogError(ex, "An error occurred while migrating the database.");
-                    }
+                    await sp.MigrateDatabaseAsync();
                 }
-
-                await host.RunAsync();
-            }
-            catch (Exception e)
-            {
-                Log.Fatal(e, "Application start-up failed");
-            }
-            finally
-            {
-                Log.CloseAndFlush();
-            }
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            return Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
+                catch (Exception ex)
                 {
-                    webBuilder.UseStartup<Startup>()
-                        .UseUrls(LaunchSettings?.GetValue<string>("ApplicationSettings:LaunchUrls") ?? "https://localhost:4661;http://localhost:4660");
-                }).UseSerilog(Log.Logger);
+                    var logger = sp.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred while migrating the database.");
+                }
+            }
+
+            await host.RunAsync();
         }
+        catch (Exception e)
+        {
+            Log.Fatal(e, "Application start-up failed");
+        }
+        finally
+        {
+            Log.CloseAndFlush();
+        }
+    }
+
+    public static IHostBuilder CreateHostBuilder(string[] args)
+    {
+        return Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
+            .UseSerilog(Log.Logger);
     }
 }

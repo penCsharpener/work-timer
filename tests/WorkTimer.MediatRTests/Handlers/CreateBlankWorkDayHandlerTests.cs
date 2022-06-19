@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using WorkTimer.Dev.Seeding;
 using WorkTimer.Domain.Models;
-using WorkTimer.MediatR;
+using WorkTimer.MediatR.Handlers;
 using WorkTimer.Persistence.Data;
 using Xunit;
 

@@ -1,29 +1,28 @@
 using MediatR;
 using Microsoft.AspNetCore.Components;
 using System.Threading.Tasks;
-using WorkTimer.MediatR.Requests;
+using WorkTimer.MediatR.Handlers;
 
-namespace WorkTimer.Blazor.Pages.Contracts
+namespace WorkTimer.Blazor.Pages.Contracts;
+
+public partial class NewContractPage
 {
-    public partial class NewContractPage
+    public NewContractRequest Model { get; set; } = new NewContractRequest();
+
+    [Inject]
+    public IMediator Mediator { get; set; } = default!;
+
+    [Inject]
+    public NavigationManager Navi { get; set; } = default!;
+
+    private async Task HandleValidSubmitAsync()
     {
-        public NewContractRequest Model { get; set; } = new NewContractRequest();
-
-        [Inject]
-        public IMediator Mediator { get; set; } = default!;
-
-        [Inject]
-        public NavigationManager Navi { get; set; } = default!;
-
-        private async Task HandleValidSubmitAsync()
+        var result = await Mediator.Send(Model);
+        if (result)
         {
-            bool result = await Mediator.Send(Model);
-            if (result)
-            {
-                Navi.NavigateTo("contracts");
-            }
-
-            Model = new NewContractRequest();
+            Navi.NavigateTo("contracts");
         }
+
+        Model = new NewContractRequest();
     }
 }

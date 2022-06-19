@@ -8,54 +8,52 @@ using System.Threading;
 using System.Threading.Tasks;
 using WorkTimer.Domain.Models;
 using WorkTimer.MediatR.Handlers;
-using WorkTimer.MediatR.Requests;
 using WorkTimer.Persistence.Data;
 using Xunit;
 
-namespace WorkTimer.MediatRTests.Handlers
+namespace WorkTimer.MediatRTests.Handlers;
+
+public class NewContractHandlerTests
 {
-    public class NewContractHandlerTests
+    private readonly NewContractHandler _testObject;
+    private readonly DbContextOptions<AppDbContext> _options;
+
+    public NewContractHandlerTests()
     {
-        private readonly NewContractHandler _testObject;
-        private readonly DbContextOptions<AppDbContext> _options;
+        _options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
 
-        public NewContractHandlerTests()
+        _testObject = new NewContractHandler(new AppDbContext(_options), Substitute.For<ILogger<NewContractHandler>>());
+    }
+
+    [Fact]
+    public async Task Handler_Creates_New_Contract()
+    {
+        using (var context = new AppDbContext(_options))
         {
-            _options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
-
-            _testObject = new NewContractHandler(new AppDbContext(_options), Substitute.For<ILogger<NewContractHandler>>());
+            context.Contracts.Count().Should().Be(0);
         }
 
-        [Fact]
-        public async Task Handler_Creates_New_Contract()
+        var request = new NewContractRequest()
         {
-            using (var context = new AppDbContext(_options))
-            {
-                context.Contracts.Count().Should().Be(0);
-            }
+            User = new AppUser { Id = 1 },
+            Name = "New Contract",
+            Employer = "Test Employer",
+            HoursPerWeek = 35,
+            IsCurrent = true
+        };
 
-            var request = new NewContractRequest()
-            {
-                User = new AppUser { Id = 1 },
-                Name = "New Contract",
-                Employer = "Test Employer",
-                HoursPerWeek = 35,
-                IsCurrent = true
-            };
+        var response = await _testObject.Handle(request, CancellationToken.None);
 
-            var response = await _testObject.Handle(request, CancellationToken.None);
+        response.Should().BeTrue();
 
-            response.Should().BeTrue();
-
-            using (var context = new AppDbContext(_options))
-            {
-                context.Contracts.Count().Should().Be(1);
-                var contract = context.Contracts.FirstOrDefault(x => x.Name == "New Contract");
-                contract.Employer.Should().Be("Test Employer");
-                contract.HoursPerWeek.Should().Be(35);
-                contract.IsCurrent.Should().BeTrue();
-                contract.UserId.Should().Be(1);
-            }
+        using (var context = new AppDbContext(_options))
+        {
+            context.Contracts.Count().Should().Be(1);
+            var contract = context.Contracts.FirstOrDefault(x => x.Name == "New Contract");
+            contract.Employer.Should().Be("Test Employer");
+            contract.HoursPerWeek.Should().Be(35);
+            contract.IsCurrent.Should().BeTrue();
+            contract.UserId.Should().Be(1);
         }
     }
 }

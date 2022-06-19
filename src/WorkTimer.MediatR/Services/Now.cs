@@ -1,10 +1,9 @@
 ﻿using System;
 using WorkTimer.MediatR.Services.Abstractions;
 
-namespace WorkTimer.MediatR.Services
+namespace WorkTimer.MediatR.Services;
+
+public class NowTimeProvider : INow
 {
-    public class NowTimeProvider : INow
-    {
-        public DateTime Now => DateTime.Now;
-    }
+    public DateTime Now => DateTime.Now;
 }

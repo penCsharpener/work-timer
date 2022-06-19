@@ -4,53 +4,51 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using WorkTimer.Domain.Models;
-using WorkTimer.MediatR.Requests;
-using WorkTimer.MediatR.Responses;
+using WorkTimer.MediatR.Handlers;
 
-namespace WorkTimer.Blazor.Pages.WorkDay
+namespace WorkTimer.Blazor.Pages.WorkDay;
+
+public partial class WorkDayDetailPage
 {
-    public partial class WorkDayDetailPage
+    [Parameter]
+    public int WorkDayId { get; set; }
+
+    [Inject]
+    public IDialogService DialogService { get; set; } = default!;
+
+    public GetWorkDayDetailsResponse Model { get; set; }
+
+    public WorkDayType[] WorkDayTypes { get; set; } = Enum.GetValues(typeof(WorkDayType)).Cast<WorkDayType>().ToArray();
+
+    private MudTable<WorkingPeriod> _table;
+
+    protected override async Task OnInitializedAsync()
     {
-        [Parameter]
-        public int WorkDayId { get; set; }
+        Model = await Mediator.Send(new GetWorkDayDetailsRequest(WorkDayId));
+    }
 
-        [Inject]
-        public IDialogService DialogService { get; set; } = default!;
+    protected async Task HandleValidSubmitAsync()
+    {
+        var result = await Mediator.Send(Model);
+    }
 
-        public GetWorkDayDetailsResponse Model { get; set; }
-
-        public WorkDayType[] WorkDayTypes { get; set; } = Enum.GetValues(typeof(WorkDayType)).Cast<WorkDayType>().ToArray();
-
-        private MudTable<WorkingPeriod> _table;
-
-        protected override async Task OnInitializedAsync()
+    void OpenDialog()
+    {
+        DialogParameters parameters = new()
         {
-            Model = await Mediator.Send(new GetWorkDayDetailsRequest(WorkDayId));
-        }
+            { "DeleteEntity", OkClickAsync },
+        };
 
-        protected async Task HandleValidSubmitAsync()
+        DialogService.Show<ConfirmDeletionDialog>("Delete Item", parameters);
+    }
+
+    async Task OkClickAsync()
+    {
+        var result = await Mediator.Send(new DeleteWorkDayRequest(Model.WorkDay) { User = Model.UserContext.User });
+
+        if (result)
         {
-            bool result = await Mediator.Send(Model);
-        }
-
-        void OpenDialog()
-        {
-            DialogParameters parameters = new()
-            {
-                { "DeleteEntity", OkClickAsync },
-            };
-
-            DialogService.Show<ConfirmDeletionDialog>("Delete Item", parameters);
-        }
-
-        async Task OkClickAsync()
-        {
-            bool result = await Mediator.Send(new DeleteWorkDayRequest(Model.WorkDay) { User = Model.UserContext.User });
-
-            if (result)
-            {
-                Navi.NavigateTo("/");
-            }
+            Navi.NavigateTo("/");
         }
     }
 }

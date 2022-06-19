@@ -2,8 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Threading.Tasks;
-using WorkTimer.MediatR.Requests;
-using WorkTimer.MediatR.Responses;
+using WorkTimer.MediatR.Handlers;
 
 namespace WorkTimer.Blazor.Pages.WorkDay;
 
@@ -66,7 +65,7 @@ public partial class WorkingPeriodDetailsPage
 
     async Task OkClickAsync()
     {
-        bool result = await Mediator.Send(new DeleteWorkingPeriodRequest(Model.WorkingPeriod) { User = Model.UserContext.User });
+        var result = await Mediator.Send(new DeleteWorkingPeriodRequest(Model.WorkingPeriod) { User = Model.UserContext.User });
 
         if (result)
         {

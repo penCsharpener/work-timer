@@ -4,24 +4,51 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WorkTimer.Domain.Models;
-using WorkTimer.MediatR.Requests;
-using WorkTimer.MediatR.Responses;
+using WorkTimer.MediatR.Models;
 using WorkTimer.Persistence.Data;
 
-namespace WorkTimer.MediatR.Handlers {
-    public class ContractListHandler : IRequestHandler<ContractListRequest, ContractListResponse> {
-        private readonly AppDbContext _context;
+namespace WorkTimer.MediatR.Handlers;
 
-        public ContractListHandler(AppDbContext context) {
-            _context = context;
+public class ContractListRequest : UserContext, IRequest<ContractListResponse> { }
+
+public class ContractListResponse
+{
+    public ContractListResponse(ICollection<ContractListModel> contracts)
+    {
+        Contracts = contracts;
+    }
+
+    public ICollection<ContractListModel> Contracts { get; set; }
+
+    public class ContractListModel : Contract
+    {
+        public ContractListModel(Contract contract)
+        {
+            Id = contract.Id;
+            Name = contract.Name;
+            Employer = contract.Employer;
+            HoursPerWeek = contract.HoursPerWeek;
+            IsCurrent = contract.IsCurrent;
+            UserId = contract.UserId;
         }
+    }
+}
 
-        public Task<ContractListResponse> Handle(ContractListRequest request, CancellationToken cancellationToken) {
-            List<Contract> result = _context.Contracts.Where(x => x.UserId == request.User.Id).ToList();
+public class ContractListHandler : IRequestHandler<ContractListRequest, ContractListResponse>
+{
+    private readonly AppDbContext _context;
 
-            ContractListResponse response = new ContractListResponse(result.Select(x => new ContractListResponse.ContractListModel(x)).ToList());
+    public ContractListHandler(AppDbContext context)
+    {
+        _context = context;
+    }
 
-            return Task.FromResult(response);
-        }
+    public Task<ContractListResponse> Handle(ContractListRequest request, CancellationToken cancellationToken)
+    {
+        var result = _context.Contracts.Where(x => x.UserId == request.User.Id).ToList();
+
+        ContractListResponse response = new(result.Select(x => new ContractListResponse.ContractListModel(x)).ToList());
+
+        return Task.FromResult(response);
     }
 }

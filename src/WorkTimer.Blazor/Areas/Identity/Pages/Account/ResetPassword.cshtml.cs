@@ -9,80 +9,79 @@ using System.Threading.Tasks;
 using WorkTimer.Blazor.Validation;
 using WorkTimer.Domain.Models;
 
-namespace WorkTimer.Blazor.Areas.Identity.Pages.Account
+namespace WorkTimer.Blazor.Areas.Identity.Pages.Account;
+
+[AllowAnonymous]
+public class ResetPasswordModel : PageModel
 {
-    [AllowAnonymous]
-    public class ResetPasswordModel : PageModel
+    private readonly UserManager<AppUser> _userManager;
+
+    public ResetPasswordModel(UserManager<AppUser> userManager)
     {
-        private readonly UserManager<AppUser> _userManager;
+        _userManager = userManager;
+    }
 
-        public ResetPasswordModel(UserManager<AppUser> userManager)
+    [BindProperty]
+    public InputModel Input { get; set; }
+
+    public IActionResult OnGet(string? code = null)
+    {
+        if (code == null)
         {
-            _userManager = userManager;
+            return BadRequest("A code must be supplied for password reset.");
         }
 
-        [BindProperty]
-        public InputModel Input { get; set; }
+        Input = new InputModel { Code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code)) };
 
-        public IActionResult OnGet(string code = null)
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        if (!ModelState.IsValid)
         {
-            if (code == null)
-            {
-                return BadRequest("A code must be supplied for password reset.");
-            }
-
-            Input = new InputModel { Code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code)) };
-
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        var user = await _userManager.FindByEmailAsync(Input.Email);
+
+        if (user == null)
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
-            AppUser? user = await _userManager.FindByEmailAsync(Input.Email);
-
-            if (user == null)
-            {
-                // Don't reveal that the user does not exist
-                return RedirectToPage("./ResetPasswordConfirmation");
-            }
-
-            IdentityResult? result = await _userManager.ResetPasswordAsync(user, Input.Code, Input.Password);
-
-            if (result.Succeeded)
-            {
-                return RedirectToPage("./ResetPasswordConfirmation");
-            }
-
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-
-            return Page();
+            // Don't reveal that the user does not exist
+            return RedirectToPage("./ResetPasswordConfirmation");
         }
 
-        public class InputModel
+        var result = await _userManager.ResetPasswordAsync(user, Input.Code, Input.Password);
+
+        if (result.Succeeded)
         {
-            [Required]
-            [EmailAddress]
-            public string Email { get; set; }
-
-            [Required]
-            [PasswordLength(ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.")]
-            [DataType(DataType.Password)]
-            public string Password { get; set; }
-
-            [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-            public string ConfirmPassword { get; set; }
-
-            public string Code { get; set; }
+            return RedirectToPage("./ResetPasswordConfirmation");
         }
+
+        foreach (var error in result.Errors)
+        {
+            ModelState.AddModelError(string.Empty, error.Description);
+        }
+
+        return Page();
+    }
+
+    public class InputModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        [PasswordLength(ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.")]
+        [DataType(DataType.Password)]
+        public string Password { get; set; }
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm password")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; }
+
+        public string Code { get; set; }
     }
 }

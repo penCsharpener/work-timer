@@ -7,46 +7,44 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using WorkTimer.MediatR.Handlers;
-using WorkTimer.MediatR.Requests;
 using WorkTimer.Messaging;
 using WorkTimer.Messaging.MessageModels;
 using WorkTimer.Persistence.Data;
 using Xunit;
 
-namespace WorkTimer.Integration
+namespace WorkTimer.Integration;
+
+public class RecalculateHoursOfUserTests
 {
-    public class RecalculateHoursOfUserTests
+    private readonly MessageWorker _worker;
+    private readonly DbContextOptions<AppDbContext> _options;
+    private readonly IBus _bus;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly DeleteWorkingPeriodHandler _handler;
+
+    public RecalculateHoursOfUserTests()
     {
-        private readonly MessageWorker _worker;
-        private readonly DbContextOptions<AppDbContext> _options;
-        private readonly IBus _bus;
-        private readonly IServiceProvider _serviceProvider;
-        private readonly DeleteWorkingPeriodHandler _handler;
+        _options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
 
-        public RecalculateHoursOfUserTests()
+        using (var context = new AppDbContext(_options))
         {
-            _options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
 
-            using (var context = new AppDbContext(_options))
-            {
-
-            }
-
-            _bus = Substitute.For<IBus>();
-            _serviceProvider = new ServiceCollection().AddScoped(_ => new AppDbContext(_options)).BuildServiceProvider();
-
-            _worker = new MessageWorker(_bus, _serviceProvider, Substitute.For<ILogger<MessageWorker>>());
         }
 
-        [Fact]
-        public async Task Index_Runs_RecalculateHoursOfUserAsync()
-        {
-            var handlerRequest = new DeleteWorkingPeriodRequest(new() { });
+        _bus = Substitute.For<IBus>();
+        _serviceProvider = new ServiceCollection().AddScoped(_ => new AppDbContext(_options)).BuildServiceProvider();
 
-            await _handler.Handle(handlerRequest, CancellationToken.None);
+        _worker = new MessageWorker(_bus, _serviceProvider, Substitute.For<ILogger<MessageWorker>>());
+    }
 
-            var request = new UpdateTotalHoursFromWorkDayMessage(4);
-            await _worker.UpdateTotalHoursFromWorkDayAsync(request, CancellationToken.None);
-        }
+    [Fact]
+    public async Task Index_Runs_RecalculateHoursOfUserAsync()
+    {
+        var handlerRequest = new DeleteWorkingPeriodRequest(new() { });
+
+        await _handler.Handle(handlerRequest, CancellationToken.None);
+
+        var request = new UpdateTotalHoursFromWorkDayMessage(4);
+        await _worker.UpdateTotalHoursFromWorkDayAsync(request, CancellationToken.None);
     }
 }

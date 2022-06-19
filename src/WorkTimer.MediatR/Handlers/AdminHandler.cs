@@ -5,56 +5,72 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WorkTimer.MediatR.Handlers.Stats;
-using WorkTimer.MediatR.Requests;
-using WorkTimer.MediatR.Responses;
 
-namespace WorkTimer.MediatR.Handlers
+namespace WorkTimer.MediatR.Handlers;
+
+public class AdminRequest : IRequest<AdminResponse>
 {
-    public class AdminHandler : IRequestHandler<AdminRequest, AdminResponse>
+    public bool CalculateZeroHourWorkDays { get; set; }
+    public bool RecalculateAllMyWorkDays { get; set; }
+    public bool RecalculateAllUsersHours { get; set; }
+    public bool RecalculateAllWorkMonths { get; set; }
+}
+
+public class AdminResponse
+{
+    public bool HasError { get; set; }
+    public string Message { get; set; }
+
+    public static AdminResponse ErrorMessage(string message)
     {
-        private readonly ILogger<AdminHandler> _logger;
-        private readonly IMediator _mediator;
+        return new AdminResponse { HasError = true, Message = message };
+    }
+}
 
-        public AdminHandler(IMediator mediator, ILogger<AdminHandler> logger)
+public class AdminHandler : IRequestHandler<AdminRequest, AdminResponse>
+{
+    private readonly ILogger<AdminHandler> _logger;
+    private readonly IMediator _mediator;
+
+    public AdminHandler(IMediator mediator, ILogger<AdminHandler> logger)
+    {
+        _mediator = mediator;
+        _logger = logger;
+    }
+
+    public async Task<AdminResponse> Handle(AdminRequest request, CancellationToken cancellationToken)
+    {
+        try
         {
-            _mediator = mediator;
-            _logger = logger;
+            StringBuilder messageText = new();
+
+            if (request.CalculateZeroHourWorkDays)
+            {
+                messageText.Append(await _mediator.Send(new CalculateZeroHourWorkDaysRequest()));
+            }
+
+            if (request.RecalculateAllMyWorkDays)
+            {
+                messageText.Append(await _mediator.Send(new RecalculateAllMyWorkDaysRequest()));
+            }
+
+            if (request.RecalculateAllUsersHours)
+            {
+                messageText.Append(await _mediator.Send(new RecalculateAllUsersHoursRequest()));
+            }
+
+            if (request.RecalculateAllWorkMonths)
+            {
+                await _mediator.Send(new RecalculateMyMonthsRequest());
+            }
+
+            return new AdminResponse { HasError = false, Message = "Batch jobs ran successfully:" + messageText };
         }
-
-        public async Task<AdminResponse> Handle(AdminRequest request, CancellationToken cancellationToken)
+        catch (Exception ex)
         {
-            try
-            {
-                StringBuilder messageText = new StringBuilder();
+            _logger.LogError(ex, "Could not complete admin request.");
 
-                if (request.CalculateZeroHourWorkDays)
-                {
-                    messageText.Append(await _mediator.Send(new CalculateZeroHourWorkDaysRequest()));
-                }
-
-                if (request.RecalculateAllMyWorkDays)
-                {
-                    messageText.Append(await _mediator.Send(new RecalculateAllMyWorkDaysRequest()));
-                }
-
-                if (request.RecalculateAllUsersHours)
-                {
-                    messageText.Append(await _mediator.Send(new RecalculateAllUsersHoursRequest()));
-                }
-
-                if (request.RecalculateAllWorkMonths)
-                {
-                    await _mediator.Send(new RecalculateMyMonthsRequest());
-                }
-
-                return new AdminResponse { HasError = false, Message = "Batch jobs ran successfully:" + messageText };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Could not complete admin request.");
-
-                return AdminResponse.ErrorMessage("An error occurred.");
-            }
+            return AdminResponse.ErrorMessage("An error occurred.");
         }
     }
 }

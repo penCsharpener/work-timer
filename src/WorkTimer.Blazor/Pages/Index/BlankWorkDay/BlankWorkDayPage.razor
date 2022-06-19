@@ -1,4 +1,5 @@
 ﻿@page "/blankWorkday"
+@using WorkTimer.MediatR.Handlers
 @using global::MediatR
 @using WorkTimer.MediatR
 @using WorkTimer.Domain.Models
@@ -28,16 +29,4 @@
   </div>
 </EditForm>
 
-@code {
 
-  public CreateBlankWorkDayCommand Model { get; set; } = new(DateTime.Today.AddDays(1));
-
-  public WorkDayType[] WorkDayTypes { get; set; } = Enum.GetValues(typeof(WorkDayType)).Cast<WorkDayType>().ToArray();
-
-  private async Task HandleValidSubmitAsync()
-  {
-    var response = await Mediator.Send(Model);
-
-    Navi.NavigateTo($"workday/{response.WorkDay.Id}");
-  }
-}

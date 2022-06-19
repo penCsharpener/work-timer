@@ -7,67 +7,65 @@ using System.Threading;
 using System.Threading.Tasks;
 using WorkTimer.Domain.Extensions;
 using WorkTimer.MediatR.Handlers.Shared;
-using WorkTimer.MediatR.Responses;
 using WorkTimer.Messaging.Abstractions;
 using WorkTimer.Persistence.Data;
 
-namespace WorkTimer.MediatR.Handlers
+namespace WorkTimer.MediatR.Handlers;
+
+public class EditWorkDayHandler : TotalHoursBase, IRequestHandler<GetWorkDayDetailsResponse, bool>
 {
-    public class EditWorkDayHandler : TotalHoursBase, IRequestHandler<GetWorkDayDetailsResponse, bool>
+    private readonly IMessageService _messageService;
+    private readonly ILogger<EditWorkDayHandler> _logger;
+
+    public EditWorkDayHandler(AppDbContext context, IMessageService messageService, ILogger<EditWorkDayHandler> logger) : base(context)
     {
-        private readonly IMessageService _messageService;
-        private readonly ILogger<EditWorkDayHandler> _logger;
+        _messageService = messageService;
+        _logger = logger;
+    }
 
-        public EditWorkDayHandler(AppDbContext context, IMessageService messageService, ILogger<EditWorkDayHandler> logger) : base(context)
+    public async Task<bool> Handle(GetWorkDayDetailsResponse request, CancellationToken cancellationToken)
+    {
+        try
         {
-            _messageService = messageService;
-            _logger = logger;
-        }
+            var workDay = await _context.WorkDays.FirstOrDefaultAsync(wd => wd.Id == request.WorkDay.Id);
+            workDay.RequiredHours = request.WorkDay.GetRequiredHoursForDay(request.CurrentContract.HoursPerWeek);
+            workDay.WorkDayType = request.WorkDay.WorkDayType;
+            workDay.ContractId = request.WorkDay.ContractId;
 
-        public async Task<bool> Handle(GetWorkDayDetailsResponse request, CancellationToken cancellationToken)
-        {
-            try
+            var hasChanges = _context.ChangeTracker.HasChanges();
+
+            if (hasChanges)
             {
-                var workDay = await _context.WorkDays.FirstOrDefaultAsync(wd => wd.Id == request.WorkDay.Id);
-                workDay.RequiredHours = request.WorkDay.GetRequiredHoursForDay(request.CurrentContract.HoursPerWeek);
-                workDay.WorkDayType = request.WorkDay.WorkDayType;
-                workDay.ContractId = request.WorkDay.ContractId;
-
-                var hasChanges = _context.ChangeTracker.HasChanges();
-
-                if (hasChanges)
-                {
-                    await _messageService.UpdateOnEditWorkdayAsync(request.WorkDay.Id, request.User.Id);
-                }
-
-                await _context.SaveChangesAsync();
-
-                return true;
+                await _messageService.UpdateOnEditWorkdayAsync(request.WorkDay.Id, request.User.Id);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Could not update work day with id {request.WorkDay.Id}");
 
-                return false;
-            }
+            await _context.SaveChangesAsync();
+
+            return true;
         }
-
-        private void CorrectWorkDayDateBasedOnPeriods(GetWorkDayDetailsResponse request)
+        catch (Exception ex)
         {
-            var workingPeriods = request.WorkDay.WorkingPeriods.Select(x => new { x.StartTime.Date }).ToList();
+            _logger.LogError(ex, $"Could not update work day with id {request.WorkDay.Id}");
 
-            if (workingPeriods?.Count > 0)
+            return false;
+        }
+    }
+
+    private void CorrectWorkDayDateBasedOnPeriods(GetWorkDayDetailsResponse request)
+    {
+        var workingPeriods = request.WorkDay.WorkingPeriods.Select(x => new { x.StartTime.Date }).ToList();
+
+        if (workingPeriods?.Count > 0)
+        {
+            var count = workingPeriods.GroupBy(x => x.Date).Count();
+
+            if (count == 1)
             {
-                int count = workingPeriods.GroupBy(x => x.Date).Count();
+                var date = workingPeriods.FirstOrDefault().Date;
 
-                if (count == 1)
+                if (date != request.WorkDay.Date)
                 {
-                    DateTime date = workingPeriods.FirstOrDefault().Date;
-
-                    if (date != request.WorkDay.Date)
-                    {
-                        request.WorkDay.Date = date;
-                    }
+                    request.WorkDay.Date = date;
                 }
             }
         }

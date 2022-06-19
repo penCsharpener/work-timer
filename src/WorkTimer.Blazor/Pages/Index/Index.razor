@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using WorkTimer.MediatR.Handlers
 @using global::MediatR
 @inject IMediator Mediator
 @inject NavigationManager Navi;
@@ -77,60 +78,3 @@ else
 </div>
 
 
-@code {
-
-    public IndexResponse IndexResponse { get; set; }
-
-    public NewWorkingPeriodRequest NewPeriodModel { get; set; } = new NewWorkingPeriodRequest();
-
-    public string dayButtonText;
-    private MudTable<DisplayWorkDayModel> _tableWorkdays;
-    private MudTable<Domain.Models.WorkingPeriod> _tableRecent;
-
-    int pageSize = 25;
-    int pageIndex;
-
-    protected override async Task OnInitializedAsync()
-    {
-        IndexResponse = await Mediator.Send(new IndexRequest(pageIndex, pageSize));
-        EvaluateButtonText();
-        await base.OnInitializedAsync();
-    }
-
-    private void PageChanged(int i)
-    {
-        _tableWorkdays.NavigateTo(i - 1);
-    }
-
-    private async Task HandleValidSubmitAsync()
-    {
-        await Mediator.Send(NewPeriodModel);
-        NewPeriodModel = new NewWorkingPeriodRequest();
-        IndexResponse = await Mediator.Send(new IndexRequest());
-        EvaluateButtonText();
-        Navi.NavigateTo("/");
-    }
-
-    private string CheckForContracts()
-    {
-        var contract = Mediator.Send(new ContractListRequest()).GetAwaiter().GetResult();
-        if (contract?.Contracts?.Any() == false)
-        {
-            Navi.NavigateTo("/contracts/add");
-        }
-        return "";
-    }
-
-    private void EvaluateButtonText()
-    {
-        dayButtonText = IndexResponse.HasOngoingWorkPeriod ? "Stop" : "Start";
-    }
-
-    //async Task OnPage(MatPaginatorPageEvent e)
-    //{
-    //    pageSize = e.PageSize;
-    //    pageIndex = e.PageIndex;
-    //    IndexResponse = await Mediator.Send(new IndexRequest(pageIndex, pageSize));
-    //}
-
-}

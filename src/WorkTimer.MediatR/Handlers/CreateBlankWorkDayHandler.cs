@@ -10,67 +10,66 @@ using WorkTimer.Domain.Models;
 using WorkTimer.MediatR.Models;
 using WorkTimer.Persistence.Data;
 
-namespace WorkTimer.MediatR
+namespace WorkTimer.MediatR.Handlers;
+
+public class CreateBlankWorkDayCommand : UserContext, IRequest<CreateBlankWorkDayResponse>
 {
-    public class CreateBlankWorkDayCommand : UserContext, IRequest<CreateBlankWorkDayResponse>
+    public CreateBlankWorkDayCommand(DateTime date)
     {
-        public CreateBlankWorkDayCommand(DateTime date)
-        {
-            Date = date.Date;
-        }
-
-        public DateTime Date { get; set; }
-        public WorkDayType WorkDayType { get; set; } = WorkDayType.Undefined;
+        Date = date.Date;
     }
 
-    public class CreateBlankWorkDayResponse
+    public DateTime Date { get; set; }
+    public WorkDayType WorkDayType { get; set; } = WorkDayType.Undefined;
+}
+
+public class CreateBlankWorkDayResponse
+{
+    public WorkDay WorkDay { get; set; }
+}
+
+public class CreateBlankWorkDayHandler : IRequestHandler<CreateBlankWorkDayCommand, CreateBlankWorkDayResponse>
+{
+    private readonly AppDbContext _context;
+    private readonly ILogger<CreateBlankWorkDayHandler> _logger;
+
+    public CreateBlankWorkDayHandler(AppDbContext context, ILogger<CreateBlankWorkDayHandler> logger)
     {
-        public WorkDay WorkDay { get; set; }
+        _context = context;
+        _logger = logger;
     }
 
-    public class CreateBlankWorkDayHandler : IRequestHandler<CreateBlankWorkDayCommand, CreateBlankWorkDayResponse>
+    public async Task<CreateBlankWorkDayResponse> Handle(CreateBlankWorkDayCommand request, CancellationToken cancellationToken)
     {
-        private readonly AppDbContext _context;
-        private readonly ILogger<CreateBlankWorkDayHandler> _logger;
+        CreateBlankWorkDayResponse response = new();
 
-        public CreateBlankWorkDayHandler(AppDbContext context, ILogger<CreateBlankWorkDayHandler> logger)
+        try
         {
-            _context = context;
-            _logger = logger;
-        }
+            var existingWorkDay = await _context.WorkDays.FirstOrDefaultAsync(x => x.Contract.UserId == request.User.Id && x.Contract.IsCurrent && x.Date == request.Date);
 
-        public async Task<CreateBlankWorkDayResponse> Handle(CreateBlankWorkDayCommand request, CancellationToken cancellationToken)
-        {
-            var response = new CreateBlankWorkDayResponse();
-
-            try
+            if (existingWorkDay == null)
             {
-                var existingWorkDay = await _context.WorkDays.FirstOrDefaultAsync(x => x.Contract.UserId == request.User.Id && x.Contract.IsCurrent && x.Date == request.Date);
+                var contract = request.User.Contracts.FirstOrDefault();
 
-                if (existingWorkDay == null)
+                existingWorkDay = new WorkDay
                 {
-                    var contract = request.User.Contracts.FirstOrDefault();
+                    Date = request.Date,
+                    ContractId = contract.Id,
+                    RequiredHours = contract.GetContractedHoursPerDay(),
+                    WorkDayType = request.WorkDayType == WorkDayType.Undefined ? request.Date.ToWorkDayType() : request.WorkDayType,
+                };
 
-                    existingWorkDay = new WorkDay
-                    {
-                        Date = request.Date,
-                        ContractId = contract.Id,
-                        RequiredHours = contract.GetContractedHoursPerDay(),
-                        WorkDayType = request.WorkDayType == WorkDayType.Undefined ? request.Date.ToWorkDayType() : request.WorkDayType,
-                    };
-
-                    _context.WorkDays.Add(existingWorkDay);
-                    await _context.SaveChangesAsync();
-                }
-
-                response.WorkDay = existingWorkDay;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Could not create workday from date '{request.Date:G}' and user {request.User.Id}");
+                _context.WorkDays.Add(existingWorkDay);
+                await _context.SaveChangesAsync();
             }
 
-            return response;
+            response.WorkDay = existingWorkDay;
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Could not create workday from date '{request.Date:G}' and user {request.User.Id}");
+        }
+
+        return response;
     }
 }

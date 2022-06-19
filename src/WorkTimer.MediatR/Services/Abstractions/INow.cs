@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace WorkTimer.MediatR.Services.Abstractions
+namespace WorkTimer.MediatR.Services.Abstractions;
+
+public interface INow
 {
-    public interface INow
-    {
-        DateTime Now { get; }
-    }
+    DateTime Now { get; }
 }

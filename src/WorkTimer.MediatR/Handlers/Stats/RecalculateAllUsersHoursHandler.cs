@@ -1,42 +1,40 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WorkTimer.Domain.Extensions;
-using WorkTimer.Domain.Models;
 using WorkTimer.MediatR.Handlers.Shared;
-using WorkTimer.MediatR.Requests;
 using WorkTimer.Persistence.Data;
 
-namespace WorkTimer.MediatR.Handlers.Stats
+namespace WorkTimer.MediatR.Handlers.Stats;
+
+public class RecalculateAllUsersHoursRequest : IRequest<string> { }
+
+public class RecalculateAllUsersHoursHandler : TotalHoursBase, IRequestHandler<RecalculateAllUsersHoursRequest, string>
 {
-    public class RecalculateAllUsersHoursHandler : TotalHoursBase, IRequestHandler<RecalculateAllUsersHoursRequest, string>
+    private readonly ILogger<RecalculateAllUsersHoursHandler> _logger;
+
+    public RecalculateAllUsersHoursHandler(AppDbContext context, ILogger<RecalculateAllUsersHoursHandler> logger) : base(context)
     {
-        private readonly ILogger<RecalculateAllUsersHoursHandler> _logger;
+        _logger = logger;
+    }
 
-        public RecalculateAllUsersHoursHandler(AppDbContext context, ILogger<RecalculateAllUsersHoursHandler> logger) : base(context)
+    public Task<string> Handle(RecalculateAllUsersHoursRequest request, CancellationToken cancellationToken)
+    {
+        var workdays = _context.WorkDays.Include(x => x.Contract).Include(x => x.WorkingPeriods).ToList();
+
+        foreach (var workDay in workdays)
         {
-            _logger = logger;
+            UpdateTotalHoursOfWorkDay(workDay);
+            workDay.RequiredHours = workDay.GetRequiredHoursForDay(workDay.Contract.HoursPerWeek);
         }
 
-        public Task<string> Handle(RecalculateAllUsersHoursRequest request, CancellationToken cancellationToken)
-        {
-            List<WorkDay> workdays = _context.WorkDays.Include(x => x.Contract).Include(x => x.WorkingPeriods).ToList();
+        _context.SaveChanges();
 
-            foreach (WorkDay workDay in workdays)
-            {
-                UpdateTotalHoursOfWorkDay(workDay);
-                workDay.RequiredHours = workDay.GetRequiredHoursForDay(workDay.Contract.HoursPerWeek);
-            }
+        _logger.LogInformation($"Processed {workdays.Count} work days.");
 
-            _context.SaveChanges();
-
-            _logger.LogInformation($"Processed {workdays.Count} work days.");
-
-            return Task.FromResult($"Processed {workdays.Count} work days.");
-        }
+        return Task.FromResult($"Processed {workdays.Count} work days.");
     }
 }
