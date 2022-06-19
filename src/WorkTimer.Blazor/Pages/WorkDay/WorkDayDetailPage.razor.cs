@@ -15,7 +15,7 @@ namespace WorkTimer.Blazor.Pages.WorkDay
         public int WorkDayId { get; set; }
 
         [Inject]
-        public IDialogService DialogService { get; set; }
+        public IDialogService DialogService { get; set; } = default!;
 
         public GetWorkDayDetailsResponse Model { get; set; }
 

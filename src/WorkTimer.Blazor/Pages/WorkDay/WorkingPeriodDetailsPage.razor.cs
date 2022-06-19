@@ -16,15 +16,15 @@ public partial class WorkingPeriodDetailsPage
     public int WorkingPeriodId { get; set; }
 
     [Inject]
-    public IDialogService DialogService { get; set; }
+    public IDialogService DialogService { get; set; } = default!;
 
     [Inject]
-    public IMediator Mediator { get; set; }
+    public IMediator Mediator { get; set; } = default!;
 
     [Inject]
-    public NavigationManager Navi { get; set; }
+    public NavigationManager Navi { get; set; } = default!;
 
-    public GetWorkingPeriodResponse Model { get; set; }
+    public GetWorkingPeriodResponse Model { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -33,7 +33,19 @@ public partial class WorkingPeriodDetailsPage
 
     protected async Task HandleValidSubmitAsync()
     {
-        bool result = await Mediator.Send(Model);
+        Model.WorkingPeriod.StartTime = Model.StartDate!.Value.Add(Model.StartTime!.Value);
+
+        if (Model.EndDate is not null && Model.EndTime is not null)
+        {
+            Model.WorkingPeriod.EndTime = Model.EndDate!.Value.Add(Model.EndTime!.Value);
+        }
+        else
+        {
+            Model.WorkingPeriod.EndTime = null;
+        }
+
+        await Mediator.Send(Model);
+
         Navi.NavigateTo($"/workday/{Model.WorkingPeriod.WorkDayId}");
     }
 

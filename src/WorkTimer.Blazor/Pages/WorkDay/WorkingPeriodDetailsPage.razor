@@ -11,12 +11,12 @@
 
       <div class="">
         <div class="d-flex flex-row gap-4">
-            <MudDatePicker Label="Start Date" Class="form-control" Mask="@(new DateMask("dd.MM.yyyy"))" DateFormat="dd.MM.yyyy" @bind-Date="Model.StartDate" />
+            <MudDatePicker Label="Start Date" Mask="@(new DateMask("dd.MM.yyyy"))" DateFormat="dd.MM.yyyy" @bind-Date="Model.StartDate" />
             <MudTimePicker Label="Start Time" Editable="true" @bind-Time="Model.StartTime" />
         </div>
 
         <div class="d-flex flex-row gap-4">
-          <MudDatePicker Label="End Date" Class="form-control" Mask="@(new DateMask("dd.MM.yyyy"))" DateFormat="dd.MM.yyyy" @bind-Value="Model.EndDate" />
+          <MudDatePicker Label="End Date" Mask="@(new DateMask("dd.MM.yyyy"))" DateFormat="dd.MM.yyyy" @bind-Date="Model.EndDate" />
           <MudTimePicker Label="End Time" Editable="true" @bind-Time="Model.EndTime" />
         </div>
       </div>

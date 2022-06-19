@@ -39,25 +39,27 @@
   <MudFab Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" OnClick="@OpenDialog">Delete</MudFab>
 </div>
 
-<MudTable @ref="_table" Items="Model.WorkingPeriods" Dense="true" Striped="true" Hover="true" RowsPerPage="20" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
-  <HeaderContent>
-    <MudTh>Id</MudTh>
-    <MudTh>Start Time</MudTh>
-    <MudTh>End Time</MudTh>
-    <MudTh>Length</MudTh>
-    <MudTh>Comment</MudTh>
-    <MudTh>Edit</MudTh>
-  </HeaderContent>
-  <RowTemplate>
-    <MudTd DataLabel="Id">@context.Id</MudTd>
-    <MudTd DataLabel="Start Time">@context.StartTime.ToString()</MudTd>
-    <MudTd DataLabel="End Time">@context.EndTime.ToString()</MudTd>
-    <MudTd DataLabel="Length">@context.GetWorkTime().ToTimeString()</MudTd>
-    <MudTd DataLabel="Comment">@context.Comment</MudTd>
-    <MudTd DataLabel="Edit">
-      <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Href="@($"workday/{context.WorkDayId}/workperiod/{context.Id}")"></MudIconButton>
-    </MudTd>
-  </RowTemplate>
-</MudTable>
+<MudPaper Class="mt-10" Elevation="4">
+  <MudTable @ref="_table" Items="Model.WorkingPeriods" Dense="true" Striped="true" Hover="true" RowsPerPage="20" Breakpoint="Breakpoint.Xs" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+      <MudTh>Id</MudTh>
+      <MudTh>Start Time</MudTh>
+      <MudTh>End Time</MudTh>
+      <MudTh>Length</MudTh>
+      <MudTh>Comment</MudTh>
+      <MudTh>Edit</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+      <MudTd DataLabel="Id">@context.Id</MudTd>
+      <MudTd DataLabel="Start Time">@context.StartTime.ToString()</MudTd>
+      <MudTd DataLabel="End Time">@context.EndTime.ToString()</MudTd>
+      <MudTd DataLabel="Length">@context.GetWorkTime().ToTimeString()</MudTd>
+      <MudTd DataLabel="Comment">@context.Comment</MudTd>
+      <MudTd DataLabel="Edit">
+        <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Href="@($"workday/{context.WorkDayId}/workperiod/{context.Id}")"></MudIconButton>
+      </MudTd>
+    </RowTemplate>
+  </MudTable>
+</MudPaper>
 
 

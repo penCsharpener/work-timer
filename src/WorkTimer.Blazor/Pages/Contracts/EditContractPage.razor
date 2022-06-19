@@ -1,57 +1,27 @@
 ﻿@page "/contracts/{ContractId:int}"
-@using global::MediatR
-@inject IMediator Mediator
-@inject NavigationManager Navi
 @attribute [Authorize]
 
-<h3>Edit Contract</h3>
+<MudText Typo="Typo.h4" Class="mb-5">Edit Contract</MudText>
 
-<EditForm Model="@Model" OnValidSubmit="@HandleValidSubmitAsync">
-    <DataAnnotationsValidator/>
-    <ValidationSummary/>
-    <div class="form-group">
-        <label for="txtName">Name</label>
-        <InputText class="form-control" id="txtName" @bind-Value="@Model.Name"/>
+<MudPaper Class="pa-6" Elevation="4">
+
+  <EditForm class="d-flex flex-column gap-6" Model="@Model" OnValidSubmit="@HandleValidSubmitAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <MudTextField Label="Name" @bind-Value="@Model.Name" />
+    <MudTextField Label="Employer" @bind-Value="@Model.Employer" />
+    <MudNumericField Label="Contracted hours per week" @bind-Value="@Model.HoursPerWeek" Min="1" Max="40" />
+    <MudCheckBox Label="Is currently active contract" @bind-Checked="@Model.IsCurrent" />
+
+    <div>
+      <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Primary">Save</MudButton>
     </div>
-    <div class="form-group">
-        <label for="txtEmployer">Employer</label>
-        <InputText class="form-control" id="txtEmployer" @bind-Value="@Model.Employer"/>
-    </div>
-    <div class="form-group">
-        <label for="numHoursPerWeek">Contracted hours per week</label>
-        <InputNumber class="form-control" id="numHoursPerWeek" @bind-Value="@Model.HoursPerWeek"/>
-    </div>
-    <div class="form-group form-check">
-        <InputCheckbox class="form-check-input" id="chkIsCurrent" @bind-Value="@Model.IsCurrent"/>
-        <label class="form-check-label" for="chkIsCurrent">Is currently active contract</label>
-    </div>
+  </EditForm>
 
-    <button type="submit" class="btn btn-primary">Save</button>
-</EditForm>
+</MudPaper>
 
-@code {
 
-    public GetContractResponse Model { get; set; }
-
-    [Parameter]
-    public int ContractId { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        Model = await Mediator.Send(new GetContractRequest(ContractId));
-    }
-
-    private async Task HandleValidSubmitAsync()
-    {
-        var result = await Mediator.Send(Model);
-        if (result)
-        {
-            Navi.NavigateTo("contracts");
-        }
-        else
-        {
-            Navi.NavigateTo($"contracts/{ContractId}");
-        }
-    }
-
-}
+<div class="fixed-delete-button">
+  <MudFab Color="Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@OpenDialog"></MudFab>
+</div>

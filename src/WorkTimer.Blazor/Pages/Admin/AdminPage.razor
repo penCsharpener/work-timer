@@ -28,22 +28,23 @@
     </div>
 </EditForm>
 
-
 <div class="container">
-    <p class="text-left @(ResponseModel.HasError ? "text-danger" : "text-info")">@ResponseModel.Message</p>
+  <MudText Class="mt-5 text-left" Style="@_errorTextStyle">@ResponseModel.Message</MudText>
 </div>
 
 @code {
 
-    public AdminRequest RequestModel { get; set; } = new AdminRequest();
+  public AdminRequest RequestModel { get; set; } = new AdminRequest();
 
-    public AdminResponse ResponseModel { get; set; } = new AdminResponse();
+  public AdminResponse ResponseModel { get; set; } = new AdminResponse();
 
-    protected override async Task OnInitializedAsync() { }
+  private string _errorTextStyle = "color: var(--mud-palette-info-text);";
 
-    private async Task HandleValidSubmitAsync()
-    {
-        ResponseModel = await Mediator.Send(RequestModel);
-    }
+  private async Task HandleValidSubmitAsync()
+  {
+    ResponseModel = await Mediator.Send(RequestModel);
+
+    _errorTextStyle = ResponseModel.HasError ? "color: var(--mud-palette-error);" : "color: var(--mud-palette-info-text);";
+  }
 
 }

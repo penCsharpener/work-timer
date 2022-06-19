@@ -3,3 +3,9 @@
     bottom: 2rem;
     right: 2rem;
 }
+
+.fixed-add-button {
+    position: fixed;
+    bottom: 6rem;
+    right: 2rem;
+}

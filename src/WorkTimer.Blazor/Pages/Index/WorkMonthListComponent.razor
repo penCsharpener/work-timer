@@ -4,35 +4,37 @@
 
 <MudText Typo="Typo.h4">Work Months</MudText>
 
-@if(Response?.Months != null)
+@if (Response?.Months != null)
 {
-    <MudTable @ref="_table" Items="Response.Months" Dense="true" Striped="true" Hover="true" RowsPerPage="20" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
-        <HeaderContent>
-            <MudTh>Year-Month</MudTh>
-            <MudTh>Days Worked</MudTh>
-            <MudTh>Total Hours</MudTh>
-            <MudTh>Total Overhours</MudTh>
-            <MudTh>Details</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Year-Month">@context.Year-@context.Month</MudTd>
-            <MudTd DataLabel="Days Worked">@context.DaysWorked</MudTd>
-            <MudTd DataLabel="Total Hours">@context.TotalHours (@context.RequiredHours)</MudTd>
-            <MudTd DataLabel="Total Overhours">@context.TotalOverhours</MudTd>
-            <MudTd DataLabel="Details">
-                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Href="@($"workmonth/{context.Year}/{context.Month}")"></MudIconButton>
-            </MudTd>
-        </RowTemplate>
+  <MudPaper Elevation="4">
+    <MudTable @ref="_table" Items="Response.Months" Dense="true" Striped="true" Hover="true" RowsPerPage="20" Breakpoint="Breakpoint.Xs" LoadingProgressColor="Color.Info">
+      <HeaderContent>
+        <MudTh>Year-Month</MudTh>
+        <MudTh>Days Worked</MudTh>
+        <MudTh>Total Hours</MudTh>
+        <MudTh>Total Overhours</MudTh>
+        <MudTh>Details</MudTh>
+      </HeaderContent>
+      <RowTemplate>
+        <MudTd DataLabel="Year-Month">@context.Year-@context.Month</MudTd>
+        <MudTd DataLabel="Days Worked">@context.DaysWorked</MudTd>
+        <MudTd DataLabel="Total Hours">@context.TotalHours (@context.RequiredHours)</MudTd>
+        <MudTd DataLabel="Total Overhours">@context.TotalOverhours</MudTd>
+        <MudTd DataLabel="Details">
+          <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Href="@($"workmonth/{context.Year}/{context.Month}")"></MudIconButton>
+        </MudTd>
+      </RowTemplate>
     </MudTable>
+  </MudPaper>
 }
 
 @code {
-    public GetWorkMonthsResponse Response { get; set; }
+  public GetWorkMonthsResponse Response { get; set; }
 
-    private MudTable<WorkMonthsListModel> _table;
+  private MudTable<WorkMonthsListModel> _table;
 
-    protected override async Task OnInitializedAsync()
-    {
-        Response = await Mediator.Send(new GetWorkMonthsRequest());
-    }
+  protected override async Task OnInitializedAsync()
+  {
+    Response = await Mediator.Send(new GetWorkMonthsRequest());
+  }
 }

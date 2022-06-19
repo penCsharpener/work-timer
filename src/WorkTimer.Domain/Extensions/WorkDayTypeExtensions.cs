@@ -6,6 +6,11 @@ namespace WorkTimer.Domain.Extensions
 {
     public static class WorkDayTypeExtensions
     {
+        static WorkDayTypeExtensions()
+        {
+            DateSystem.LicenseKey = "LostTimeIsNeverFoundAgain";
+        }
+
         public static WorkDayType ToWorkDayType(this DateTime date)
         {
             if (DateSystem.IsPublicHoliday(date, CountryCode.DE, "DE-SN"))

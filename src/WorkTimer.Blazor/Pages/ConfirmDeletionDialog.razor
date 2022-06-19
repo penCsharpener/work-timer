@@ -16,7 +16,7 @@
 
 @code {
   [Parameter]
-  public Func<Task> DeleteEntity { get; set; }
+  public Func<Task> DeleteEntity { get; set; } = default!;
 
   private bool visible;
   private int rating;

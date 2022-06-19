@@ -16,26 +16,28 @@
 
 <MudText Typo="Typo.h4" Class="my-4">Most recent work periods</MudText>
 
-<MudTable @ref="_tableRecent" Items="IndexResponse?.MostRecentWorkPeriods" Dense="true" Striped="true" Hover="true" RowsPerPage="20" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
-    <HeaderContent>
-        <MudTh>Id</MudTh>
-        <MudTh>Start Time</MudTh>
-        <MudTh>End Time</MudTh>
-        <MudTh>Length</MudTh>
-        <MudTh>Comment</MudTh>
-        <MudTh>Edit</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Id">@context.Id</MudTd>
-        <MudTd DataLabel="Start Time">@context.StartTime.ToString()</MudTd>
-        <MudTd DataLabel="End Time">@context.EndTime.ToString()</MudTd>
-        <MudTd DataLabel="Length">@context.GetWorkTime().ToTimeString()</MudTd>
-        <MudTd DataLabel="Comment">@context.Comment</MudTd>
-        <MudTd DataLabel="Edit">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Href="@($"workday/{context.WorkDayId}/workperiod/{context.Id}")"></MudIconButton>
-        </MudTd>
-    </RowTemplate>
-</MudTable>
+<MudPaper Elevation="4">
+  <MudTable @ref="_tableRecent" Items="IndexResponse?.MostRecentWorkPeriods" Dense="true" Striped="true" Hover="true" RowsPerPage="20" Breakpoint="Breakpoint.Xs" LoadingProgressColor="Color.Info">
+      <HeaderContent>
+          <MudTh>Id</MudTh>
+          <MudTh>Start Time</MudTh>
+          <MudTh>End Time</MudTh>
+          <MudTh>Length</MudTh>
+          <MudTh>Comment</MudTh>
+          <MudTh>Edit</MudTh>
+      </HeaderContent>
+      <RowTemplate>
+          <MudTd DataLabel="Id">@context.Id</MudTd>
+          <MudTd DataLabel="Start Time">@context.StartTime.ToString()</MudTd>
+          <MudTd DataLabel="End Time">@context.EndTime.ToString()</MudTd>
+          <MudTd DataLabel="Length">@context.GetWorkTime().ToTimeString()</MudTd>
+          <MudTd DataLabel="Comment">@context.Comment</MudTd>
+          <MudTd DataLabel="Edit">
+              <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Href="@($"workday/{context.WorkDayId}/workperiod/{context.Id}")"></MudIconButton>
+          </MudTd>
+      </RowTemplate>
+  </MudTable>
+</MudPaper>
 
 @if (IndexResponse?.WorkDays?.Items.Any() == true)
 {
@@ -43,7 +45,8 @@
 
     <p class="my-3">@IndexResponse.TotalOverHours.ToTimeString()</p>
 
-    <MudTable @ref="_tableWorkdays" Items="IndexResponse.WorkDays.Items" Dense="true" Striped="true" Hover="true" RowsPerPage="20" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+  <MudPaper Elevation="4">
+    <MudTable @ref="_tableWorkdays" Items="IndexResponse.WorkDays.Items" Dense="true" Striped="true" Hover="true" RowsPerPage="20" Breakpoint="Breakpoint.Xs" LoadingProgressColor="Color.Info">
       <HeaderContent>
         <MudTh>Date</MudTh>
         <MudTh>Time worked</MudTh>
@@ -62,6 +65,7 @@
         <MudPagination SelectedChanged="PageChanged" Count="@((_tableWorkdays.GetFilteredItemsCount() + _tableWorkdays.RowsPerPage - 1) / _tableWorkdays.RowsPerPage)" Class="pa-4"/>
     </PagerContent>
     </MudTable>
+  </MudPaper>
 }
 else
 {
