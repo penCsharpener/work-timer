@@ -5,78 +5,83 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using WorkTimer.Domain.Models;
 
-namespace WorkTimer.Blazor.Areas.Identity.Pages.Account.Manage {
-    public class SetPasswordModel : PageModel {
-        private readonly SignInManager<AppUser> _signInManager;
-        private readonly UserManager<AppUser> _userManager;
+namespace WorkTimer.Blazor.Areas.Identity.Pages.Account.Manage;
+public class SetPasswordModel : PageModel
+{
+    private readonly SignInManager<AppUser> _signInManager;
+    private readonly UserManager<AppUser> _userManager;
 
-        public SetPasswordModel(
-            UserManager<AppUser> userManager,
-            SignInManager<AppUser> signInManager) {
-            _userManager = userManager;
-            _signInManager = signInManager;
+    public SetPasswordModel(
+        UserManager<AppUser> userManager,
+        SignInManager<AppUser> signInManager)
+    {
+        _userManager = userManager;
+        _signInManager = signInManager;
+    }
+
+    [BindProperty]
+    public InputModel Input { get; set; }
+
+    [TempData]
+    public string StatusMessage { get; set; }
+
+    public async Task<IActionResult> OnGetAsync()
+    {
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user == null)
+        {
+            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
         }
 
-        [BindProperty]
-        public InputModel Input { get; set; }
+        var hasPassword = await _userManager.HasPasswordAsync(user);
 
-        [TempData]
-        public string StatusMessage { get; set; }
+        return hasPassword ? RedirectToPage("./ChangePassword") : Page();
+    }
 
-        public async Task<IActionResult> OnGetAsync() {
-            AppUser? user = await _userManager.GetUserAsync(User);
+    public async Task<IActionResult> OnPostAsync()
+    {
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
 
-            if (user == null) {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
+        var user = await _userManager.GetUserAsync(User);
 
-            bool hasPassword = await _userManager.HasPasswordAsync(user);
+        if (user == null)
+        {
+            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+        }
 
-            if (hasPassword) {
-                return RedirectToPage("./ChangePassword");
+        var addPasswordResult = await _userManager.AddPasswordAsync(user, Input.NewPassword);
+
+        if (!addPasswordResult.Succeeded)
+        {
+            foreach (var error in addPasswordResult.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
             }
 
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync() {
-            if (!ModelState.IsValid) {
-                return Page();
-            }
+        await _signInManager.RefreshSignInAsync(user);
+        StatusMessage = "Your password has been set.";
 
-            AppUser? user = await _userManager.GetUserAsync(User);
+        return RedirectToPage();
+    }
 
-            if (user == null) {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
+    public class InputModel
+    {
+        [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = "New password")]
+        public string NewPassword { get; set; }
 
-            IdentityResult? addPasswordResult = await _userManager.AddPasswordAsync(user, Input.NewPassword);
-
-            if (!addPasswordResult.Succeeded) {
-                foreach (var error in addPasswordResult.Errors) {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-
-                return Page();
-            }
-
-            await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your password has been set.";
-
-            return RedirectToPage();
-        }
-
-        public class InputModel {
-            [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-            [DataType(DataType.Password)]
-            [Display(Name = "New password")]
-            public string NewPassword { get; set; }
-
-            [DataType(DataType.Password)]
-            [Display(Name = "Confirm new password")]
-            [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
-            public string ConfirmPassword { get; set; }
-        }
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm new password")]
+        [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; }
     }
 }

@@ -67,13 +67,13 @@ public partial class IndexHandler : IRequestHandler<IndexRequest, IndexResponse>
             return new IndexResponse();
         }
 
-        int count = await _context.WorkingPeriods
+        var count = await _context.WorkingPeriods
             .Where(x => x.WorkDay.Contract.UserId == request.User.Id && x.WorkDay.Contract.IsCurrent && x.WorkDay.WorkingPeriods.All(x => x.EndTime.HasValue))
             .CountAsync();
 
-        List<DisplayWorkDayModel> results = MapDisplayModel(request).ToList();
+        var results = MapDisplayModel(request).ToList();
 
-        List<WorkingPeriod> mostRecent = _context.WorkingPeriods.Include(x => x.WorkDay).ThenInclude(x => x.Contract)
+        var mostRecent = _context.WorkingPeriods.Include(x => x.WorkDay).ThenInclude(x => x.Contract)
             .Where(x => x.WorkDay.Contract.UserId == request.User.Id && x.WorkDay.Contract.IsCurrent)
             .OrderByDescending(x => x.StartTime)
             .Take(5)
@@ -90,18 +90,18 @@ public partial class IndexHandler : IRequestHandler<IndexRequest, IndexResponse>
 
     private IEnumerable<DisplayWorkDayModel> MapDisplayModel(IndexRequest request)
     {
-        IEnumerable<WorkDay> workDays = _context.WorkDays.Include(x => x.Contract).Include(x => x.WorkingPeriods)
+        var workDays = _context.WorkDays.Include(x => x.Contract).Include(x => x.WorkingPeriods)
             .Where(x => x.Contract.UserId == request.User.Id && x.Contract.IsCurrent)
             .OrderByDescending(x => x.Date)
             .Skip(request.PagingFilter.SkippedItems)
             .Take(request.PagingFilter.PageSize)
             .AsEnumerable();
 
-        foreach (WorkDay workDay in workDays)
+        foreach (var workDay in workDays)
         {
-            double contractedHours = workDay.Contract.GetContractedHoursPerDay();
-            double secondsWorked = TimeSpan.FromHours(workDay.TotalHours).TotalSeconds;
-            double overHoursSeconds = secondsWorked - (contractedHours * 60 * 60 * workDay.WorkDayType.GetWorkHourMultiplier());
+            var contractedHours = workDay.Contract.GetContractedHoursPerDay();
+            var secondsWorked = TimeSpan.FromHours(workDay.TotalHours).TotalSeconds;
+            var overHoursSeconds = secondsWorked - (contractedHours * 60 * 60 * workDay.WorkDayType.GetWorkHourMultiplier());
 
             yield return new DisplayWorkDayModel(workDay)
             {

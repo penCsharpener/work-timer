@@ -16,11 +16,11 @@ public partial class WorkDayDetailPage
     [Inject]
     public IDialogService DialogService { get; set; } = default!;
 
-    public GetWorkDayDetailsResponse Model { get; set; }
+    public GetWorkDayDetailsResponse? Model { get; set; }
 
     public WorkDayType[] WorkDayTypes { get; set; } = Enum.GetValues(typeof(WorkDayType)).Cast<WorkDayType>().ToArray();
 
-    private MudTable<WorkingPeriod> _table;
+    private MudTable<WorkingPeriod>? _table;
 
     protected override async Task OnInitializedAsync()
     {
@@ -32,7 +32,7 @@ public partial class WorkDayDetailPage
         var result = await Mediator.Send(Model);
     }
 
-    void OpenDialog()
+    private void OpenDialog()
     {
         DialogParameters parameters = new()
         {
@@ -42,7 +42,7 @@ public partial class WorkDayDetailPage
         DialogService.Show<ConfirmDeletionDialog>("Delete Item", parameters);
     }
 
-    async Task OkClickAsync()
+    private async Task OkClickAsync()
     {
         var result = await Mediator.Send(new DeleteWorkDayRequest(Model.WorkDay) { User = Model.UserContext.User });
 

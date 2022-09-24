@@ -2,28 +2,19 @@
 using System;
 using WorkTimer.Domain.Models;
 
-namespace WorkTimer.Domain.Extensions
+namespace WorkTimer.Domain.Extensions;
+
+public static class WorkDayTypeExtensions
 {
-    public static class WorkDayTypeExtensions
+    static WorkDayTypeExtensions()
     {
-        static WorkDayTypeExtensions()
-        {
-            DateSystem.LicenseKey = "LostTimeIsNeverFoundAgain";
-        }
+        DateSystem.LicenseKey = "LostTimeIsNeverFoundAgain";
+    }
 
-        public static WorkDayType ToWorkDayType(this DateTime date)
-        {
-            if (DateSystem.IsPublicHoliday(date, CountryCode.DE, "DE-SN"))
-            {
-                return WorkDayType.BankHoliday;
-            }
-
-            if (DateSystem.IsWeekend(date, CountryCode.DE))
-            {
-                return WorkDayType.Weekend;
-            }
-
-            return WorkDayType.Workday;
-        }
+    public static WorkDayType ToWorkDayType(this DateTime date)
+    {
+        return DateSystem.IsPublicHoliday(date, CountryCode.DE, "DE-SN")
+            ? WorkDayType.BankHoliday
+            : DateSystem.IsWeekend(date, CountryCode.DE) ? WorkDayType.Weekend : WorkDayType.Workday;
     }
 }

@@ -7,14 +7,14 @@ namespace WorkTimer.Blazor.Pages.Index;
 
 public partial class Index
 {
-    public IndexResponse IndexResponse { get; set; }
+    public IndexResponse? IndexResponse { get; set; }
 
     public NewWorkingPeriodRequest NewPeriodModel { get; set; } = new NewWorkingPeriodRequest();
-    public string dayButtonText;
-    private MudTable<DisplayWorkDayModel> _tableWorkdays;
-    private MudTable<Domain.Models.WorkingPeriod> _tableRecent;
-    readonly int pageSize = 25;
-    readonly int pageIndex;
+    public string? dayButtonText;
+    private MudTable<DisplayWorkDayModel>? _tableWorkdays;
+    private MudTable<Domain.Models.WorkingPeriod>? _tableRecent;
+    private readonly int pageSize = 25;
+    private readonly int pageIndex;
     protected override async Task OnInitializedAsync()
     {
         IndexResponse = await Mediator.Send(new IndexRequest(pageIndex, pageSize));

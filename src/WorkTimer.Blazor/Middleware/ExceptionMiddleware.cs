@@ -4,45 +4,44 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace WorkTimer.Blazor.Middleware
+namespace WorkTimer.Blazor.Middleware;
+
+public class ExceptionMiddleware
 {
-    public class ExceptionMiddleware
+    private readonly ILogger<ExceptionMiddleware> _logger;
+    private readonly RequestDelegate _next;
+
+    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
     {
-        private readonly ILogger<ExceptionMiddleware> _logger;
-        private readonly RequestDelegate _next;
+        _next = next;
+        _logger = logger;
+    }
 
-        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+    public async Task Invoke(HttpContext context)
+    {
+        try
         {
-            _next = next;
-            _logger = logger;
+            await _next(context);
         }
-
-        public async Task Invoke(HttpContext context)
+        catch (Exception ex)
         {
-            try
-            {
-                await _next(context);
-            }
-            catch (Exception ex)
-            {
-                await HandleUnhandledError(context, ex);
-            }
+            await HandleUnhandledError(context, ex);
         }
+    }
 
-        private Task HandleUnhandledError(HttpContext context, Exception exception)
-        {
-            _logger.LogError(exception, "Unhandled Error.");
+    private Task HandleUnhandledError(HttpContext context, Exception exception)
+    {
+        _logger.LogError(exception, "Unhandled Error.");
 
-            context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+        context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
 
-            return context.Response.WriteAsync(string.Empty);
-        }
+        return context.Response.WriteAsync(string.Empty);
+    }
 
-        private Task HandleObjectDisposedError(HttpContext context, ObjectDisposedException exception)
-        {
-            context.Response.StatusCode = (int) HttpStatusCode.BadRequest;
+    private Task HandleObjectDisposedError(HttpContext context, ObjectDisposedException exception)
+    {
+        context.Response.StatusCode = (int) HttpStatusCode.BadRequest;
 
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
     }
 }

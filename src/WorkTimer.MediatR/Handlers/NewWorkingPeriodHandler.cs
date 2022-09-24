@@ -53,10 +53,7 @@ public class NewWorkingPeriodHandler : TotalHoursBase, IRequestHandler<NewWorkin
                                                   .Include(x => x.Contract)
                                                   .FirstOrDefaultAsync(x => x.Contract.UserId == request.User.Id && x.Contract.IsCurrent && x.Date == _now.Now.Date);
 
-        if (workDayToday is null)
-        {
-            workDayToday = CreateWorkday(request.CurrentContract);
-        }
+        workDayToday ??= CreateWorkday(request.CurrentContract);
 
         workDayToday.WorkingPeriods.Add(new() { Comment = request.Comment, StartTime = _now.Now });
         workDayToday.RequiredHours = workDayToday.GetRequiredHoursForDay(request.CurrentContract.HoursPerWeek);

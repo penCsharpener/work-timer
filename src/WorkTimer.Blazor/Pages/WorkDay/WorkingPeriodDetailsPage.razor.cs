@@ -34,14 +34,7 @@ public partial class WorkingPeriodDetailsPage
     {
         Model.WorkingPeriod.StartTime = Model.StartDate!.Value.Add(Model.StartTime!.Value);
 
-        if (Model.EndDate is not null && Model.EndTime is not null)
-        {
-            Model.WorkingPeriod.EndTime = Model.EndDate!.Value.Add(Model.EndTime!.Value);
-        }
-        else
-        {
-            Model.WorkingPeriod.EndTime = null;
-        }
+        Model.WorkingPeriod.EndTime = Model.EndDate is not null && Model.EndTime is not null ? Model.EndDate!.Value.Add(Model.EndTime!.Value) : null;
 
         await Mediator.Send(Model);
 
@@ -53,7 +46,7 @@ public partial class WorkingPeriodDetailsPage
         return Model.WorkingPeriod.EndTime.HasValue ? " - " + Model.WorkingPeriod.EndTime.Value : "";
     }
 
-    void OpenDialog()
+    private void OpenDialog()
     {
         DialogParameters parameters = new()
         {
@@ -63,7 +56,7 @@ public partial class WorkingPeriodDetailsPage
         DialogService.Show<ConfirmDeletionDialog>("Delete", parameters);
     }
 
-    async Task OkClickAsync()
+    private async Task OkClickAsync()
     {
         var result = await Mediator.Send(new DeleteWorkingPeriodRequest(Model.WorkingPeriod) { User = Model.UserContext.User });
 

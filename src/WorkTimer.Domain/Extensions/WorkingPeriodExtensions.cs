@@ -1,18 +1,12 @@
 ﻿using System;
 using WorkTimer.Domain.Models;
 
-namespace WorkTimer.Domain.Extensions
-{
-    public static class WorkingPeriodExtensions
-    {
-        public static TimeSpan GetWorkTime(this WorkingPeriod period)
-        {
-            if (period.EndTime.HasValue)
-            {
-                return period.EndTime.Value - period.StartTime;
-            }
+namespace WorkTimer.Domain.Extensions;
 
-            return DateTime.Now - period.StartTime;
-        }
+public static class WorkingPeriodExtensions
+{
+    public static TimeSpan GetWorkTime(this WorkingPeriod period)
+    {
+        return period.EndTime.HasValue ? period.EndTime.Value - period.StartTime : DateTime.Now - period.StartTime;
     }
 }

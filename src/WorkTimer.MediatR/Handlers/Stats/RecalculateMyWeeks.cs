@@ -166,7 +166,7 @@ public class RecalculateMyWeeksHandler : TotalHoursBase, IRequestHandler<Recalcu
         var totalHours = workDays.Sum(x => CalculateTotalHoursFromWorkDay(x));
         var totalOverhours = workDays.Sum(x => x.GetOverhours());
         var totalRequiredHours = workDays.Sum(x => x.RequiredHours);
-        var daysOffWork = workDays.Count(x => x.WorkDayType != Domain.Models.WorkDayType.Workday && x.WorkDayType != Domain.Models.WorkDayType.Undefined);
+        var daysOffWork = workDays.Count(x => x.WorkDayType is not Domain.Models.WorkDayType.Workday and not Domain.Models.WorkDayType.Undefined);
         var daysWorked = workDays.Count(x => x.WorkDayType == Domain.Models.WorkDayType.Workday);
 
         var workWeek = await _context.WorkWeeks.FirstOrDefaultAsync(x => x.ContractId == request.CurrentContract.Id && x.WeekNumber == request.CalendarWeek);

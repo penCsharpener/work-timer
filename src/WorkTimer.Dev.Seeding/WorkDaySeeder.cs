@@ -3,65 +3,64 @@ using System.Collections.Generic;
 using WorkTimer.Domain.Extensions;
 using WorkTimer.Domain.Models;
 
-namespace WorkTimer.Dev.Seeding
+namespace WorkTimer.Dev.Seeding;
+
+public class WorkDaySeeder : Seeder<WorkDay>
 {
-    public class WorkDaySeeder : Seeder<WorkDay>
+    private readonly Contract _contract;
+
+    public WorkDaySeeder(Contract contract)
     {
-        private readonly Contract _contract;
+        _contract = contract;
+    }
 
-        public WorkDaySeeder(Contract contract)
+    public WorkDaySeeder AddWorkDayRange(string startDateString, string endDateString)
+    {
+        if (DateTime.TryParse(startDateString, out var startDate) && DateTime.TryParse(endDateString, out var endDate))
         {
-            _contract = contract;
+            AddWorkDayRange(startDate, endDate);
         }
 
-        public WorkDaySeeder AddWorkDayRange(string startDateString, string endDateString)
-        {
-            if (DateTime.TryParse(startDateString, out var startDate) && DateTime.TryParse(endDateString, out var endDate))
-            {
-                AddWorkDayRange(startDate, endDate);
-            }
+        return this;
+    }
 
-            return this;
+    public WorkDaySeeder AddWorkDayRange(DateTime startDate, DateTime endDate)
+    {
+        var date = startDate.Date;
+        endDate = endDate.Date;
+
+        while (date <= endDate)
+        {
+            AddWorkDay(date, GetPeriodCountRandomly());
+
+            date = date.AddDays(1);
         }
 
-        public WorkDaySeeder AddWorkDayRange(DateTime startDate, DateTime endDate)
+        return this;
+    }
+
+    public WorkDaySeeder AddWorkDay(DateTime date, int numberOfPeriods)
+    {
+        if (date.ToWorkDayType() == WorkDayType.Workday)
         {
-            var date = startDate.Date;
-            endDate = endDate.Date;
+            var wd = new WorkDay { ContractId = _contract.Id, Date = date.Date, WorkingPeriods = new WorkingPeriodSeeder(0, date.Date, numberOfPeriods).Seed(), WorkDayType = date.ToWorkDayType() };
+            wd.RequiredHours = wd.GetRequiredHoursForDay(_contract.HoursPerWeek);
 
-            while (date <= endDate)
-            {
-                AddWorkDay(date, GetPeriodCountRandomly());
-
-                date = date.AddDays(1);
-            }
-
-            return this;
+            _list.Add(wd.CalculateTotalHours());
         }
 
-        public WorkDaySeeder AddWorkDay(DateTime date, int numberOfPeriods)
-        {
-            if (date.ToWorkDayType() == WorkDayType.Workday)
-            {
-                var wd = new WorkDay { ContractId = _contract.Id, Date = date.Date, WorkingPeriods = new WorkingPeriodSeeder(0, date.Date, numberOfPeriods).Seed(), WorkDayType = date.ToWorkDayType() };
-                wd.RequiredHours = wd.GetRequiredHoursForDay(_contract.HoursPerWeek);
+        return this;
+    }
 
-                _list.Add(wd.CalculateTotalHours());
-            }
+    public override IList<WorkDay> Seed()
+    {
+        return _list;
+    }
 
-            return this;
-        }
+    private int GetPeriodCountRandomly()
+    {
+        var rnd = _random.Next(200, 300);
 
-        public override IList<WorkDay> Seed()
-        {
-            return _list;
-        }
-
-        private int GetPeriodCountRandomly()
-        {
-            var rnd = _random.Next(200, 300);
-
-            return (int) Math.Round(rnd / 100d, 0);
-        }
+        return (int) Math.Round(rnd / 100d, 0);
     }
 }

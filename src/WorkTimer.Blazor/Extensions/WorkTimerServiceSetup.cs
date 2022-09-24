@@ -8,17 +8,16 @@ using WorkTimer.Messaging;
 using WorkTimer.Messaging.Abstractions;
 using WorkTimer.Messaging.Implementations;
 
-namespace WorkTimer.Blazor.Extensions
+namespace WorkTimer.Blazor.Extensions;
+
+public static class WorkTimerServiceSetup
 {
-    public static class WorkTimerServiceSetup
+    public static void AddWorkTimerServices(this IServiceCollection services)
     {
-        public static void AddWorkTimerServices(this IServiceCollection services)
-        {
-            services.AddMediatR(typeof(UserContext).Assembly);
-            services.AddSingleton<INow, NowTimeProvider>();
-            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UserIdPipeline<,>));
-            services.AddScoped<IMessageService, MessageService>();
-            services.AddHostedService<MessageWorker>();
-        }
+        services.AddMediatR(typeof(UserContext).Assembly);
+        services.AddSingleton<INow, NowTimeProvider>();
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UserIdPipeline<,>));
+        services.AddScoped<IMessageService, MessageService>();
+        services.AddHostedService<MessageWorker>();
     }
 }

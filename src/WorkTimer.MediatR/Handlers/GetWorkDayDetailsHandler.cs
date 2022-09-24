@@ -55,9 +55,8 @@ public class GetWorkDayDetailsHandler : IRequestHandler<GetWorkDayDetailsRequest
         var contracts = _context.Contracts.Where(x => x.UserId == request.User.Id)
             .Select(x => new ContractDropdownListModel { Id = x.Id, Name = x.Name }).ToList();
 
-        if (result != null)
-        {
-            return Task.FromResult(
+        return result != null
+            ? Task.FromResult(
                 new GetWorkDayDetailsResponse
                 {
                     WorkingPeriods = result.WorkingPeriods,
@@ -65,9 +64,7 @@ public class GetWorkDayDetailsHandler : IRequestHandler<GetWorkDayDetailsRequest
                     IsOpenWorkday = result.WorkingPeriods.Any(x => !x.EndTime.HasValue),
                     Contracts = contracts,
                     UserContext = new UserContext { User = request.User, UserEmail = request.UserEmail, UserIsAdmin = request.UserIsAdmin }
-                });
-        }
-
-        return null;
+                })
+            : null;
     }
 }

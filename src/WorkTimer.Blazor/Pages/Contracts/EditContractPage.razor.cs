@@ -40,7 +40,7 @@ public partial class EditContractPage
         }
     }
 
-    void OpenDialog()
+    private void OpenDialog()
     {
         DialogParameters parameters = new()
         {
@@ -50,7 +50,7 @@ public partial class EditContractPage
         DialogService.Show<ConfirmDeletionDialog>("Delete Item", parameters);
     }
 
-    async Task OkClickAsync()
+    private async Task OkClickAsync()
     {
         var result = await Mediator.Send(new DeleteContractRequest(Model) { User = Model.UserContext.User });
 

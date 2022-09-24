@@ -1,7 +1,6 @@
-﻿namespace WorkTimer.Domain.Models.Config
-{
-    public class ApplicationSettings
-    {
+﻿namespace WorkTimer.Domain.Models.Config;
 
-    }
+public class ApplicationSettings
+{
+
 }

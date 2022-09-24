@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
 
-namespace WorkTimer.Messaging.Abstractions
+namespace WorkTimer.Messaging.Abstractions;
+
+public interface IMessageService
 {
-    public interface IMessageService
-    {
-        Task RecalculateStatsAsync(int userId);
-        Task UpdateOnEditWorkdayAsync(int workdayId, int userId);
-        Task UpdateTotalHoursFromWorkDayAsync(int workDayId);
-    }
+    Task RecalculateStatsAsync(int userId);
+    Task UpdateOnEditWorkdayAsync(int workdayId, int userId);
+    Task UpdateTotalHoursFromWorkDayAsync(int workDayId);
 }

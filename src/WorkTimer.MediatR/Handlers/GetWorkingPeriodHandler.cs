@@ -51,9 +51,8 @@ public class GetWorkingPeriodHandler : IRequestHandler<GetWorkingPeriodRequest, 
         var workingPeriod = await _context.WorkingPeriods.Where(x => x.WorkDayId == request.WorkDayId && x.Id == request.WorkingPeriodId)
             .SingleOrDefaultAsync();
 
-        if (workingPeriod != null)
-        {
-            return new GetWorkingPeriodResponse
+        return workingPeriod != null
+            ? new GetWorkingPeriodResponse
             {
                 WorkingPeriod = workingPeriod,
                 StartDate = workingPeriod.StartTime.Date,
@@ -61,9 +60,7 @@ public class GetWorkingPeriodHandler : IRequestHandler<GetWorkingPeriodRequest, 
                 EndDate = workingPeriod.EndTime?.Date,
                 EndTime = workingPeriod.EndTime?.TimeOfDay,
                 UserContext = new UserContext { User = request.User, UserEmail = request.UserEmail, UserIsAdmin = request.UserIsAdmin, CurrentContract = request.CurrentContract }
-            };
-        }
-
-        return default;
+            }
+            : default;
     }
 }

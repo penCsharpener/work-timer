@@ -49,17 +49,11 @@ public class RestrictRegistrationHandler : IRequestHandler<RestrictRegistrationR
                 return Task.FromResult(CheckBlocked(request.UserEmail, userDomain));
             }
 
-            if (_config.PermittedEmails?.Any(x => x.Equals(request.UserEmail, StringComparison.InvariantCultureIgnoreCase)) == true)
-            {
-                return Task.FromResult(true);
-            }
-
-            if (_config.PermittedDomains?.Any(x => x.Equals(userDomain, StringComparison.InvariantCultureIgnoreCase)) == true)
-            {
-                return Task.FromResult(true);
-            }
-
-            return Task.FromResult(CheckBlocked(request.UserEmail, userDomain));
+            return _config.PermittedEmails?.Any(x => x.Equals(request.UserEmail, StringComparison.InvariantCultureIgnoreCase)) == true
+                ? Task.FromResult(true)
+                : _config.PermittedDomains?.Any(x => x.Equals(userDomain, StringComparison.InvariantCultureIgnoreCase)) == true
+                ? Task.FromResult(true)
+                : Task.FromResult(CheckBlocked(request.UserEmail, userDomain));
         }
         catch (Exception ex)
         {

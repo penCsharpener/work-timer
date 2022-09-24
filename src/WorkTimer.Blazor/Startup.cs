@@ -17,69 +17,68 @@ using WorkTimer.Blazor.Services;
 using WorkTimer.Domain.Models;
 using WorkTimer.Persistence.Extensions;
 
-namespace WorkTimer.Blazor
+namespace WorkTimer.Blazor;
+
+public class Startup
 {
-    public class Startup
+    public Startup(IConfiguration configuration)
     {
-        public Startup(IConfiguration configuration)
+        Configuration = configuration;
+    }
+
+    public IConfiguration Configuration { get; }
+
+    public void ConfigureServices(IServiceCollection services)
+    {
+        var mailSettings = Configuration.GetSection("MailKitOptions").Get<MailKitOptions>();
+        var passwordOptions = Configuration.GetSection(nameof(PasswordOptions)).Get<PasswordOptions>();
+        services.AddEntityFramework(Configuration);
+        services.AddHttpContextAccessor();
+        services.AddRazorPages();
+        services.AddSingleton(_ => RabbitHutch.CreateBus(Configuration.GetConnectionString("RabbitMqConnection")));
+        services.AddServerSideBlazor();
+        services.AddWorkTimerServices();
+        services.AddDatabaseDeveloperPageExceptionFilter();
+        services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<AppUser>>();
+        services.AddScoped<TokenProvider>();
+        services.AddSingleton(mailSettings);
+        services.AddSingleton(passwordOptions);
+        services.AddMailKit(options => options.UseMailKit(mailSettings));
+        services.AddMudServices();
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
         {
-            Configuration = configuration;
+            app.UseDeveloperExceptionPage();
+        }
+        else
+        {
+            app.UseExceptionHandler("/Error");
+            app.UseHsts();
         }
 
-        public IConfiguration Configuration { get; }
+        app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto });
 
-        public void ConfigureServices(IServiceCollection services)
+        if (Configuration?.GetValue<string>("ApplicationSettings:LaunchUrls")?.Contains("https") == true)
         {
-            MailKitOptions? mailSettings = Configuration.GetSection("MailKitOptions").Get<MailKitOptions>();
-            PasswordOptions? passwordOptions = Configuration.GetSection(nameof(PasswordOptions)).Get<PasswordOptions>();
-            services.AddEntityFramework(Configuration);
-            services.AddHttpContextAccessor();
-            services.AddRazorPages();
-            services.AddSingleton(_ => RabbitHutch.CreateBus(Configuration.GetConnectionString("RabbitMqConnection")));
-            services.AddServerSideBlazor();
-            services.AddWorkTimerServices();
-            services.AddDatabaseDeveloperPageExceptionFilter();
-            services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<AppUser>>();
-            services.AddScoped<TokenProvider>();
-            services.AddSingleton(mailSettings);
-            services.AddSingleton(passwordOptions);
-            services.AddMailKit(options => options.UseMailKit(mailSettings));
-            services.AddMudServices();
+            app.UseHttpsRedirection();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        app.UseMiddleware<ExceptionMiddleware>();
+        app.UseStaticFiles();
+
+        app.UseRouting();
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.UseEndpoints(endpoints =>
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-                app.UseHsts();
-            }
-
-            app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto });
-
-            if (Configuration?.GetValue<string>("ApplicationSettings:LaunchUrls")?.Contains("https") == true)
-            {
-                app.UseHttpsRedirection();
-            }
-
-            app.UseMiddleware<ExceptionMiddleware>();
-            app.UseStaticFiles();
-
-            app.UseRouting();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-                endpoints.MapBlazorHub();
-                endpoints.MapFallbackToPage("/_Host");
-            });
-        }
+            endpoints.MapControllers();
+            endpoints.MapBlazorHub();
+            endpoints.MapFallbackToPage("/_Host");
+        });
     }
 }

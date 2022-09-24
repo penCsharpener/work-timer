@@ -1,12 +1,11 @@
-﻿namespace WorkTimer.Messaging.MessageModels
-{
-    public class RecalculateStatsMessage
-    {
-        public int UserId { get; set; }
+﻿namespace WorkTimer.Messaging.MessageModels;
 
-        public RecalculateStatsMessage(int userId)
-        {
-            UserId = userId;
-        }
+public class RecalculateStatsMessage
+{
+    public int UserId { get; set; }
+
+    public RecalculateStatsMessage(int userId)
+    {
+        UserId = userId;
     }
 }

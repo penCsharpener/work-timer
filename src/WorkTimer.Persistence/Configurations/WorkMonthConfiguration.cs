@@ -2,13 +2,12 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using WorkTimer.Domain.Models;
 
-namespace WorkTimer.Persistence.Configurations
+namespace WorkTimer.Persistence.Configurations;
+
+public class WorkMonthConfiguration : IEntityTypeConfiguration<WorkMonth>
 {
-    public class WorkMonthConfiguration : IEntityTypeConfiguration<WorkMonth>
+    public void Configure(EntityTypeBuilder<WorkMonth> builder)
     {
-        public void Configure(EntityTypeBuilder<WorkMonth> builder)
-        {
-            builder.HasIndex(x => new { x.ContractId, x.Month, x.Year }).IsUnique();
-        }
+        builder.HasIndex(x => new { x.ContractId, x.Month, x.Year }).IsUnique();
     }
 }

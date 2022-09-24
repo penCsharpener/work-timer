@@ -3,10 +3,11 @@ using WorkTimer.Blazor.Areas.Identity;
 
 [assembly: HostingStartup(typeof(IdentityHostingStartup))]
 
-namespace WorkTimer.Blazor.Areas.Identity {
-    public class IdentityHostingStartup : IHostingStartup {
-        public void Configure(IWebHostBuilder builder) {
-            builder.ConfigureServices((context, services) => { });
-        }
+namespace WorkTimer.Blazor.Areas.Identity;
+public class IdentityHostingStartup : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder)
+    {
+        builder.ConfigureServices((context, services) => { });
     }
 }

@@ -8,7 +8,7 @@ namespace WorkTimer.Blazor.Pages.Contracts;
 
 public partial class ContractsPage
 {
-    public ContractListResponse Response { get; set; }
+    public ContractListResponse? Response { get; set; }
 
     [Inject]
     public IMediator Mediator { get; set; } = default!;

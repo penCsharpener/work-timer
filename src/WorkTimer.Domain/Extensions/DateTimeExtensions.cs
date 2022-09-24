@@ -3,82 +3,81 @@ using System.Collections.Generic;
 using System.Globalization;
 using WorkTimer.Domain.Models;
 
-namespace WorkTimer.Domain.Extensions
+namespace WorkTimer.Domain.Extensions;
+
+public static class DateTimeExtensions
 {
-    public static class DateTimeExtensions
+    private static readonly Calendar _calendar = new CultureInfo("de-DE").Calendar;
+
+    public static IEnumerable<DateTime> GetWholeWeek(this DateTime dateTime)
     {
-        private static Calendar _calendar = new CultureInfo("de-DE").Calendar;
+        var weekStart = dateTime;
 
-        public static IEnumerable<DateTime> GetWholeWeek(this DateTime dateTime)
+        while (weekStart.DayOfWeek != DayOfWeek.Monday)
         {
-            DateTime weekStart = dateTime;
-
-            while (weekStart.DayOfWeek != DayOfWeek.Monday)
-            {
-                weekStart = weekStart.AddDays(-1);
-            }
-
-            var list = new List<DateTime>();
-
-            for (int i = 0; i < 7; i++)
-            {
-                list.Add(weekStart.AddDays(i));
-            }
-
-            return list;
+            weekStart = weekStart.AddDays(-1);
         }
 
-        public static int GetWeekNumber(this DateTime dateTime)
+        var list = new List<DateTime>();
+
+        for (var i = 0; i < 7; i++)
         {
-            return _calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
+            list.Add(weekStart.AddDays(i));
         }
 
-        public static int GetWeekNumber(int year, int calendarWeek, out DateTime dayInThatWeek)
+        return list;
+    }
+
+    public static int GetWeekNumber(this DateTime dateTime)
+    {
+        return _calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
+    }
+
+    public static int GetWeekNumber(int year, int calendarWeek, out DateTime dayInThatWeek)
+    {
+        dayInThatWeek = new DateTime(year, 01, 01);
+
+        while (calendarWeek != _calendar.GetWeekOfYear(dayInThatWeek, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday) || dayInThatWeek.Year >= (year + 2))
         {
-            dayInThatWeek = new DateTime(year, 01, 01);
-
-            while (calendarWeek != _calendar.GetWeekOfYear(dayInThatWeek, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday) || dayInThatWeek.Year >= (year + 2))
-            {
-                dayInThatWeek = dayInThatWeek.AddDays(7);
-            }
-
-            return _calendar.GetWeekOfYear(dayInThatWeek, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
+            dayInThatWeek = dayInThatWeek.AddDays(7);
         }
 
-        public static double GetRequiredHoursForMonth(Contract contract, int year, int month)
+        return _calendar.GetWeekOfYear(dayInThatWeek, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
+    }
+
+    public static double GetRequiredHoursForMonth(Contract contract, int year, int month)
+    {
+        var date = new DateTime(year, month, 1);
+        var result = 0d;
+        var hoursPerDay = contract.HoursPerWeek / 5d;
+
+        while (date.Month == month)
         {
-            var date = new DateTime(year, month, 1);
-            var result = 0d;
-            var hoursPerDay = contract.HoursPerWeek / 5d;
+            result += date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Saturday ? 0 : hoursPerDay;
 
-            while (date.Month == month)
-            {
-                result += date.DayOfWeek == DayOfWeek.Sunday || date.DayOfWeek == DayOfWeek.Saturday ? 0 : hoursPerDay;
-
-                date = date.AddDays(1);
-            }
-
-            return Math.Round(result, 2);
+            date = date.AddDays(1);
         }
 
-        public static int GetTotalDaysInMonth(int month)
+        return Math.Round(result, 2);
+    }
+
+    public static int GetTotalDaysInMonth(int month)
+    {
+        return month switch
         {
-            return month switch
-            {
-                1 => 31,
-                2 => 28,
-                3 => 31,
-                4 => 30,
-                5 => 31,
-                6 => 30,
-                7 => 31,
-                8 => 31,
-                9 => 30,
-                10 => 31,
-                11 => 30,
-                12 => 31,
-                _ => 0
-            };
-        }
+            1 => 31,
+            2 => 28,
+            3 => 31,
+            4 => 30,
+            5 => 31,
+            6 => 30,
+            7 => 31,
+            8 => 31,
+            9 => 30,
+            10 => 31,
+            11 => 30,
+            12 => 31,
+            _ => 0
+        };
     }
 }
