@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 using WorkTimer.MediatR.Handlers;
 
-namespace WorkTimer.Blazor.Pages.Admin;
+namespace WorkTimer.Blazor.Pages.BulkActions;
 
-public partial class AdminPage
+public partial class BulkActionsPage
 {
     public AdminRequest RequestModel { get; set; } = new AdminRequest();
     public AdminResponse ResponseModel { get; set; } = new AdminResponse();
