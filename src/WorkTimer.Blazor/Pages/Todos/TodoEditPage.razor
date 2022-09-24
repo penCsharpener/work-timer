@@ -1,0 +1,9 @@
+﻿@page "/todos/edit/{TodoId:int}"
+
+<p>Todo @TodoId</p>
+
+@code {
+
+  [Parameter]
+  public int TodoId { get; set; }
+}

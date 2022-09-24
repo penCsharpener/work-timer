@@ -1,0 +1,39 @@
+﻿@page "/todos"
+
+<MudText Typo="Typo.h3">Todos</MudText>
+
+@if (_result != null && _result.Todos.Any())
+{
+  <MudTable @ref="_table" Items="_result.Todos" Dense="true" Striped="true" Hover="true" RowsPerPage="20" Breakpoint="Breakpoint.Xs" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+      <MudTh>Id</MudTh>
+      <MudTh>Title</MudTh>
+      <MudTh>Deadline</MudTh>
+      <MudTh>Priority</MudTh>
+      <MudTh>Created on</MudTh>
+      <MudTh>Edit</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+      <MudTd DataLabel="Id">@context.Id</MudTd>
+      <MudTd DataLabel="Title">@context.Title</MudTd>
+      <MudTd DataLabel="Deadline">@(context.Deadline.HasValue ? context.Deadline.Value.ToString() : string.Empty)</MudTd>
+      <MudTd DataLabel="Priority">@context.Priority</MudTd>
+      <MudTd DataLabel="Created on">@context.CreatedOn</MudTd>
+      <MudTd DataLabel="Edit">
+        <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Href="@($"todos/edit/{context.Id}")"></MudIconButton>
+      </MudTd>
+    </RowTemplate>
+  </MudTable>
+}
+
+@code {
+
+  private TodosQueryResponse? _result;
+  private MudTable<Todo>? _table;
+
+  protected override async Task OnInitializedAsync()
+  {
+    _result = await Mediator.Send(new TodosQuery());
+  }
+
+}

@@ -15,4 +15,8 @@
     <ProjectReference Include="..\WorkTimer.Persistence\WorkTimer.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="MediatR"/>
+  </ItemGroup>
+
 </Project>

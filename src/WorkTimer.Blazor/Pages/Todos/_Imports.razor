@@ -1,0 +1,8 @@
+﻿@using WorkTimer.Domain.Models
+@using WorkTimer.MediatR.Handlers.Todos
+@using global::MediatR
+
+@attribute [Authorize]
+@inject IMediator Mediator
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
