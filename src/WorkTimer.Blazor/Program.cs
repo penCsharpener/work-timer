@@ -5,6 +5,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using System;
+using System.Globalization;
+using System.Threading;
 using System.Threading.Tasks;
 using WorkTimer.Persistence.Extensions;
 
@@ -28,6 +30,9 @@ public sealed class Program
         try
         {
             Log.Information("Starting up");
+
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE");
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo("de-DE");
 
             var host = CreateHostBuilder(args).Build();
 

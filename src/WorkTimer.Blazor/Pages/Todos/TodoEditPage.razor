@@ -1,9 +1,74 @@
 ﻿@page "/todos/edit/{TodoId:int}"
+@using System.Text.RegularExpressions
+@using WorkTimer.Blazor.Validation
+@using WorkTimer.Domain.Models.Enums
 
-<p>Todo @TodoId</p>
+<MudCard>
+  <MudForm Model="@_result.Todo" @ref="@form" Validation="@(todoValidator.ValidateValue)" ValidationDelay="0">
+    <MudCardContent>
+      <MudTextField @bind-Value="_result.Todo.Title"
+                    For="@(() => _result.Todo.Title)"
+                    Immediate="true"
+                    Label="Title" />
+
+      <MudTextField @bind-Value="_result.Todo.Description"
+                    For="@(() => _result.Todo.Description)"
+                    Immediate="true"
+                    Lines="20"
+                    Label="Description" />
+
+      <MudDatePicker @bind-Value="_result.Todo.Deadline"
+                    For="@(() => _result.Todo.Deadline)"
+                    Label="Deadline" />
+
+      <MudSelect T="TodoPriority" @bind-Value="_result.Todo.Priority"
+                    For="@(() => _result.Todo.Priority)"
+                    Immediate="true"
+                    Label="Priority" >
+                    @foreach (var item in Enum.GetValues<TodoPriority>())
+                    {
+                      <MudSelectItem Value="item">@item.ToString()</MudSelectItem>
+                    }
+      </MudSelect>
+
+      <MudCheckBox @bind-Value="_result.Todo.IsContractIndependent"
+                   For="@(() => _result.Todo.IsContractIndependent)"
+                    Label="For all contracts?" />
+    </MudCardContent>
+  </MudForm>
+  <MudCardActions>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await SubmitAsync())">Save</MudButton>
+  </MudCardActions>
+</MudCard>
 
 @code {
 
   [Parameter]
   public int TodoId { get; set; }
+
+  private TodoEditValidator todoValidator = new TodoEditValidator();
+  private GetTodoQueryResult _result;
+  MudForm? form;
+
+  protected override async Task OnInitializedAsync()
+  {
+    _result = await Mediator.Send<GetTodoQueryResult>(new GetTodoQuery { Id = TodoId });
+  }
+
+  public async Task SubmitAsync()
+  {
+    if (form == null)
+    {
+      return;
+    }
+
+    await form.Validate();
+
+    if (!form.IsValid)
+    {
+      return;
+    }
+
+    await Mediator.Send(new EditTodoCommand { Todo = _result.Todo });
+  }
 }
