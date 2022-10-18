@@ -16,15 +16,12 @@ public partial class ContractsPage
     [Inject]
     public NavigationManager Navi { get; set; } = default!;
 
-    private readonly MudTheme Theme = new();
+    [Inject]
+    public MudTheme MudTheme { get; set; } = default!;
+
     protected override async Task OnInitializedAsync()
     {
         Response = await Mediator.Send(new ContractListRequest());
-    }
-
-    private string GetCardColor(bool isCurrentContract)
-    {
-        return isCurrentContract ? $"background-color: {Theme.Palette.BackgroundGrey};" : $"background-color: {Theme.Palette.Background};";
     }
 
     private string RedirectToCreateContract()

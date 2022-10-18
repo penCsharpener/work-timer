@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider/>
+<MudThemeProvider IsDarkMode="true" Theme="MudTheme" />
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 
@@ -25,6 +25,9 @@
 
 @code {
   bool _drawerOpen = true;
+
+  [Inject]
+  public MudTheme MudTheme { get; set; }
 
   void DrawerToggle()
   {

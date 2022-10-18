@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using MudBlazor;
 using WorkTimer.MediatR.Models;
 using WorkTimer.MediatR.Pipelines;
 using WorkTimer.MediatR.Services;
@@ -19,5 +20,6 @@ public static class WorkTimerServiceSetup
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UserIdPipeline<,>));
         services.AddScoped<IMessageService, MessageService>();
         services.AddHostedService<MessageWorker>();
+        services.AddSingleton(_ => new MudTheme());
     }
 }

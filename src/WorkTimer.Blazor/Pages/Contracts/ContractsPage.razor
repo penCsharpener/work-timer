@@ -11,7 +11,7 @@
   <div class="d-flex gap-10 flex-wrap">
     @foreach (var contract in Response.Contracts)
     {
-      <MudCard Elevation="@(contract.IsCurrent ? 10 : 3)" Style="@GetCardColor(contract.IsCurrent)">
+      <MudCard Elevation="@(contract.IsCurrent ? 10 : 3)">
         <MudCardHeader>
           <CardHeaderContent>
             <MudText Typo="Typo.h6">@contract.Name</MudText>
