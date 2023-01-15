@@ -23,9 +23,9 @@ public class LoginWithRecoveryCodeModel : PageModel
     }
 
     [BindProperty]
-    public InputModel Input { get; set; }
+    public InputModel Input { get; set; } = default!;
 
-    public string ReturnUrl { get; set; }
+    public string? ReturnUrl { get; set; }
 
     public async Task<IActionResult> OnGetAsync(string? returnUrl = null)
     {
@@ -86,6 +86,6 @@ public class LoginWithRecoveryCodeModel : PageModel
         [Required]
         [DataType(DataType.Text)]
         [Display(Name = "Recovery Code")]
-        public string RecoveryCode { get; set; }
+        public string RecoveryCode { get; set; } = default!;
     }
 }

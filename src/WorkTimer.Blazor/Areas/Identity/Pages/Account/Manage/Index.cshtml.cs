@@ -19,22 +19,22 @@ public class IndexModel : PageModel
         _signInManager = signInManager;
     }
 
-    public string Username { get; set; }
+    public string Username { get; set; } = default!;
 
     [TempData]
-    public string StatusMessage { get; set; }
+    public string StatusMessage { get; set; } = default!;
 
     [BindProperty]
-    public InputModel Input { get; set; }
+    public InputModel Input { get; set; } = default!;
 
     private async Task LoadAsync(AppUser user)
     {
         var userName = await _userManager.GetUserNameAsync(user);
         var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
-        Username = userName;
+        Username = userName!;
 
-        Input = new InputModel { PhoneNumber = phoneNumber };
+        Input = new InputModel { PhoneNumber = phoneNumber! };
     }
 
     public async Task<IActionResult> OnGetAsync()
@@ -91,6 +91,6 @@ public class IndexModel : PageModel
     {
         [Phone]
         [Display(Name = "Phone number")]
-        public string PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; } = default!;
     }
 }

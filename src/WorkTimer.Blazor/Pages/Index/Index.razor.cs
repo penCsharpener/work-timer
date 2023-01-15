@@ -24,6 +24,11 @@ public partial class Index
 
     private void PageChanged(int i)
     {
+        if (_tableWorkdays == null)
+        {
+            return;
+        }
+
         _tableWorkdays.NavigateTo(i - 1);
     }
 
@@ -49,6 +54,6 @@ public partial class Index
 
     private void EvaluateButtonText()
     {
-        dayButtonText = IndexResponse.HasOngoingWorkPeriod ? "Stop" : "Start";
+        dayButtonText = IndexResponse!.HasOngoingWorkPeriod ? "Stop" : "Start";
     }
 }

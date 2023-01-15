@@ -23,7 +23,7 @@ public static class DatabaseExtensions
         services.AddDefaultIdentity<AppUser>(options =>
         {
             options.SignIn.RequireConfirmedAccount = true;
-            options.Password = configuration.GetSection(nameof(PasswordOptions)).Get<PasswordOptions>();
+            options.Password = configuration.GetSection(nameof(PasswordOptions)).Get<PasswordOptions>()!;
         }).AddRoles<AppRole>().AddEntityFrameworkStores<AppDbContext>();
     }
 

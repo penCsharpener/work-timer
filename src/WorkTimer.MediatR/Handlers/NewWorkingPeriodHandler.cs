@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -17,7 +16,7 @@ namespace WorkTimer.MediatR.Handlers;
 
 public class NewWorkingPeriodRequest : UserContext, IRequest<EmptyResult>
 {
-    public string? Comment { get; set; }
+    public string Comment { get; set; }
 }
 
 public class NewWorkingPeriodHandler : TotalHoursBase, IRequestHandler<NewWorkingPeriodRequest, EmptyResult>

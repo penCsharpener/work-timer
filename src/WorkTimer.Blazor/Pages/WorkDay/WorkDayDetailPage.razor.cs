@@ -16,7 +16,7 @@ public partial class WorkDayDetailPage
     [Inject]
     public IDialogService DialogService { get; set; } = default!;
 
-    public GetWorkDayDetailsResponse? Model { get; set; }
+    public GetWorkDayDetailsResponse Model { get; set; } = default!;
 
     public WorkDayType[] WorkDayTypes { get; set; } = Enum.GetValues(typeof(WorkDayType)).Cast<WorkDayType>().ToArray();
 
@@ -36,7 +36,7 @@ public partial class WorkDayDetailPage
     {
         DialogParameters parameters = new()
         {
-            { "DeleteEntity", OkClickAsync },
+            { "DeleteEntity", (object) OkClickAsync },
         };
 
         DialogService.Show<ConfirmDeletionDialog>("Delete Item", parameters);

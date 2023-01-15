@@ -23,11 +23,11 @@ public class LoginWith2faModel : PageModel
     }
 
     [BindProperty]
-    public InputModel Input { get; set; }
+    public InputModel Input { get; set; } = default!;
 
-    public bool RememberMe { get; set; }
+    public bool RememberMe { get; set; } = default!;
 
-    public string ReturnUrl { get; set; }
+    public string? ReturnUrl { get; set; }
 
     public async Task<IActionResult> OnGetAsync(bool rememberMe, string? returnUrl = null)
     {
@@ -61,7 +61,7 @@ public class LoginWith2faModel : PageModel
             throw new InvalidOperationException("Unable to load two-factor authentication user.");
         }
 
-        var authenticatorCode = Input.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
+        var authenticatorCode = Input.TwoFactorCode?.Replace(" ", string.Empty).Replace("-", string.Empty) ?? string.Empty;
 
         var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, rememberMe, Input.RememberMachine);
 
@@ -91,7 +91,7 @@ public class LoginWith2faModel : PageModel
         [StringLength(7, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Text)]
         [Display(Name = "Authenticator code")]
-        public string TwoFactorCode { get; set; }
+        public string? TwoFactorCode { get; set; }
 
         [Display(Name = "Remember this machine")]
         public bool RememberMachine { get; set; }

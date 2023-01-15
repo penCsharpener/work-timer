@@ -26,24 +26,24 @@ public class EmailModel : PageModel
         _emailSender = emailSender;
     }
 
-    public string Username { get; set; }
+    public string Username { get; set; } = default!;
 
-    public string Email { get; set; }
+    public string Email { get; set; } = default!;
 
     public bool IsEmailConfirmed { get; set; }
 
     [TempData]
-    public string StatusMessage { get; set; }
+    public string StatusMessage { get; set; } = default!;
 
     [BindProperty]
-    public InputModel Input { get; set; }
+    public InputModel Input { get; set; } = default!;
 
     private async Task LoadAsync(AppUser user)
     {
         var email = await _userManager.GetEmailAsync(user);
-        Email = email;
+        Email = email!;
 
-        Input = new InputModel { NewEmail = email };
+        Input = new InputModel { NewEmail = email! };
 
         IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
     }
@@ -94,7 +94,7 @@ public class EmailModel : PageModel
             await _emailSender.SendEmailAsync(
                 Input.NewEmail,
                 "Confirm your email",
-                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl!)}'>clicking here</a>.");
 
             StatusMessage = "Confirmation link to change email sent. Please check your email.";
 
@@ -134,9 +134,9 @@ public class EmailModel : PageModel
             Request.Scheme);
 
         await _emailSender.SendEmailAsync(
-            email,
+            email!,
             "Confirm your email",
-            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl!)}'>clicking here</a>.");
 
         StatusMessage = "Verification email sent. Please check your email.";
 
@@ -148,6 +148,6 @@ public class EmailModel : PageModel
         [Required]
         [EmailAddress]
         [Display(Name = "New email")]
-        public string NewEmail { get; set; }
+        public string NewEmail { get; set; } = default!;
     }
 }

@@ -25,7 +25,7 @@ public class DeletePersonalDataModel : PageModel
     }
 
     [BindProperty]
-    public InputModel Input { get; set; }
+    public InputModel Input { get; set; } = default!;
 
     public bool RequirePassword { get; set; }
 
@@ -83,6 +83,6 @@ public class DeletePersonalDataModel : PageModel
     {
         [Required]
         [DataType(DataType.Password)]
-        public string Password { get; set; }
+        public string Password { get; set; } = default!;
     }
 }

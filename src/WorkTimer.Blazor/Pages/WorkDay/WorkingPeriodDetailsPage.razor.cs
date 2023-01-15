@@ -50,7 +50,7 @@ public partial class WorkingPeriodDetailsPage
     {
         DialogParameters parameters = new()
         {
-            { "DeleteEntity", OkClickAsync },
+            { "DeleteEntity", (object) OkClickAsync },
         };
 
         DialogService.Show<ConfirmDeletionDialog>("Delete", parameters);

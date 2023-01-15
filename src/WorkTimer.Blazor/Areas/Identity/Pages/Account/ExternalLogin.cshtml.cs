@@ -35,14 +35,14 @@ public class ExternalLoginModel : PageModel
     }
 
     [BindProperty]
-    public InputModel Input { get; set; }
+    public InputModel Input { get; set; } = default!;
 
-    public string ProviderDisplayName { get; set; }
+    public string? ProviderDisplayName { get; set; }
 
-    public string ReturnUrl { get; set; }
+    public string ReturnUrl { get; set; } = default!;
 
     [TempData]
-    public string ErrorMessage { get; set; }
+    public string ErrorMessage { get; set; } = default!;
 
     public IActionResult OnGetAsync()
     {
@@ -81,7 +81,7 @@ public class ExternalLoginModel : PageModel
         // Sign in the user with this external login provider if the user already has a login.
         var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false, true);
 
-        if (result.Succeeded)
+        if (result.Succeeded && info is { Principal.Identity: not null })
         {
             _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
 
@@ -95,11 +95,11 @@ public class ExternalLoginModel : PageModel
 
         // If the user does not have an account, then ask the user to create an account.
         ReturnUrl = returnUrl;
-        ProviderDisplayName = info.ProviderDisplayName;
+        ProviderDisplayName = info!.ProviderDisplayName;
 
-        if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+        if (info is { Principal: not null } && info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
         {
-            Input = new InputModel { Email = info.Principal.FindFirstValue(ClaimTypes.Email) };
+            Input = new InputModel { Email = info!.Principal.FindFirstValue(ClaimTypes.Email)! };
         }
 
         return Page();
@@ -144,7 +144,7 @@ public class ExternalLoginModel : PageModel
                         Request.Scheme);
 
                     await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                                                      $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                                                      $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl!)}'>clicking here</a>.");
 
                     // If account confirmation is required, we need to show the link if we don't have a real email sender
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
@@ -164,7 +164,7 @@ public class ExternalLoginModel : PageModel
             }
         }
 
-        ProviderDisplayName = info.ProviderDisplayName;
+        ProviderDisplayName = info!.ProviderDisplayName;
         ReturnUrl = returnUrl;
 
         return Page();
@@ -174,6 +174,6 @@ public class ExternalLoginModel : PageModel
     {
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string Email { get; set; } = default!;
     }
 }

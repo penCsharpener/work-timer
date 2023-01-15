@@ -5,40 +5,53 @@
 @inject NavigationManager Navi;
 @attribute [Authorize]
 
-<MudText Class="mb-2" Typo="Typo.h3">Timer</MudText>
+<div class="index__dashboard d-flex flex-row gap-8">
+  <div class="index__work-hours">
+    <MudText Class="mb-2" Typo="Typo.h3">Timer</MudText>
 
-<EditForm class="d-flex flex-row gap-3" Model="@NewPeriodModel" OnValidSubmit="@HandleValidSubmitAsync">
-    <DataAnnotationsValidator/>
-    <ValidationSummary/>
-    <MudTextField Label="Comment" @bind-Value="@NewPeriodModel.Comment"/>
-    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled">@dayButtonText</MudButton>
-    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Href="/blankWorkday">Add Day</MudButton>
-</EditForm>
+    <EditForm class="d-flex flex-row gap-3" Model="@NewPeriodModel" OnValidSubmit="@HandleValidSubmitAsync">
+      <DataAnnotationsValidator />
+      <ValidationSummary />
+      <MudTextField Label="Comment" @bind-Value="@NewPeriodModel.Comment" />
+      <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled">@dayButtonText</MudButton>
+      <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Href="/blankWorkday">Add Day</MudButton>
+    </EditForm>
 
-<MudText Typo="Typo.h4" Class="my-4">Most recent work periods</MudText>
+    <MudText Typo="Typo.h4" Class="my-4">Most recent work periods</MudText>
 
-<MudPaper Elevation="4">
-  <MudTable @ref="_tableRecent" Items="IndexResponse?.MostRecentWorkPeriods" Dense="true" Striped="true" Hover="true" RowsPerPage="20" Breakpoint="Breakpoint.Xs" LoadingProgressColor="Color.Info">
-      <HeaderContent>
+    <MudPaper Elevation="4">
+      <MudTable @ref="_tableRecent" Items="IndexResponse?.MostRecentWorkPeriods" Dense="true" Striped="true" Hover="true" RowsPerPage="20" Breakpoint="Breakpoint.Xs" LoadingProgressColor="Color.Info">
+        <HeaderContent>
           <MudTh>Id</MudTh>
           <MudTh>Start Time</MudTh>
           <MudTh>End Time</MudTh>
           <MudTh>Length</MudTh>
           <MudTh>Comment</MudTh>
           <MudTh>Edit</MudTh>
-      </HeaderContent>
-      <RowTemplate>
+        </HeaderContent>
+        <RowTemplate>
           <MudTd DataLabel="Id">@context.Id</MudTd>
           <MudTd DataLabel="Start Time">@context.StartTime.ToString()</MudTd>
           <MudTd DataLabel="End Time">@context.EndTime.ToString()</MudTd>
           <MudTd DataLabel="Length">@context.GetWorkTime().ToTimeString()</MudTd>
           <MudTd DataLabel="Comment">@context.Comment</MudTd>
           <MudTd DataLabel="Edit">
-              <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Href="@($"workday/{context.WorkDayId}/workperiod/{context.Id}")"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Href="@($"workday/{context.WorkDayId}/workperiod/{context.Id}")"></MudIconButton>
           </MudTd>
-      </RowTemplate>
-  </MudTable>
-</MudPaper>
+        </RowTemplate>
+      </MudTable>
+    </MudPaper>
+  </div>
+  <div class="index__widgets d-flex flex-column flex-grow-1">
+    <div class="index__todos d-flex flex-initial">
+      <TodoWidgetComponent></TodoWidgetComponent>
+    </div>
+    <div class="index__notes">
+    </div>
+  </div>
+</div>
+
+
 
 @if (IndexResponse?.WorkDays?.Items.Any() == true)
 {

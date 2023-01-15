@@ -23,7 +23,7 @@ public class ResetAuthenticatorModel : PageModel
     }
 
     [TempData]
-    public string StatusMessage { get; set; }
+    public string StatusMessage { get; set; } = default!;
 
     public async Task<IActionResult> OnGet()
     {

@@ -8,12 +8,12 @@ public static class WorkDayExtensions
 {
     public static bool IsUnfinishedWorkday(this WorkDay workday)
     {
-        return workday.WorkingPeriods.Any(wp => !wp.EndTime.HasValue);
+        return workday.WorkingPeriods?.Any(wp => !wp.EndTime.HasValue) == true;
     }
 
     public static WorkingPeriod? GetOngoingWorkingPeriod(this WorkDay workDay)
     {
-        return workDay.WorkingPeriods.FirstOrDefault(wp => wp.EndTime is null);
+        return workDay.WorkingPeriods?.FirstOrDefault(wp => wp.EndTime is null);
     }
 
     public static double GetContractedHoursPerDay(this Contract contract)
@@ -60,7 +60,7 @@ public static class WorkDayExtensions
     {
         if (workday.WorkingPeriods?.Count > 0)
         {
-            workday.TotalHours = workday.WorkingPeriods.Where(x => x.EndTime.HasValue).Sum(x => (x.EndTime.Value - x.StartTime).TotalHours);
+            workday.TotalHours = workday.WorkingPeriods.Where(x => x.EndTime.HasValue).Sum(x => (x.EndTime!.Value - x.StartTime).TotalHours);
         }
 
         return workday;

@@ -22,11 +22,11 @@ public class RegisterConfirmationModel : PageModel
         _sender = sender;
     }
 
-    public string Email { get; set; }
+    public string Email { get; set; } = default!;
 
     public bool DisplayConfirmAccountLink { get; set; }
 
-    public string EmailConfirmationUrl { get; set; }
+    public string EmailConfirmationUrl { get; set; } = default!;
 
     public async Task<IActionResult> OnGetAsync(string email, string? returnUrl = null)
     {
@@ -56,7 +56,7 @@ public class RegisterConfirmationModel : PageModel
                 "/Account/ConfirmEmail",
                 null,
                 new { area = "Identity", userId, code, returnUrl },
-                Request.Scheme);
+                Request.Scheme)!;
         }
 
         return Page();

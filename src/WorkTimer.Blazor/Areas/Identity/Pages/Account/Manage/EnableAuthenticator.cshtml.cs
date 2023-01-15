@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
@@ -27,18 +28,18 @@ public class EnableAuthenticatorModel : PageModel
         _urlEncoder = urlEncoder;
     }
 
-    public string SharedKey { get; set; }
+    public string SharedKey { get; set; } = default!;
 
-    public string AuthenticatorUri { get; set; }
-
-    [TempData]
-    public string[] RecoveryCodes { get; set; }
+    public string AuthenticatorUri { get; set; } = default!;
 
     [TempData]
-    public string StatusMessage { get; set; }
+    public string[] RecoveryCodes { get; set; } = default!;
+
+    [TempData]
+    public string StatusMessage { get; set; } = default!;
 
     [BindProperty]
-    public InputModel Input { get; set; }
+    public InputModel Input { get; set; } = default!;
 
     public async Task<IActionResult> OnGetAsync()
     {
@@ -93,7 +94,7 @@ public class EnableAuthenticatorModel : PageModel
         if (await _userManager.CountRecoveryCodesAsync(user) == 0)
         {
             var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
-            RecoveryCodes = recoveryCodes.ToArray();
+            RecoveryCodes = recoveryCodes?.ToArray() ?? Array.Empty<string>();
 
             return RedirectToPage("./ShowRecoveryCodes");
         }
@@ -112,10 +113,10 @@ public class EnableAuthenticatorModel : PageModel
             unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
         }
 
-        SharedKey = FormatKey(unformattedKey);
+        SharedKey = FormatKey(unformattedKey!);
 
         var email = await _userManager.GetEmailAsync(user);
-        AuthenticatorUri = GenerateQrCodeUri(email, unformattedKey);
+        AuthenticatorUri = GenerateQrCodeUri(email!, unformattedKey!);
     }
 
     private string FormatKey(string unformattedKey)
@@ -152,6 +153,6 @@ public class EnableAuthenticatorModel : PageModel
         [StringLength(7, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Text)]
         [Display(Name = "Verification Code")]
-        public string Code { get; set; }
+        public string Code { get; set; } = default!;
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
 using WorkTimer.Domain.Models;
 using WorkTimer.Domain.Models.Enums;
 
@@ -13,7 +12,6 @@ public class NoteConfiguration : IEntityTypeConfiguration<Note>
         builder.Property(x => x.UserId).IsRequired();
         builder.Property(x => x.Title).IsRequired();
         builder.Property(x => x.Description).IsRequired().HasDefaultValue(TodoPriority.Medium);
-        builder.Property(x => x.CreatedOn).HasDefaultValue(DateTime.Now);
 
         builder.HasOne(x => x.AppUser).WithMany(x => x.Notes).HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
         builder.HasOne(x => x.Contract).WithMany(x => x.Notes).HasForeignKey(x => x.ContractId).OnDelete(DeleteBehavior.Cascade);

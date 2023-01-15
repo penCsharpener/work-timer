@@ -24,7 +24,7 @@ public class ForgotPasswordModel : PageModel
     }
 
     [BindProperty]
-    public InputModel Input { get; set; }
+    public InputModel Input { get; set; } = default!;
 
     public async Task<IActionResult> OnPostAsync()
     {
@@ -47,7 +47,7 @@ public class ForgotPasswordModel : PageModel
                 "/Account/ResetPassword",
                 null,
                 new { area = "Identity", code },
-                Request.Scheme);
+                Request.Scheme)!;
 
             await _emailSender.SendEmailAsync(
                 Input.Email,
@@ -64,6 +64,6 @@ public class ForgotPasswordModel : PageModel
     {
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string Email { get; set; } = default!;
     }
 }

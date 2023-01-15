@@ -14,6 +14,7 @@ public sealed class Todo
     public TodoPriority Priority { get; set; }
     public int ContractId { get; set; }
     public Contract Contract { get; set; } = default!;
+    public bool IsCompleted { get; set; }
     public bool IsContractIndependent { get; set; }
     public DateTime CreatedOn { get; set; } = DateTime.Now;
 }

@@ -1,0 +1,42 @@
+﻿@using WorkTimer.Domain.Models;
+@using WorkTimer.MediatR.Handlers.Todos
+@using global::MediatR
+@inject IMediator Mediator
+@inject NavigationManager Navi;
+@attribute [Authorize]
+
+<div class="d-flex flex-grow-1 justify-center align-content-center">
+@if(Todos is not null && Todos.Count > 0)
+{
+@*  @foreach (var todo in Todos)
+  {*@
+      <MudPaper Elevation="4">
+        <MudTable @ref="_tableRef" Items="Todos" Dense="true" Striped="true" Hover="true" RowsPerPage="5" Breakpoint="Breakpoint.Xs" LoadingProgressColor="Color.Info">
+          <HeaderContent>
+            <MudTh>Title</MudTh>
+            <MudTh>Deadline</MudTh>
+            <MudTh>Prio</MudTh>
+          </HeaderContent>
+          <RowTemplate>
+            <MudTd DataLabel="Title">@context.Title</MudTd>
+            <MudTd DataLabel="Deadline">@context.Deadline?.ToLongDateString()</MudTd>
+            <MudTd DataLabel="Prio">@context.Priority.ToString()</MudTd>
+          </RowTemplate>
+        </MudTable>
+      </MudPaper>
+  @*}*@
+}
+</div>
+
+
+@code {
+
+  public List<Todo> Todos { get; set; }
+  private MudTable<Domain.Models.Todo>? _tableRef;
+
+  protected override async Task OnInitializedAsync()
+  {
+    var result = await Mediator.Send(new GetTodoForWidgetQuery());
+    Todos = result.Todos;
+  }
+}
