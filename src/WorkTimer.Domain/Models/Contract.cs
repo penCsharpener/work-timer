@@ -14,5 +14,7 @@ public class Contract
     public TimeSpan TotalOverhours { get; set; }
 
     public ICollection<WorkDay>? WorkDays { get; set; }
+    public ICollection<Todo>? Todos { get; set; }
+    public ICollection<Note>? Notes { get; set; }
     public AppUser? User { get; set; }
 }

@@ -18,4 +18,6 @@ public class AppUser : IdentityUser<int>
     }
 
     public ICollection<Contract>? Contracts { get; set; }
+    public ICollection<Todo> Todos { get; set; }
+    public ICollection<Note> Notes { get; set; }
 }

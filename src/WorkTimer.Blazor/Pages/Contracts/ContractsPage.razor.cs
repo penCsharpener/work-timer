@@ -1,6 +1,5 @@
 using MediatR;
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
 using System.Threading.Tasks;
 using WorkTimer.MediatR.Handlers;
 
@@ -15,9 +14,6 @@ public partial class ContractsPage
 
     [Inject]
     public NavigationManager Navi { get; set; } = default!;
-
-    [Inject]
-    public MudTheme MudTheme { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {

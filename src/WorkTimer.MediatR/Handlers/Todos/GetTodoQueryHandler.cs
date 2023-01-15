@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WorkTimer.Domain.Models;
@@ -20,30 +21,16 @@ public sealed class GetTodoQueryResult
 public sealed class GetTodoQueryHandler : IRequestHandler<GetTodoQuery, GetTodoQueryResult>
 {
     private readonly AppDbContext _context;
-    private static readonly Random random = new(4);
 
     public GetTodoQueryHandler(AppDbContext context)
     {
         _context = context;
     }
 
-    public Task<GetTodoQueryResult> Handle(GetTodoQuery request, CancellationToken cancellationToken)
+    public async Task<GetTodoQueryResult> Handle(GetTodoQuery request, CancellationToken cancellationToken)
     {
-        var result = new GetTodoQueryResult
-        {
-            Todo = new Todo()
-            {
-                Id = request.Id,
-                ContactId = 1,
-                CreatedOn = DateTime.Now,
-                Deadline = DateTime.Now.AddDays(random.NextInt64(1, 3)),
-                IsContractIndependent = true,
-                Priority = (Domain.Models.Enums.TodoPriority) random.NextInt64(0, 3),
-                Title = "Title " + request.Id,
-                UserId = request.User.Id
-            }
-        };
+        var todo = await _context.Todos.Where(t => t.Id == request.Id && t.UserId == request.User.Id && (t.IsContractIndependent || t.ContractId == request.CurrentContract.Id)).FirstAsync(cancellationToken);
 
-        return Task.FromResult(result);
+        return new() { Todo = todo };
     }
 }

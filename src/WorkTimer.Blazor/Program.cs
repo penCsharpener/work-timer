@@ -43,6 +43,10 @@ public sealed class Program
                 try
                 {
                     await sp.MigrateDatabaseAsync();
+
+#if DEBUG
+                    await sp.SeedDatabase();
+#endif
                 }
                 catch (Exception ex)
                 {

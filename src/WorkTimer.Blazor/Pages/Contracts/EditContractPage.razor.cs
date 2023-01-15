@@ -44,7 +44,7 @@ public partial class EditContractPage
     {
         DialogParameters parameters = new()
         {
-            { "DeleteEntity", OkClickAsync },
+            { "DeleteEntity", (object) OkClickAsync },
         };
 
         DialogService.Show<ConfirmDeletionDialog>("Delete Item", parameters);

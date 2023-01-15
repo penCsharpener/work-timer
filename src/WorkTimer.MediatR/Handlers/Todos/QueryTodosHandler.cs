@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WorkTimer.Domain.Models;
 using WorkTimer.MediatR.Models;
+using WorkTimer.Persistence.Data;
 
 namespace WorkTimer.MediatR.Handlers.Todos;
 
@@ -20,30 +21,22 @@ public sealed class TodosQueryResponse
 
 public class QueryTodosHandler : IRequestHandler<TodosQuery, TodosQueryResponse>
 {
-    public Task<TodosQueryResponse> Handle(TodosQuery request, CancellationToken cancellationToken)
-    {
+    private readonly AppDbContext _context;
 
-        var todos = Enumerable.Range(1, 200).Select(i => new Todo()
-        {
-            Id = i,
-            ContactId = i % 23 == 0 ? 2 : 1,
-            CreatedOn = DateTime.Now.AddDays(-i + 1),
-            Deadline = i % 17 == 0 ? DateTime.Now.AddDays(i) : null,
-            Description = $"Description " + i,
-            IsContractIndependent = i % 47 == 0,
-            Priority = i % 19 == 0 ? Domain.Models.Enums.TodoPriority.High : Domain.Models.Enums.TodoPriority.Medium,
-            Title = "Title " + i,
-            UserId = 1,
-        }).OrderBy(t => t.Deadline ?? DateTime.MaxValue)
-        .ThenByDescending(t => t.Priority)
-        .ThenBy(t => t.CreatedOn)
-        .ToList();
+    public QueryTodosHandler(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<TodosQueryResponse> Handle(TodosQuery request, CancellationToken cancellationToken)
+    {
+        var todos = await _context.Todos.Where(t => t.UserId == request.User.Id && (t.IsContractIndependent || t.ContractId == request.CurrentContract.Id)).ToListAsync(cancellationToken);
 
         var response = new TodosQueryResponse()
         {
             Todos = todos
         };
 
-        return Task.FromResult(response);
+        return response;
     }
 }

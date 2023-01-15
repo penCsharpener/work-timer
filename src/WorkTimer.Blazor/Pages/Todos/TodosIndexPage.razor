@@ -26,6 +26,10 @@
   </MudTable>
 }
 
+<div class="fixed-add-button">
+  <MudFab Color="Color.Secondary" Icon="@Icons.Material.Filled.Add" Href="todos/add"></MudFab>
+</div>
+
 @code {
 
   private TodosQueryResponse? _result;
@@ -35,5 +39,4 @@
   {
     _result = await Mediator.Send(new TodosQuery());
   }
-
 }

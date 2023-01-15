@@ -1,4 +1,5 @@
 ﻿@page "/todos/edit/{TodoId:int}"
+@page "/todos/add"
 @using System.Text.RegularExpressions
 @using WorkTimer.Blazor.Validation
 @using WorkTimer.Domain.Models.Enums
@@ -19,7 +20,10 @@
 
       <MudDatePicker @bind-Value="_result.Todo.Deadline"
                     For="@(() => _result.Todo.Deadline)"
-                    Label="Deadline" />
+                     Clearable="true"
+                     MinDate="DateTime.Now.AddDays(-1)"
+                     Required="false"
+                     Label="Deadline" />
 
       <MudSelect T="TodoPriority" @bind-Value="_result.Todo.Priority"
                     For="@(() => _result.Todo.Priority)"
@@ -41,6 +45,10 @@
   </MudCardActions>
 </MudCard>
 
+<div class="fixed-add-button">
+  <MudFab Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" OnClick="DeleteAsync"></MudFab>
+</div>
+
 @code {
 
   [Parameter]
@@ -52,6 +60,13 @@
 
   protected override async Task OnInitializedAsync()
   {
+    if (TodoId == 0)
+    {
+      _result = new() { Todo = new() };
+
+      return;
+    }
+
     _result = await Mediator.Send<GetTodoQueryResult>(new GetTodoQuery { Id = TodoId });
   }
 
@@ -69,6 +84,29 @@
       return;
     }
 
+    if (TodoId == 0)
+    {
+      var newTodoId = await Mediator.Send(new AddTodoCommand { Todo = _result.Todo });
+      _result.Todo.Id = newTodoId;
+      NavigationManager.NavigateTo($"/todos/edit/{newTodoId}");
+
+      return;
+    }
+
     await Mediator.Send(new EditTodoCommand { Todo = _result.Todo });
+
+    NavigationManager.NavigateTo("/todos");
+  }
+
+  private async Task DeleteAsync()
+  {
+    if (TodoId == 0)
+    {
+      return;
+    }
+
+    await Mediator.Send(new DeleteTodoCommand(TodoId));
+
+    NavigationManager.NavigateTo("/todos");
   }
 }

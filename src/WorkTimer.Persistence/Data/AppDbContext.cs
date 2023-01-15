@@ -13,6 +13,8 @@ public class AppDbContext : IdentityDbContext<AppUser, AppRole, int>
     public DbSet<WorkWeek> WorkWeeks { get; set; }
     public DbSet<WorkMonth> WorkMonths { get; set; }
     public DbSet<Contract> Contracts { get; set; }
+    public DbSet<Todo> Todos { get; set; }
+    public DbSet<Note> Notes { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
